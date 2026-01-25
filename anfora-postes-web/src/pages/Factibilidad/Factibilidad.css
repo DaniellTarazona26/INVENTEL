@@ -1,0 +1,101 @@
+/* src/pages/Factibilidad/Factibilidad.css */
+
+.factibilidad-container {
+  padding: 0;
+  max-width: 100%;
+}
+
+.page-main-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: #000;
+}
+
+/* =============================================
+   TABS PRINCIPALES (Agregar vs Ver Registros)
+   ============================================= */
+.tabs-principales {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 3px solid #e5e7eb;
+}
+
+.tab-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: -3px;
+}
+
+.tab-btn:hover {
+  color: #111827;
+  background-color: #f3f4f6;
+}
+
+.tab-btn.active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+/* =============================================
+   CONTENIDO
+   ============================================= */
+.factibilidad-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 0;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 768px) {
+  .factibilidad-container {
+    padding: 0.5rem;
+  }
+
+  .page-main-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .tabs-principales {
+    gap: 0.25rem;
+  }
+
+  .tab-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs-principales {
+    flex-direction: column;
+    border-bottom: none;
+    gap: 0;
+  }
+
+  .tab-btn {
+    width: 100%;
+    text-align: left;
+    border-left: 3px solid transparent;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 0;
+    padding: 0.75rem 1rem;
+  }
+
+  .tab-btn.active {
+    border-left-color: #3b82f6;
+    border-bottom-color: #e5e7eb;
+  }
+}

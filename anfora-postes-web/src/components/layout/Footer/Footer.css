@@ -1,0 +1,17 @@
+.footer {
+  background-color: #1e293b;
+  color: #cbd5e1;
+  text-align: center;
+  padding: 1.25rem 2rem;
+  font-size: 0.875rem;
+  border-top: 1px solid #334155;
+}
+
+.footer p {
+  margin: 0.25rem 0;
+}
+
+.footer-credits {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}

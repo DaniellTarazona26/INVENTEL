@@ -1,0 +1,172 @@
+.inventario-page h2 {
+  margin-bottom: 1rem;
+  color: var(--primary-dark);
+}
+
+.inventario-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.inventario-filtros > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.inventario-filtros label {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.inventario-filtros input,
+.inventario-filtros select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+}
+
+.btn-primary {
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background-color: var(--primary-blue);
+  color: #fff;
+  cursor: pointer;
+}
+
+.inventario-tabla table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.inventario-tabla th,
+.inventario-tabla td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 0.75rem;
+}
+
+.inventario-tabla thead {
+  background-color: #e5f0ff;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--primary-blue);
+  margin-right: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* Header con botón */
+.inventario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.inventario-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.btn-primary {
+  padding: 0.6rem 1.5rem;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #059669;
+}
+
+.btn-secondary {
+  padding: 0.6rem 1.5rem;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: #4b5563;
+}
+
+/* Stats */
+.inventario-stats {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+/* Acciones */
+.acciones-btns {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.btn-ver:hover {
+  background-color: #dbeafe;
+}
+
+.btn-editar:hover {
+  background-color: #fef3c7;
+}
+
+.btn-eliminar:hover {
+  background-color: #fee2e2;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  margin-top: 1rem;
+  color: #6b7280;
+}
