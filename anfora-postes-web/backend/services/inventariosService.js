@@ -10,7 +10,6 @@ const inventariosService = {
     try {
       await client.query('BEGIN')
       
-      // Convertir nombre de barrio a ID si es necesario
       let barrioId = datos.barrio
       
       if (datos.barrio && isNaN(datos.barrio)) {
@@ -26,12 +25,10 @@ const inventariosService = {
         }
       }
 
-      // Validar que empresa sea obligatoria
       if (!datos.empresaId) {
         throw new Error('La empresa es obligatoria')
       }
 
-      // Obtener nombre del usuario
       const usuarioQuery = await client.query(
         'SELECT nombre FROM usuarios WHERE id = $1',
         [usuarioId]
@@ -52,7 +49,7 @@ const inventariosService = {
           elementos_adicionales, lampara, camara_tv, corneta, aviso, caja_metalica, otro, posible_fraude,
           estado_estructura, desplomado, flectado, fracturado, hierro_base,
           poda_arboles, operadores, 
-          usuario_id, inspector_nombre, created_by, ciudad_id, empresa_id, proyecto_id
+          usuario_id, inspector_nombre, created_by, ciudad_id, empresa_id
         ) VALUES (
           $1, $2, $3, $4, $5, $6, $7,
           $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
@@ -60,7 +57,7 @@ const inventariosService = {
           $28, $29, $30, $31, $32, $33, $34, $35, $36, $37,
           $38, $39, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $50,
           $51, $52, $53, $54, $55, $56, $57,
-          $58, $59, $60, $61, $62, $63
+          $58, $59, $60, $61, $62
         )
         RETURNING *
       `
@@ -129,8 +126,7 @@ const inventariosService = {
         inspectorNombre,
         usuarioId,
         datos.ciudadId || null,
-        datos.empresaId,
-        datos.proyectoId || null
+        datos.empresaId
       ]
       
       const result = await client.query(query, values)
@@ -155,7 +151,6 @@ const inventariosService = {
         c.nombre as ciudad_nombre,
         e.nombre as empresa_nombre,
         u.nombre as usuario_nombre,
-        p.nombre as proyecto_nombre,
         creator.nombre as creado_por_nombre,
         updater.nombre as actualizado_por_nombre
       FROM inventarios i
@@ -163,7 +158,6 @@ const inventariosService = {
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN empresas e ON i.empresa_id = e.id
       LEFT JOIN usuarios u ON i.usuario_id = u.id
-      LEFT JOIN proyectos p ON i.proyecto_id = p.id
       LEFT JOIN usuarios creator ON i.created_by = creator.id
       LEFT JOIN usuarios updater ON i.updated_by = updater.id
       WHERE i.estado = 'activo'
@@ -190,12 +184,6 @@ const inventariosService = {
       paramCount++
     }
     
-    if (filtros.proyectoId) {
-      query += ` AND i.proyecto_id = $${paramCount}`
-      values.push(filtros.proyectoId)
-      paramCount++
-    }
-    
     query += ` ORDER BY i.fecha_registro DESC`
     
     const result = await pool.query(query, values)
@@ -210,7 +198,6 @@ const inventariosService = {
         c.nombre as ciudad_nombre,
         e.nombre as empresa_nombre,
         u.nombre as usuario_nombre,
-        p.nombre as proyecto_nombre,
         creator.nombre as creado_por_nombre,
         updater.nombre as actualizado_por_nombre
       FROM inventarios i
@@ -218,7 +205,6 @@ const inventariosService = {
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN empresas e ON i.empresa_id = e.id
       LEFT JOIN usuarios u ON i.usuario_id = u.id
-      LEFT JOIN proyectos p ON i.proyecto_id = p.id
       LEFT JOIN usuarios creator ON i.created_by = creator.id
       LEFT JOIN usuarios updater ON i.updated_by = updater.id
       WHERE i.id = $1 AND i.estado = 'activo'
@@ -319,9 +305,8 @@ const inventariosService = {
           operadores = $57,
           ciudad_id = $58,
           empresa_id = $59,
-          proyecto_id = $60,
-          updated_by = $61
-        WHERE id = $62 AND estado = 'activo'
+          updated_by = $60
+        WHERE id = $61 AND estado = 'activo'
         RETURNING *
       `
       
@@ -385,7 +370,6 @@ const inventariosService = {
         JSON.stringify(datos.operadores || []),
         datos.ciudadId || null,
         datos.empresaId,
-        datos.proyectoId || null,
         usuarioId,
         id
       ]

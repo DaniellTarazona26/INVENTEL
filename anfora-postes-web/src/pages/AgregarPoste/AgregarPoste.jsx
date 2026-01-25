@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import './AgregarPoste.css'
 import inventarioService from '../../services/inventarioService'
 import ciudadesService from '../../services/ciudadesService'
-import proyectosService from '../../services/proyectosService'
 import operadoresService from '../../services/operadoresService'
 import empresasService from '../../services/empresasService'
 
@@ -13,8 +12,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
   const [ciudades, setCiudades] = useState([])
   const [barrios, setBarrios] = useState([])
   const [empresas, setEmpresas] = useState([])
-  const [proyectos, setProyectos] = useState([])
-  const [proyectosFiltrados, setProyectosFiltrados] = useState([])
   const [operadores, setOperadores] = useState([])
 
   const [seccionesAbiertas, setSeccionesAbiertas] = useState({
@@ -29,7 +26,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
   const [formData, setFormData] = useState({
     ciudadId: '',
     empresaId: '',
-    proyectoId: '',
     barrio: '',
     direccion1: '',
     direccion2: '',
@@ -95,28 +91,9 @@ const AgregarPoste = ({ setCurrentPage }) => {
   useEffect(() => {
     cargarCiudades()
     cargarEmpresas()
-    cargarProyectos()
     cargarOperadores()
   }, [])
 
-  useEffect(() => {
-    if (formData.empresaId) {
-      const proyectosDeLaEmpresa = proyectos.filter(
-        p => p.empresa_id == formData.empresaId
-      )
-      setProyectosFiltrados(proyectosDeLaEmpresa)
-      
-      const proyectoActualValido = proyectosDeLaEmpresa.find(
-        p => p.id == formData.proyectoId
-      )
-      if (!proyectoActualValido) {
-        setFormData(prev => ({ ...prev, proyectoId: '' }))
-      }
-    } else {
-      setProyectosFiltrados([])
-      setFormData(prev => ({ ...prev, proyectoId: '' }))
-    }
-  }, [formData.empresaId, proyectos])
 
   useEffect(() => {
     if (formData.ciudadId) {
@@ -217,7 +194,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
         setFormData({
           ciudadId: inv.ciudad_id || '',
           empresaId: empresaIdDelInventario,
-          proyectoId: inv.proyecto_id || '',
           barrio: inv.barrio_id || '',
           direccion1: inv.direccion_campo1 || '',
           direccion2: inv.direccion_campo2 || '',
@@ -695,7 +671,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
       setFormData({
         ciudadId: '',
         empresaId: '',
-        proyectoId: '',
         barrio: '',
         direccion1: '',
         direccion2: '',
@@ -764,7 +739,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
       setFormData({
         ciudadId: '',
         empresaId: '',
-        proyectoId: '',
         barrio: '',
         direccion1: '',
         direccion2: '',
@@ -903,27 +877,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
             </div>
 
             <div className="form-grid form-grid-2">
-              <div className="form-group">
-                <label>Proyecto:</label>
-                <select 
-                  value={formData.proyectoId}
-                  onChange={(e) => handleInputChange('proyectoId', e.target.value)}
-                  disabled={!formData.empresaId}
-                >
-                  <option value="">
-                    {!formData.empresaId 
-                      ? 'Primero seleccione una empresa' 
-                      : 'Seleccione proyecto (opcional)'
-                    }
-                  </option>
-                  {proyectosFiltrados.map(proyecto => (
-                    <option key={proyecto.id} value={proyecto.id}>
-                      {proyecto.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+              
               <div className="form-group">
                 <label>Barrio: *</label>
                 <select 

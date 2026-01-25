@@ -30,7 +30,6 @@ const inventarioService = {
       const params = new URLSearchParams()
       if (filtros.ciudadId) params.append('ciudad_id', filtros.ciudadId)
       if (filtros.barrioId) params.append('barrio_id', filtros.barrioId)
-      if (filtros.proyectoId) params.append('proyecto_id', filtros.proyectoId)
       
       const response = await axios.get(
         `${API_URL}/inventarios?${params.toString()}`,
