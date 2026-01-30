@@ -9,18 +9,21 @@
   overflow-y: auto;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
   border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-nav {
   padding: 1rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.sidebar-item-wrapper {
-  margin-bottom: 0.25rem;
-}
-
-/* Items del menú */
-.sidebar-item {
+/* ============================================
+   NAV ITEMS Y SECCIONES
+   ============================================ */
+.nav-item {
   width: 100%;
   display: flex;
   align-items: center;
@@ -37,97 +40,87 @@
   border-left: 3px solid transparent;
 }
 
-.sidebar-item:hover {
+.nav-item:hover {
   background-color: #e8f4f8;
   color: #2c3e50;
 }
 
-.sidebar-item.active {
+.nav-item.active {
   background-color: #d6eaf8;
   color: #1e3a8a;
   border-left-color: #3498db;
   font-weight: 500;
 }
 
-.sidebar-item.open {
-  background-color: #f0f4f8;
-  color: #2c3e50;
-}
-
-.sidebar-icon {
+.nav-icon {
   font-size: 1.2rem;
   width: 28px;
   text-align: center;
   flex-shrink: 0;
 }
 
-.sidebar-label {
+.nav-text {
   flex: 1;
   font-weight: 400;
 }
 
-.dropdown-arrow {
-  margin-left: auto;
-  font-size: 0.7rem;
-  transition: transform 0.2s ease;
-  color: #95a5a6;
+/* ============================================
+   SECCIONES (Inventario, Factibilidad)
+   ============================================ */
+.nav-section {
+  margin-bottom: 0.5rem;
 }
 
-/* Submenú */
-.submenu {
-  background-color: #ffffff;
-  border-left: 3px solid #e0e0e0;
-  animation: slideDown 0.2s ease-out;
-  overflow: hidden;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 300px;
-  }
-}
-
-.submenu-item {
-  width: 100%;
-  display: block;
-  padding: 0.7rem 1.25rem 0.7rem 3.5rem;
-  background: transparent;
-  border: none;
-  color: #6b7280;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  position: relative;
-  border-left: 3px solid transparent;
-}
-
-.submenu-item::before {
-  content: "•";
-  position: absolute;
-  left: 2.5rem;
+.nav-section-title {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
   color: #9ca3af;
-  font-size: 1.2rem;
+  letter-spacing: 0.05em;
 }
 
-.submenu-item:hover {
-  background-color: #f3f4f6;
-  color: #2c3e50;
+/* ============================================
+   FOOTER CON BADGE DE ROL
+   ============================================ */
+.nav-footer {
+  margin-top: auto;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e0e0e0;
 }
 
-.submenu-item.active {
-  background-color: #dbeafe;
-  color: #1e40af;
-  border-left-color: #3b82f6;
-  font-weight: 500;
+.rol-badge {
+  display: block;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
 }
 
-/* Scrollbar personalizado */
+.rol-badge.rol-admin {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.rol-badge.rol-inspector {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(240, 147, 251, 0.3);
+}
+
+.rol-badge.rol-consultor {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(79, 172, 254, 0.3);
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
 .sidebar::-webkit-scrollbar {
   width: 6px;
 }
@@ -145,19 +138,21 @@
   background: #9ca3af;
 }
 
-/* Responsive */
+/* ============================================
+   RESPONSIVE
+   ============================================ */
 @media (max-width: 768px) {
   .sidebar {
     width: 200px;
     min-width: 200px;
   }
   
-  .sidebar-item {
+  .nav-item {
     padding: 0.7rem 1rem;
     font-size: 0.9rem;
   }
   
-  .submenu-item {
-    padding-left: 2.5rem;
+  .nav-section-title {
+    padding: 0.5rem 1rem;
   }
 }

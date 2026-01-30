@@ -8,8 +8,8 @@ router.use(verificarToken);
 
 router.get('/', operadoresController.obtenerOperadores);
 router.get('/:id', operadoresController.obtenerOperadorPorId);
-router.post('/', verificarRol('admin', 'supervisor'), operadoresController.crearOperador);
-router.put('/:id', verificarRol('admin', 'supervisor'), operadoresController.actualizarOperador);
-router.delete('/:id', verificarRol('admin'), operadoresController.eliminarOperador);
+router.post('/', verificarRol('ADMIN', 'supervisor'), operadoresController.crearOperador);
+router.put('/:id', verificarRol('ADMIN', 'supervisor'), operadoresController.actualizarOperador);
+router.delete('/:id', verificarRol('ADMIN'), operadoresController.eliminarOperador);
 
 module.exports = router;

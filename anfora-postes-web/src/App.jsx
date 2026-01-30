@@ -19,7 +19,7 @@ function App() {
   const [cargando, setCargando] = useState(true)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [pendingDestination, setPendingDestination] = useState(null)
-  
+  const [factibilidadEditandoId, setFactibilidadEditandoId] = useState(null) // ← AGREGAR
 
   // Verificar si hay sesión al cargar
   useEffect(() => {
@@ -53,14 +53,19 @@ function App() {
     setCurrentPage('inicio')
   }
 
-  const handleNavegacion = (destino) => {
+  const handleNavegacion = (destino, factibilidadId = null) => { // ← MODIFICADO
     const enEdicion = localStorage.getItem('editarInventarioId')
     
     if (currentPage === 'agregar' && enEdicion) {
-      // Guardar destino pendiente y mostrar modal
       setPendingDestination(destino)
       setShowConfirmModal(true)
     } else {
+      // ✅ Si hay ID, guardarlo para modo edición
+      if (factibilidadId) {
+        setFactibilidadEditandoId(factibilidadId)
+      } else {
+        setFactibilidadEditandoId(null)
+      }
       setCurrentPage(destino)
     }
   }
@@ -77,7 +82,6 @@ function App() {
     setPendingDestination(null)
   }
 
-  // Mostrar loading mientras verifica
   if (cargando) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -86,12 +90,11 @@ function App() {
     )
   }
 
-  // Si no está autenticado, mostrar login
   if (!isAuthenticated) {
     return <Login onLogin={handleLogin} />
   }
 
-  // Renderizar contenido según la página activa
+  
   const renderPage = () => {
     switch (currentPage) {
       case 'inicio':
@@ -101,7 +104,12 @@ function App() {
       case 'agregar':
         return <AgregarPoste setCurrentPage={handleNavegacion} />
       case 'factibilidad':
-        return <Factibilidad />
+        return (
+          <Factibilidad 
+            setCurrentPage={handleNavegacion}
+            factibilidadEditandoId={factibilidadEditandoId} // ← PASAR EL ID
+          />
+        )
       case 'reportes':
         return <Reportes />
       case 'importar':
@@ -135,3 +143,4 @@ function App() {
 }
 
 export default App
+

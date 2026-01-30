@@ -201,27 +201,6 @@
   gap: 0.5rem;
 }
 
-.btn-obtener-posicion {
-  margin-top: 1rem;
-  padding: 0.6rem 1.5rem;
-  background-color: #6b7280;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.btn-obtener-posicion:hover {
-  background-color: #4b5563;
-}
-
-.btn-obtener-posicion:active {
-  background-color: #374151;
-}
-
 .form-row {
   margin-bottom: 0.75rem;
 }
@@ -314,47 +293,52 @@
   flex: 1;
 }
 
+/* MENSAJE FIJO ABAJO */
 .mensaje-estado {
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  animation: fadeIn 0.3s ease;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: slideUpMessage 0.3s ease-out;
+  min-width: 300px;
+  text-align: center;
 }
 
-@keyframes fadeIn {
+@keyframes slideUpMessage {
   from {
+    bottom: -50px;
     opacity: 0;
-    transform: translateY(-10px);
   }
   to {
+    bottom: 20px;
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .mensaje-success {
-  background-color: #d1fae5;
-  border: 1px solid #10b981;
-  color: #065f46;
+  background-color: #10b981;
+  color: white;
 }
 
 .mensaje-error {
-  background-color: #fee2e2;
-  border: 1px solid #ef4444;
-  color: #991b1b;
+  background-color: #ef4444;
+  color: white;
 }
 
 .mensaje-info {
-  background-color: #dbeafe;
-  border: 1px solid #3b82f6;
-  color: #1e40af;
+  background-color: #3b82f6;
+  color: white;
 }
 
 .form-actions {
   margin-top: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -459,7 +443,14 @@
   .btn-guardar {
     width: 100%;
   }
+
+  .mensaje-estado {
+    min-width: 90%;
+    left: 5%;
+    transform: translateX(0);
+  }
 }
+
 .header-section {
   display: flex;
   justify-content: space-between;

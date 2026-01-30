@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
       fecha_inicio: req.query.fecha_inicio,
       fecha_fin: req.query.fecha_fin,
       busqueda: req.query.busqueda,
-      completo: req.query.completo, // 'true', 'false', undefined
+      completo: req.query.completo,
       estado: req.query.estado || 'activo',
       limit: parseInt(req.query.limit) || 100,
       offset: parseInt(req.query.offset) || 0
@@ -82,7 +82,7 @@ router.post('/', async (req, res) => {
   try {
     const datos = req.body;
 
-    // Validaciones básicas
+    // Validaciones obligatorias
     if (!datos.proyecto_id) {
       return res.status(400).json({
         success: false,
@@ -90,14 +90,21 @@ router.post('/', async (req, res) => {
       });
     }
 
-    if (!datos.propietario) {
+    if (!datos.empresa_id) {
       return res.status(400).json({
         success: false,
-        error: 'El propietario es obligatorio'
+        error: 'La empresa es obligatoria'
       });
     }
 
-    // Obtener usuario_id del token/sesión (ajusta según tu auth)
+    if (!datos.operador_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'El operador es obligatorio'
+      });
+    }
+
+    // Obtener usuario_id del token/sesión
     const usuario_id = req.user?.id || req.body.usuario_id || null;
     
     if (usuario_id) {

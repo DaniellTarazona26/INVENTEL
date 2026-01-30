@@ -8,8 +8,8 @@ router.use(verificarToken);
 
 router.get('/', barriosController.obtenerBarrios);
 router.get('/:id', barriosController.obtenerBarrioPorId);
-router.post('/', verificarRol('admin', 'supervisor'), barriosController.crearBarrio);
-router.put('/:id', verificarRol('admin', 'supervisor'), barriosController.actualizarBarrio);
-router.delete('/:id', verificarRol('admin'), barriosController.eliminarBarrio);
+router.post('/', verificarRol('ADMIN', 'supervisor'), barriosController.crearBarrio);
+router.put('/:id', verificarRol('ADMIN', 'supervisor'), barriosController.actualizarBarrio);
+router.delete('/:id', verificarRol('ADMIN'), barriosController.eliminarBarrio);
 
 module.exports = router;

@@ -11,7 +11,7 @@ router.post('/login', authController.login);
 router.get('/verificar', verificarToken, authController.verificarSesion);
 router.post('/cambiar-password', verificarToken, authController.cambiarPassword);
 
-// Solo admin puede registrar usuarios
+// Solo ADMIN puede registrar usuarios
 router.post('/registro', verificarToken, authController.registro);
 
 module.exports = router;

@@ -12,8 +12,9 @@ import FormularioBarrio from '../../components/FormularioBarrio'
 import FormularioProyecto from '../../components/FormularioProyecto'
 import './Opciones.css'
 
+
 const Opciones = () => {
-  const [seccionActiva, setSeccionActiva] = useState('usuarios')
+  const [seccionActiva, setSeccionActiva] = useState('proyectos') // ← CAMBIO: Empieza en proyectos
   const [datos, setDatos] = useState([])
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState('')
@@ -22,11 +23,45 @@ const Opciones = () => {
   const [itemSeleccionado, setItemSeleccionado] = useState(null)
   
   const usuario = authService.getUsuarioActual()
-  const esAdmin = usuario?.rol === 'admin'
+  const rol = usuario?.rol || 'CONSULTOR' // ← CAMBIO: Usar rol en mayúsculas
+  const esAdmin = rol === 'ADMIN' // ← CAMBIO
+  const esInspector = rol === 'INSPECTOR' // ← NUEVO
 
+  // ============================================
+  // NUEVO: Definir qué secciones puede ver cada rol
+  // ============================================
+  const seccionesPermitidas = {
+    ADMIN: ['usuarios', 'operadores', 'ciudades', 'barrios', 'proyectos'],
+    INSPECTOR: ['proyectos'],
+    CONSULTOR: []
+  }
+
+  const puedeVerSeccion = (seccion) => {
+    return seccionesPermitidas[rol]?.includes(seccion) || false
+  }
+
+  // ============================================
+  // NUEVO: Si no tiene acceso, mostrar mensaje
+  // ============================================
+  if (!puedeVerSeccion(seccionActiva) && seccionesPermitidas[rol].length === 0) {
+    return (
+      <div className="opciones-page">
+        <div className="access-denied">
+          <span className="icon">🚫</span>
+          <h2>Acceso Denegado</h2>
+          <p>No tienes permisos para acceder a esta sección.</p>
+        </div>
+      </div>
+    )
+  }
+
+  // ============================================
+  // RESTO DEL CÓDIGO ORIGINAL (sin cambios)
+  // ============================================
   useEffect(() => {
     cargarDatos()
   }, [seccionActiva])
+
 
   const cargarDatos = async () => {
     setCargando(true)
@@ -57,11 +92,9 @@ const Opciones = () => {
       
       console.log(`✅ Datos cargados para ${seccionActiva}:`, respuesta)
       
-      // Si respuesta es array directo, usarlo. Si es objeto, extraer el array
       if (Array.isArray(respuesta)) {
         setDatos(respuesta)
       } else if (respuesta && typeof respuesta === 'object') {
-        // Extraer el array del objeto {usuarios: [...], operadores: [...], etc}
         const arrayKey = Object.keys(respuesta).find(key => Array.isArray(respuesta[key]))
         setDatos(arrayKey ? respuesta[arrayKey] : [])
       } else {
@@ -77,11 +110,13 @@ const Opciones = () => {
     }
   }
 
+
   const abrirModalNuevo = () => {
     setModoEdicion(false)
     setItemSeleccionado(null)
     setMostrarModal(true)
   }
+
 
   const abrirModalEditar = (item) => {
     setModoEdicion(true)
@@ -89,14 +124,17 @@ const Opciones = () => {
     setMostrarModal(true)
   }
 
+
   const cerrarModal = () => {
     setMostrarModal(false)
     setItemSeleccionado(null)
     setModoEdicion(false)
   }
 
+
   const eliminarItem = async (id) => {
     if (!window.confirm('¿Está seguro de eliminar este registro?')) return
+
 
     try {
       switch (seccionActiva) {
@@ -124,6 +162,7 @@ const Opciones = () => {
     }
   }
 
+
   const renderTabla = () => {
     if (cargando) {
       return (
@@ -133,6 +172,7 @@ const Opciones = () => {
         </div>
       )
     }
+
 
     if (error) {
       return (
@@ -145,11 +185,12 @@ const Opciones = () => {
       )
     }
 
+
     if (!datos || datos.length === 0) {
       return (
         <div className="opciones-empty">
           <p>No hay registros para mostrar</p>
-          {esAdmin && (
+          {(esAdmin || esInspector) && ( // ← CAMBIO: Inspector también puede agregar proyectos
             <button onClick={abrirModalNuevo} className="btn-agregar">
               + Agregar Nuevo
             </button>
@@ -157,6 +198,7 @@ const Opciones = () => {
         </div>
       )
     }
+
 
     switch (seccionActiva) {
       case 'usuarios':
@@ -168,11 +210,12 @@ const Opciones = () => {
       case 'barrios':
         return <TablaBarrios datos={datos} onEditar={abrirModalEditar} onEliminar={eliminarItem} esAdmin={esAdmin} />
       case 'proyectos':
-        return <TablaProyectos datos={datos} onEditar={abrirModalEditar} onEliminar={eliminarItem} esAdmin={esAdmin} />
+        return <TablaProyectos datos={datos} onEditar={abrirModalEditar} onEliminar={eliminarItem} esAdmin={esAdmin || esInspector} /> 
       default:
         return null
     }
   }
+
 
   return (
     <div className="opciones-page">
@@ -181,51 +224,72 @@ const Opciones = () => {
         <p>Gestión de datos maestros del sistema</p>
       </div>
 
+
       <div className="opciones-tabs">
-        <button 
-          className={seccionActiva === 'usuarios' ? 'tab-active' : ''}
-          onClick={() => setSeccionActiva('usuarios')}
-        >
-          👥 Usuarios
-        </button>
-        <button 
-          className={seccionActiva === 'operadores' ? 'tab-active' : ''}
-          onClick={() => setSeccionActiva('operadores')}
-        >
-          📡 Operadores
-        </button>
-        <button 
-          className={seccionActiva === 'ciudades' ? 'tab-active' : ''}
-          onClick={() => setSeccionActiva('ciudades')}
-        >
-          🏙️ Ciudades
-        </button>
-        <button 
-          className={seccionActiva === 'barrios' ? 'tab-active' : ''}
-          onClick={() => setSeccionActiva('barrios')}
-        >
-          🏘️ Barrios
-        </button>
-        <button 
-          className={seccionActiva === 'proyectos' ? 'tab-active' : ''}
-          onClick={() => setSeccionActiva('proyectos')}
-        >
-          📋 Proyectos
-        </button>
+        {/* ============================================ */}
+        {/* CAMBIO: Solo mostrar tabs permitidas */}
+        {/* ============================================ */}
+        {puedeVerSeccion('usuarios') && (
+          <button 
+            className={seccionActiva === 'usuarios' ? 'tab-active' : ''}
+            onClick={() => setSeccionActiva('usuarios')}
+          >
+            👥 Usuarios
+          </button>
+        )}
+        
+        {puedeVerSeccion('operadores') && (
+          <button 
+            className={seccionActiva === 'operadores' ? 'tab-active' : ''}
+            onClick={() => setSeccionActiva('operadores')}
+          >
+            📡 Operadores
+          </button>
+        )}
+        
+        {puedeVerSeccion('ciudades') && (
+          <button 
+            className={seccionActiva === 'ciudades' ? 'tab-active' : ''}
+            onClick={() => setSeccionActiva('ciudades')}
+          >
+            🏙️ Ciudades
+          </button>
+        )}
+        
+        {puedeVerSeccion('barrios') && (
+          <button 
+            className={seccionActiva === 'barrios' ? 'tab-active' : ''}
+            onClick={() => setSeccionActiva('barrios')}
+          >
+            🏘️ Barrios
+          </button>
+        )}
+        
+        {puedeVerSeccion('proyectos') && (
+          <button 
+            className={seccionActiva === 'proyectos' ? 'tab-active' : ''}
+            onClick={() => setSeccionActiva('proyectos')}
+          >
+            📋 Proyectos
+          </button>
+        )}
       </div>
+
 
       <div className="opciones-content">
         <div className="opciones-toolbar">
           <h2>{getTituloSeccion(seccionActiva)}</h2>
-          {esAdmin && (
+          {(esAdmin || (esInspector && seccionActiva === 'proyectos')) && ( // ← CAMBIO
             <button onClick={abrirModalNuevo} className="btn-nuevo">
               + Nuevo {getNombreSeccion(seccionActiva)}
             </button>
           )}
         </div>
 
+
         {renderTabla()}
       </div>
+
 
       {mostrarModal && seccionActiva === 'usuarios' && (
         <FormularioUsuario
@@ -236,6 +300,7 @@ const Opciones = () => {
         />
       )}
 
+
       {mostrarModal && seccionActiva === 'operadores' && (
         <FormularioOperador
           modoEdicion={modoEdicion}
@@ -244,6 +309,7 @@ const Opciones = () => {
           onGuardar={cargarDatos}
         />
       )}
+
 
       {mostrarModal && seccionActiva === 'ciudades' && (
         <FormularioCiudad
@@ -254,6 +320,7 @@ const Opciones = () => {
         />
       )}
 
+
       {mostrarModal && seccionActiva === 'barrios' && (
         <FormularioBarrio
           modoEdicion={modoEdicion}
@@ -262,6 +329,7 @@ const Opciones = () => {
           onGuardar={cargarDatos}
         />
       )}
+
 
       {mostrarModal && seccionActiva === 'proyectos' && (
         <FormularioProyecto
@@ -274,6 +342,11 @@ const Opciones = () => {
     </div>
   )
 }
+
+
+// ============================================
+// TABLAS (sin cambios)
+// ============================================
 
 const TablaUsuarios = ({ datos, onEditar, onEliminar, esAdmin }) => (
   <table className="opciones-table">
@@ -309,6 +382,7 @@ const TablaUsuarios = ({ datos, onEditar, onEliminar, esAdmin }) => (
   </table>
 )
 
+
 const TablaOperadores = ({ datos, onEditar, onEliminar, esAdmin }) => (
   <table className="opciones-table">
     <thead>
@@ -343,6 +417,7 @@ const TablaOperadores = ({ datos, onEditar, onEliminar, esAdmin }) => (
   </table>
 )
 
+
 const TablaCiudades = ({ datos, onEditar, onEliminar, esAdmin }) => (
   <table className="opciones-table">
     <thead>
@@ -373,6 +448,7 @@ const TablaCiudades = ({ datos, onEditar, onEliminar, esAdmin }) => (
   </table>
 )
 
+
 const TablaBarrios = ({ datos, onEditar, onEliminar, esAdmin }) => (
   <table className="opciones-table">
     <thead>
@@ -401,13 +477,14 @@ const TablaBarrios = ({ datos, onEditar, onEliminar, esAdmin }) => (
   </table>
 )
 
+
 const TablaProyectos = ({ datos, onEditar, onEliminar, esAdmin }) => (
   <table className="opciones-table">
     <thead>
       <tr>
         <th>ID</th>
         <th>Nombre</th>
-        <th>Operador</th>
+        <th>Empresa</th>
         <th>Ciudad</th>
         <th>N° Solicitud</th>
         <th>Estado</th>
@@ -419,7 +496,7 @@ const TablaProyectos = ({ datos, onEditar, onEliminar, esAdmin }) => (
         <tr key={item.id}>
           <td>{item.id}</td>
           <td>{item.nombre}</td>
-          <td>{item.operador_nombre || '-'}</td>
+          <td>{item.empresa_nombre || '-'}</td>
           <td>{item.ciudad_nombre || '-'}</td>
           <td>{item.numero_solicitud || '-'}</td>
           <td><span className={`estado estado-${item.estado}`}>{item.estado}</span></td>
@@ -435,6 +512,7 @@ const TablaProyectos = ({ datos, onEditar, onEliminar, esAdmin }) => (
   </table>
 )
 
+
 const getTituloSeccion = (seccion) => {
   const titulos = {
     usuarios: 'Gestión de Usuarios',
@@ -446,6 +524,7 @@ const getTituloSeccion = (seccion) => {
   return titulos[seccion] || ''
 }
 
+
 const getNombreSeccion = (seccion) => {
   const nombres = {
     usuarios: 'Usuario',
@@ -456,5 +535,6 @@ const getNombreSeccion = (seccion) => {
   }
   return nombres[seccion] || ''
 }
+
 
 export default Opciones

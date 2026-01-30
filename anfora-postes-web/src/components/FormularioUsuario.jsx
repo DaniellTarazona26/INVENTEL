@@ -156,10 +156,9 @@ const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
               disabled={cargando}
               required
             >
-              <option value="admin">Administrador</option>
-              <option value="supervisor">Supervisor</option>
-              <option value="inspector">Inspector</option>
-              <option value="operador">Operador</option>
+              <option value="ADMIN">Administrador</option>
+              <option value="INSPECTOR">Inspector</option>
+              <option value="CONSULTOR">Consultor</option>
             </select>
           </div>
 

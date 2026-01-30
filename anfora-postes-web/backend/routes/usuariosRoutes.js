@@ -13,16 +13,16 @@ router.get('/', usuariosController.obtenerUsuarios);
 // Obtener usuario por ID
 router.get('/:id', usuariosController.obtenerUsuarioPorId);
 
-// Crear usuario (solo admin)
-router.post('/', verificarRol('admin'), usuariosController.crearUsuario);
+// Crear usuario (solo ADMIN)
+router.post('/', verificarRol('ADMIN'), usuariosController.crearUsuario);
 
-// Actualizar usuario (solo admin)
-router.put('/:id', verificarRol('admin'), usuariosController.actualizarUsuario);
+// Actualizar usuario (solo ADMIN)
+router.put('/:id', verificarRol('ADMIN'), usuariosController.actualizarUsuario);
 
-// Desactivar usuario (solo admin)
-router.delete('/:id', verificarRol('admin'), usuariosController.eliminarUsuario);
+// Desactivar usuario (solo ADMIN)
+router.delete('/:id', verificarRol('ADMIN'), usuariosController.eliminarUsuario);
 
-// Activar usuario (solo admin)
-router.patch('/:id/activar', verificarRol('admin'), usuariosController.activarUsuario);
+// Activar usuario (solo ADMIN)
+router.patch('/:id/activar', verificarRol('ADMIN'), usuariosController.activarUsuario);
 
 module.exports = router;

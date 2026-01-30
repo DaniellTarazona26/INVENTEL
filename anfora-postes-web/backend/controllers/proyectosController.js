@@ -6,10 +6,12 @@ const obtenerProyectos = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT p.*, 
+              e.nombre as empresa_nombre,
               o.nombre as operador_nombre,
               c.nombre as ciudad_nombre,
               u.nombre as supervisor_nombre
        FROM proyectos p
+       LEFT JOIN empresas e ON p.empresa_id = e.id
        LEFT JOIN operadores o ON p.operador_id = o.id
        LEFT JOIN ciudades c ON p.ciudad_id = c.id
        LEFT JOIN usuarios u ON p.supervisor_id = u.id
@@ -34,10 +36,12 @@ const obtenerProyectoPorId = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT p.*, 
+              e.nombre as empresa_nombre,
               o.nombre as operador_nombre,
               c.nombre as ciudad_nombre,
               u.nombre as supervisor_nombre
        FROM proyectos p
+       LEFT JOIN empresas e ON p.empresa_id = e.id
        LEFT JOIN operadores o ON p.operador_id = o.id
        LEFT JOIN ciudades c ON p.ciudad_id = c.id
        LEFT JOIN usuarios u ON p.supervisor_id = u.id
@@ -63,13 +67,21 @@ const obtenerProyectoPorId = async (req, res) => {
 // Crear proyecto
 const crearProyecto = async (req, res) => {
   const { 
-    nombre, operador_id, ciudad_id, numero_solicitud, 
+    nombre, empresa_id, operador_id, ciudad_id, numero_solicitud, 
     fecha_radicado, fecha_revision, supervisor_id, estado, descripcion 
   } = req.body;
 
   try {
     if (!nombre) {
       return res.status(400).json({ error: 'El nombre es requerido' });
+    }
+
+    if (!empresa_id) {
+      return res.status(400).json({ error: 'La empresa es requerida' });
+    }
+
+    if (!ciudad_id) {
+      return res.status(400).json({ error: 'La ciudad es requerida' });
     }
 
     // Verificar si el número de solicitud ya existe
@@ -88,14 +100,15 @@ const crearProyecto = async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO proyectos 
-       (nombre, operador_id, ciudad_id, numero_solicitud, fecha_radicado, 
+       (nombre, empresa_id, operador_id, ciudad_id, numero_solicitud, fecha_radicado, 
         fecha_revision, supervisor_id, estado, descripcion)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
       [
         nombre, 
-        operador_id || null, 
-        ciudad_id || null, 
+        empresa_id, 
+        operador_id || null,
+        ciudad_id, 
         numero_solicitud || null,
         fecha_radicado || null, 
         fecha_revision || null, 
@@ -121,7 +134,7 @@ const crearProyecto = async (req, res) => {
 const actualizarProyecto = async (req, res) => {
   const { id } = req.params;
   const { 
-    nombre, operador_id, ciudad_id, numero_solicitud, 
+    nombre, empresa_id, operador_id, ciudad_id, numero_solicitud, 
     fecha_radicado, fecha_revision, supervisor_id, estado, descripcion 
   } = req.body;
 
@@ -129,18 +142,19 @@ const actualizarProyecto = async (req, res) => {
     const result = await pool.query(
       `UPDATE proyectos 
        SET nombre = COALESCE($1, nombre),
-           operador_id = COALESCE($2, operador_id),
-           ciudad_id = COALESCE($3, ciudad_id),
-           numero_solicitud = COALESCE($4, numero_solicitud),
-           fecha_radicado = COALESCE($5, fecha_radicado),
-           fecha_revision = COALESCE($6, fecha_revision),
-           supervisor_id = COALESCE($7, supervisor_id),
-           estado = COALESCE($8, estado),
-           descripcion = COALESCE($9, descripcion),
+           empresa_id = COALESCE($2, empresa_id),
+           operador_id = COALESCE($3, operador_id),
+           ciudad_id = COALESCE($4, ciudad_id),
+           numero_solicitud = COALESCE($5, numero_solicitud),
+           fecha_radicado = COALESCE($6, fecha_radicado),
+           fecha_revision = COALESCE($7, fecha_revision),
+           supervisor_id = COALESCE($8, supervisor_id),
+           estado = COALESCE($9, estado),
+           descripcion = COALESCE($10, descripcion),
            fecha_actualizacion = CURRENT_TIMESTAMP
-       WHERE id = $10
+       WHERE id = $11
        RETURNING *`,
-      [nombre, operador_id, ciudad_id, numero_solicitud, fecha_radicado, 
+      [nombre, empresa_id, operador_id, ciudad_id, numero_solicitud, fecha_radicado, 
        fecha_revision, supervisor_id, estado, descripcion, id]
     );
 
