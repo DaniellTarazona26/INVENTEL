@@ -1,21 +1,49 @@
 // frontend/src/services/inventarioService.js
+
 import axios from 'axios'
 
 const API_URL = 'http://localhost:5000/api'
 
-// Obtener token del localStorage
 const getAuthHeader = () => {
   const token = localStorage.getItem('token')
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
 const inventarioService = {
-  // Crear nuevo inventario
+  // Crear nuevo inventario COMPLETO
   crear: async (datos) => {
     try {
       const response = await axios.post(
         `${API_URL}/inventarios`,
         datos,
+        { headers: getAuthHeader() }
+      )
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Crear inventario PARCIAL (solo eléctrica)
+  crearParcial: async (datos) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/inventarios/parcial`,
+        datos,
+        { headers: getAuthHeader() }
+      )
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Completar inventario (marcar como completo)
+  completarConOperadores: async (inventarioId) => {
+    try {
+      const response = await axios.patch(
+        `${API_URL}/inventarios/${inventarioId}/completar`,
+        {},
         { headers: getAuthHeader() }
       )
       return response.data
@@ -83,3 +111,4 @@ const inventarioService = {
 }
 
 export default inventarioService
+

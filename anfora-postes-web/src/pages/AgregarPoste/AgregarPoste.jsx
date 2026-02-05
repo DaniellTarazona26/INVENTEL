@@ -87,13 +87,13 @@ const AgregarPoste = ({ setCurrentPage }) => {
   const [loading, setLoading] = useState(false)
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' })
   const [modoEdicion, setModoEdicion] = useState(false)
+  const [allowNavigation, setAllowNavigation] = useState(false)
 
   useEffect(() => {
     cargarCiudades()
     cargarEmpresas()
     cargarOperadores()
   }, [])
-
 
   useEffect(() => {
     if (formData.ciudadId) {
@@ -112,19 +112,17 @@ const AgregarPoste = ({ setCurrentPage }) => {
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      if (modoEdicion) {
+      if (modoEdicion && !allowNavigation) {
         e.preventDefault()
         e.returnValue = '¿Estás seguro de que quieres salir? Los cambios en edición se perderán.'
         return e.returnValue
       }
     }
-
+    
     window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [modoEdicion, allowNavigation])
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [modoEdicion])
   const cargarCiudades = async () => {
     try {
       const response = await ciudadesService.obtenerTodas()
@@ -156,16 +154,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
       console.error('Error cargando empresas:', error)
       setEmpresas([])
       mostrarMensaje('error', 'Error al cargar las empresas')
-    }
-  }
-
-  const cargarProyectos = async () => {
-    try {
-      const response = await proyectosService.obtenerTodos()
-      setProyectos(Array.isArray(response) ? response : [])
-    } catch (error) {
-      console.error('Error cargando proyectos:', error)
-      setProyectos([])
     }
   }
 
@@ -297,7 +285,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
             completo = false
           }
         }
-
+        
         if (formData.alumbrado === 'SI') {
           if (!formData.alumbradoTipoCable || !formData.alumbradoEstado) {
             completo = false
@@ -395,6 +383,271 @@ const AgregarPoste = ({ setCurrentPage }) => {
       setOperadoresSeleccionados([...operadoresSeleccionados, operador])
     }
   }
+
+  const handleGuardarYContinuar = async () => {
+    if (!formData.empresaId) {
+      mostrarMensaje('error', '❌ La empresa es obligatoria')
+      return
+    }
+
+    if (!formData.ciudadId) {
+      mostrarMensaje('error', '❌ La ciudad es obligatoria')
+      return
+    }
+
+    if (!formData.barrio) {
+      mostrarMensaje('error', '❌ El barrio es obligatorio')
+      return
+    }
+
+    if (!formData.waypoint) {
+      mostrarMensaje('error', '❌ El WayPoint es obligatorio')
+      return
+    }
+
+    if (!formData.tipo) {
+      mostrarMensaje('error', '❌ El Tipo de estructura es obligatorio')
+      return
+    }
+
+    if (!formData.material) {
+      mostrarMensaje('error', '❌ El Material es obligatorio')
+      return
+    }
+
+    if (!formData.altura) {
+      mostrarMensaje('error', '❌ La Altura es obligatoria')
+      return
+    }
+
+    if (!formData.anoFabricacion) {
+      mostrarMensaje('error', '❌ El Año de fabricación es obligatorio')
+      return
+    }
+
+    if (!formData.templete) {
+      mostrarMensaje('error', '❌ El Templete es obligatorio')
+      return
+    }
+
+    if (formData.templete !== 'NO EXISTE' && !formData.estadoTemplete) {
+      mostrarMensaje('error', '❌ El Estado del templete es obligatorio')
+      return
+    }
+
+    if (!formData.bajantesElectricos) {
+      mostrarMensaje('error', '❌ Bajantes eléctricos es obligatorio')
+      return
+    }
+
+    if (!formData.baja) {
+      mostrarMensaje('error', '❌ El campo Baja es obligatorio')
+      return
+    }
+
+    if (formData.baja === 'SI') {
+      if (!formData.bajaTipoCable) {
+        mostrarMensaje('error', '❌ Tipo de cable (Baja) es obligatorio')
+        return
+      }
+      if (!formData.bajaEstado) {
+        mostrarMensaje('error', '❌ Estado de la red (Baja) es obligatorio')
+        return
+      }
+      if (!formData.bajaContinuidad) {
+        mostrarMensaje('error', '❌ Continuidad eléctrica (Baja) es obligatoria')
+        return
+      }
+      if (!formData.caja1) {
+        mostrarMensaje('error', '❌ Caja #1 es obligatoria')
+        return
+      }
+      if (!formData.caja2) {
+        mostrarMensaje('error', '❌ Caja #2 es obligatoria')
+        return
+      }
+    }
+
+    if (!formData.alumbrado) {
+      mostrarMensaje('error', '❌ El campo Alumbrado es obligatorio')
+      return
+    }
+
+    if (formData.alumbrado === 'SI') {
+      if (!formData.alumbradoTipoCable) {
+        mostrarMensaje('error', '❌ Tipo de cable (Alumbrado) es obligatorio')
+        return
+      }
+      if (!formData.alumbradoEstado) {
+        mostrarMensaje('error', '❌ Estado de la red (Alumbrado) es obligatorio')
+        return
+      }
+      if (!formData.lampara1Tipo) {
+        mostrarMensaje('error', '❌ Tipo de lámpara #1 es obligatorio')
+        return
+      }
+      
+      if (formData.lampara1Tipo !== 'NO EXISTE') {
+        if (!formData.lampara1ExisteCodigo) {
+          mostrarMensaje('error', '❌ ¿Existe código? (Lámpara #1) es obligatorio')
+          return
+        }
+        if (!formData.lampara1Danada) {
+          mostrarMensaje('error', '❌ ¿Dañada? (Lámpara #1) es obligatorio')
+          return
+        }
+        if (!formData.lampara1Encendida) {
+          mostrarMensaje('error', '❌ ¿Encendida? (Lámpara #1) es obligatorio')
+          return
+        }
+        if (formData.lampara1ExisteCodigo === 'SI' && !formData.lampara1Codigo) {
+          mostrarMensaje('error', '❌ Código de lámpara #1 es obligatorio')
+          return
+        }
+      }
+      
+      if (formData.lampara2Tipo && formData.lampara2Tipo !== 'NO EXISTE' && formData.lampara2Tipo !== '') {
+        if (!formData.lampara2ExisteCodigo) {
+          mostrarMensaje('error', '❌ ¿Existe código? (Lámpara #2) es obligatorio')
+          return
+        }
+        if (!formData.lampara2Danada) {
+          mostrarMensaje('error', '❌ ¿Dañada? (Lámpara #2) es obligatorio')
+          return
+        }
+        if (!formData.lampara2Encendida) {
+          mostrarMensaje('error', '❌ ¿Encendida? (Lámpara #2) es obligatorio')
+          return
+        }
+        if (formData.lampara2ExisteCodigo === 'SI' && !formData.lampara2Codigo) {
+          mostrarMensaje('error', '❌ Código de lámpara #2 es obligatorio')
+          return
+        }
+      }
+    }
+
+    if (!formData.tierraElectrica) {
+      mostrarMensaje('error', '❌ El campo Tierra Eléctrica es obligatorio')
+      return
+    }
+
+    if (formData.tierraElectrica === 'SI') {
+      if (!formData.tierraEstado) {
+        mostrarMensaje('error', '❌ Estado de tierra es obligatorio')
+        return
+      }
+      if (!formData.tierraSuelta) {
+        mostrarMensaje('error', '❌ Tierra suelta es obligatorio')
+        return
+      }
+      if (!formData.tierraDesconectada) {
+        mostrarMensaje('error', '❌ Tierra desconectada es obligatorio')
+        return
+      }
+      if (!formData.tierraRota) {
+        mostrarMensaje('error', '❌ Tierra rota es obligatorio')
+        return
+      }
+    }
+
+    if (formData.elementosAdicionales === 'APLICA') {
+      if (!formData.lampara) {
+        mostrarMensaje('error', '❌ Lámpara (elementos adicionales) es obligatorio')
+        return
+      }
+      if (!formData.camaraTv) {
+        mostrarMensaje('error', '❌ Cámara TV es obligatorio')
+        return
+      }
+      if (!formData.corneta) {
+        mostrarMensaje('error', '❌ Corneta es obligatorio')
+        return
+      }
+      if (!formData.aviso) {
+        mostrarMensaje('error', '❌ Aviso es obligatorio')
+        return
+      }
+      if (!formData.cajaMetalica) {
+        mostrarMensaje('error', '❌ Caja metálica es obligatorio')
+        return
+      }
+      if (!formData.otro) {
+        mostrarMensaje('error', '❌ Otro es obligatorio')
+        return
+      }
+      if (!formData.posibleFraude) {
+        mostrarMensaje('error', '❌ Posible fraude es obligatorio')
+        return
+      }
+    }
+
+    if (!formData.estadoEstructura) {
+      mostrarMensaje('error', '❌ Estado de estructura es obligatorio')
+      return
+    }
+
+    if (formData.estadoEstructura === 'NO') {
+      if (!formData.desplomado) {
+        mostrarMensaje('error', '❌ Desplomado es obligatorio')
+        return
+      }
+      if (!formData.flectado) {
+        mostrarMensaje('error', '❌ Flectado es obligatorio')
+        return
+      }
+      if (!formData.fracturado) {
+        mostrarMensaje('error', '❌ Fracturado es obligatorio')
+        return
+      }
+      if (!formData.hierroBase) {
+        mostrarMensaje('error', '❌ Hierro en la base es obligatorio')
+        return
+      }
+    }
+
+    if (!formData.podaArboles) {
+      mostrarMensaje('error', '❌ Poda de árboles es obligatorio')
+      return
+    }
+
+    if (operadoresSeleccionados.length === 0) {
+      mostrarMensaje('error', '❌ Debe seleccionar al menos un operador')
+      return
+    }
+
+    try {
+      setLoading(true)
+
+      const datosEnviar = {
+        ...formData,
+        operadores: operadoresSeleccionados
+      }
+
+      const response = await inventarioService.crearParcial(datosEnviar)
+
+      if (response.success) {
+        localStorage.setItem('inventarioParcialId', response.inventario.id)
+        localStorage.setItem('operadoresSeleccionados', JSON.stringify(operadoresSeleccionados))
+        
+        setAllowNavigation(true)
+        setModoEdicion(false)
+        
+        mostrarMensaje('success', '✅ Datos guardados. Redirigiendo a operadores...')
+        
+        setTimeout(() => {
+          setCurrentPage('agregar-operadores')
+        }, 1500)
+      }
+
+    } catch (error) {
+      console.error('Error guardando inventario:', error)
+      const mensajeError = error.error || error.message || 'Error al guardar'
+      mostrarMensaje('error', `❌ ${mensajeError}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleGuardar = async () => {
     if (!formData.empresaId) {
       mostrarMensaje('error', '❌ La empresa es obligatoria')
@@ -831,7 +1084,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
           <p>Guardando inventario...</p>
         </div>
       )}
-      {/* SECCIÓN 1: UBICACIÓN */}
+
       <section className={`form-section collapsible ${getEstadoSeccion('ubicacion')}`}>
         <h3 
           className="section-title clickable" 
@@ -877,7 +1130,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
             </div>
 
             <div className="form-grid form-grid-2">
-              
               <div className="form-group">
                 <label>Barrio: *</label>
                 <select 
@@ -979,7 +1231,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
         )}
       </section>
 
-      {/* SECCIÓN 2: ESTRUCTURA */}
       <section className={`form-section collapsible ${getEstadoSeccion('estructura')}`}>
         <h3 
           className="section-title clickable" 
@@ -1156,7 +1407,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
         )}
       </section>
 
-      {/* SECCIÓN 3: TIPO DE RED */}
       <section className={`form-section collapsible ${getEstadoSeccion('tipoRed')}`}>
         <h3 
           className="section-title clickable" 
@@ -1232,7 +1482,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   <h5 className="subsection-subtitle">CAJAS DISTRIBUCIÓN ELÉCTRICA</h5>
                   <div className="form-grid form-grid-2">
                     <div className="form-group">
-                      <label>Caja #1: *</label>
+                      <label>Caja #1:</label>
                       <select 
                         value={formData.caja1}
                         onChange={(e) => handleInputChange('caja1', e.target.value)}
@@ -1246,7 +1496,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                     </div>
 
                     <div className="form-group">
-                      <label>Caja #2: *</label>
+                      <label>Caja #2:</label>
                       <select 
                         value={formData.caja2}
                         onChange={(e) => handleInputChange('caja2', e.target.value)}
@@ -1312,7 +1562,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   <h5 className="subsection-subtitle">LÁMPARA #1</h5>
                   <div className="form-grid form-grid-5">
                     <div className="form-group">
-                      <label>Tipo: *</label>
+                      <label>Tipo:</label>
                       <select 
                         value={formData.lampara1Tipo}
                         onChange={(e) => handleInputChange('lampara1Tipo', e.target.value)}
@@ -1342,7 +1592,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                     <div className="form-group">
                       <label>Código:</label>
                       <input 
-                        type="text"
+                        type="text" 
                         value={formData.lampara1Codigo}
                         onChange={(e) => handleInputChange('lampara1Codigo', e.target.value)}
                         disabled={formData.lampara1ExisteCodigo !== 'SI'}
@@ -1410,7 +1660,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                     <div className="form-group">
                       <label>Código:</label>
                       <input 
-                        type="text"
+                        type="text" 
                         value={formData.lampara2Codigo}
                         onChange={(e) => handleInputChange('lampara2Codigo', e.target.value)}
                         disabled={formData.lampara2ExisteCodigo !== 'SI'}
@@ -1536,7 +1786,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
               {formData.elementosAdicionales === 'APLICA' && (
                 <div className="form-grid form-grid-7">
                   <div className="form-group">
-                    <label>Lámpara: *</label>
+                    <label>Lámpara:</label>
                     <select 
                       value={formData.lampara}
                       onChange={(e) => handleInputChange('lampara', e.target.value)}
@@ -1548,7 +1798,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   </div>
 
                   <div className="form-group">
-                    <label>Cámara TV: *</label>
+                    <label>Cámara TV:</label>
                     <select 
                       value={formData.camaraTv}
                       onChange={(e) => handleInputChange('camaraTv', e.target.value)}
@@ -1560,7 +1810,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   </div>
 
                   <div className="form-group">
-                    <label>Corneta: *</label>
+                    <label>Corneta:</label>
                     <select 
                       value={formData.corneta}
                       onChange={(e) => handleInputChange('corneta', e.target.value)}
@@ -1572,7 +1822,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   </div>
 
                   <div className="form-group">
-                    <label>Aviso: *</label>
+                    <label>Aviso:</label>
                     <select 
                       value={formData.aviso}
                       onChange={(e) => handleInputChange('aviso', e.target.value)}
@@ -1584,7 +1834,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   </div>
 
                   <div className="form-group">
-                    <label>Caja metálica: *</label>
+                    <label>Caja metálica:</label>
                     <select 
                       value={formData.cajaMetalica}
                       onChange={(e) => handleInputChange('cajaMetalica', e.target.value)}
@@ -1596,7 +1846,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   </div>
 
                   <div className="form-group">
-                    <label>Otro: *</label>
+                    <label>Otro:</label>
                     <select 
                       value={formData.otro}
                       onChange={(e) => handleInputChange('otro', e.target.value)}
@@ -1608,7 +1858,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   </div>
 
                   <div className="form-group">
-                    <label>Posible fraude: *</label>
+                    <label>Posible fraude:</label>
                     <select 
                       value={formData.posibleFraude}
                       onChange={(e) => handleInputChange('posibleFraude', e.target.value)}
@@ -1625,7 +1875,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
         )}
       </section>
 
-      {/* SECCIÓN 4: ESTADO ESTRUCTURA */}
       <section className={`form-section collapsible ${getEstadoSeccion('estadoEstructura')}`}>
         <h3 
           className="section-title clickable" 
@@ -1655,7 +1904,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
             {formData.estadoEstructura === 'NO' && (
               <div className="form-grid form-grid-4">
                 <div className="form-group">
-                  <label>Desplomado: *</label>
+                  <label>¿Desplomado?:</label>
                   <select 
                     value={formData.desplomado}
                     onChange={(e) => handleInputChange('desplomado', e.target.value)}
@@ -1667,7 +1916,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                 </div>
 
                 <div className="form-group">
-                  <label>Flectado: *</label>
+                  <label>¿Flectado?:</label>
                   <select 
                     value={formData.flectado}
                     onChange={(e) => handleInputChange('flectado', e.target.value)}
@@ -1679,7 +1928,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                 </div>
 
                 <div className="form-group">
-                  <label>Fracturado: *</label>
+                  <label>¿Fracturado?:</label>
                   <select 
                     value={formData.fracturado}
                     onChange={(e) => handleInputChange('fracturado', e.target.value)}
@@ -1691,7 +1940,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                 </div>
 
                 <div className="form-group">
-                  <label>Hierro en la base: *</label>
+                  <label>¿Hierro en la base?:</label>
                   <select 
                     value={formData.hierroBase}
                     onChange={(e) => handleInputChange('hierroBase', e.target.value)}
@@ -1707,7 +1956,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
         )}
       </section>
 
-      {/* SECCIÓN 5: ESTADOS */}
       <section className={`form-section collapsible ${getEstadoSeccion('estados')}`}>
         <h3 
           className="section-title clickable" 
@@ -1737,21 +1985,20 @@ const AgregarPoste = ({ setCurrentPage }) => {
         )}
       </section>
 
-      {/* SECCIÓN 6: OPERADORES */}
       <section className={`form-section collapsible ${getEstadoSeccion('operadores')}`}>
         <h3 
           className="section-title clickable" 
           onClick={() => toggleSeccion('operadores')}
         >
           <span className={`arrow ${seccionesAbiertas.operadores ? 'open' : ''}`}>▶</span>
-          6. OPERADORES
+          6. OPERADORES *
           <span className="status-indicator"></span>
         </h3>
         
         {seccionesAbiertas.operadores && (
           <div className="section-content">
             <div className="operadores-grid">
-              {operadores.map(operador => (
+              {operadores.map((operador) => (
                 <div 
                   key={operador}
                   className={`operador-checkbox ${operadoresSeleccionados.includes(operador) ? 'selected' : ''}`}
@@ -1761,6 +2008,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                     type="checkbox"
                     checked={operadoresSeleccionados.includes(operador)}
                     onChange={() => toggleOperador(operador)}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   <label>{operador}</label>
                 </div>
@@ -1770,22 +2018,53 @@ const AgregarPoste = ({ setCurrentPage }) => {
         )}
       </section>
 
-      {/* BOTONES DE ACCIÓN */}
-      <div className="form-actions">
-        <button 
-          className="btn btn-secondary" 
-          onClick={handleLimpiar}
-          disabled={loading}
-        >
-          🗑️ Limpiar
-        </button>
-        <button 
-          className="btn btn-primary" 
-          onClick={handleGuardar}
-          disabled={loading}
-        >
-          {modoEdicion ? '✏️ Actualizar' : '💾 Guardar'}
-        </button>
+      <div className="botones-accion">
+        {!modoEdicion && (
+          <button 
+            className="btn-limpiar"
+            onClick={handleLimpiar}
+            disabled={loading}
+            type="button"
+          >
+            🗑️ Limpiar
+          </button>
+        )}
+
+        <div className="botones-derecha">
+          {modoEdicion ? (
+            <>
+              <button 
+                className="btn-guardar"
+                onClick={handleGuardar}
+                disabled={loading}
+                type="button"
+              >
+                💾 Actualizar
+              </button>
+              <button 
+                className="btn-guardar-continuar"
+                onClick={() => {
+                  setAllowNavigation(true)
+                  localStorage.setItem('editarInventarioId', inventarioIdEditar)
+                  setCurrentPage('agregar-operadores')
+                }}
+                disabled={loading}
+                type="button"
+              >
+                Página Siguiente →
+              </button>
+            </>
+          ) : (
+            <button 
+              className="btn-guardar-continuar"
+              onClick={handleGuardarYContinuar}
+              disabled={loading}
+              type="button"
+            >
+              Guardar y Continuar →
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

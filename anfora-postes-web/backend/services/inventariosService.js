@@ -4,6 +4,9 @@ const pool = require('../config/database')
 
 const inventariosService = {
   
+  // ==========================================
+  // CREAR INVENTARIO COMPLETO
+  // ==========================================
   crear: async (datos, usuarioId) => {
     const client = await pool.connect()
     
@@ -49,15 +52,17 @@ const inventariosService = {
           elementos_adicionales, lampara, camara_tv, corneta, aviso, caja_metalica, otro, posible_fraude,
           estado_estructura, desplomado, flectado, fracturado, hierro_base,
           poda_arboles, operadores, 
-          usuario_id, inspector_nombre, created_by, ciudad_id, empresa_id
+          usuario_id, inspector_nombre, created_by, ciudad_id, empresa_id,
+          estado_completitud
         ) VALUES (
           $1, $2, $3, $4, $5, $6, $7,
           $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
           $19, $20, $21, $22, $23, $24, $25, $26, $27,
           $28, $29, $30, $31, $32, $33, $34, $35, $36, $37,
           $38, $39, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $50,
-          $51, $52, $53, $54, $55, $56, $57,
-          $58, $59, $60, $61, $62
+          $51, $52, $53, $54, $55, $56,
+          $57, $58, $59, $60, $61, $62,
+          'completo'
         )
         RETURNING *
       `
@@ -143,6 +148,176 @@ const inventariosService = {
     }
   },
 
+  // ==========================================
+  // CREAR INVENTARIO PARCIAL (Solo eléctrica + operadores seleccionados)
+  // ==========================================
+  crearParcial: async (datos, usuarioId) => {
+    const client = await pool.connect()
+    
+    try {
+      await client.query('BEGIN')
+      
+      let barrioId = datos.barrio
+      
+      if (datos.barrio && isNaN(datos.barrio)) {
+        const barrioQuery = await client.query(
+          'SELECT id FROM barrios WHERE UPPER(nombre) = UPPER($1) AND ciudad_id = $2',
+          [datos.barrio, datos.ciudadId]
+        )
+        
+        if (barrioQuery.rows.length > 0) {
+          barrioId = barrioQuery.rows[0].id
+        } else {
+          throw new Error(`Barrio "${datos.barrio}" no encontrado en la ciudad especificada`)
+        }
+      }
+
+      if (!datos.empresaId) {
+        throw new Error('La empresa es obligatoria')
+      }
+
+      const usuarioQuery = await client.query(
+        'SELECT nombre FROM usuarios WHERE id = $1',
+        [usuarioId]
+      )
+      const inspectorNombre = usuarioQuery.rows[0]?.nombre || 'Desconocido'
+      
+      const query = `
+        INSERT INTO inventarios (
+          barrio_id, direccion_campo1, direccion_campo2, direccion_campo3, direccion_campo4,
+          direccion_completa, waypoint,
+          tipo, marcada, codigo_estructura, consecutivo_poste, material,
+          carga_rotura, templete, estado_templete, altura, ano_fabricacion, bajantes_electricos,
+          baja, baja_tipo_cable, baja_estado_red, baja_continuidad_electrica, caja1, caja2,
+          alumbrado, alumbrado_tipo_cable, alumbrado_estado_red,
+          lampara1_tipo, lampara1_existe_codigo, lampara1_codigo, lampara1_danada, lampara1_encendida,
+          lampara2_tipo, lampara2_existe_codigo, lampara2_codigo, lampara2_danada, lampara2_encendida,
+          tierra_electrica, tierra_estado, tierra_suelta, tierra_desconectada, tierra_rota,
+          elementos_adicionales, lampara, camara_tv, corneta, aviso, caja_metalica, otro, posible_fraude,
+          estado_estructura, desplomado, flectado, fracturado, hierro_base,
+          poda_arboles, operadores, 
+          usuario_id, inspector_nombre, created_by, ciudad_id, empresa_id,
+          estado_completitud
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7,
+          $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
+          $19, $20, $21, $22, $23, $24, $25, $26, $27,
+          $28, $29, $30, $31, $32, $33, $34, $35, $36, $37,
+          $38, $39, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $50,
+          $51, $52, $53, $54, $55, $56,
+          $57, $58, $59, $60, $61, $62,
+          'pendiente_operadores'
+        )
+        RETURNING *
+      `
+      
+      const direccionCompleta = `${datos.direccion1 || ''} ${datos.direccion2 || ''} ${datos.direccion3 || ''} ${datos.direccion4 || ''}`.trim()
+      
+      const values = [
+        barrioId || null,
+        datos.direccion1 || null,
+        datos.direccion2 || null,
+        datos.direccion3 || null,
+        datos.direccion4 || null,
+        direccionCompleta || null,
+        datos.waypoint || null,
+        datos.tipo || null,
+        datos.marcada || 'NO',
+        datos.codigoEstructura || null,
+        datos.consecutivoPoste || null,
+        datos.material || null,
+        datos.cRotura || null,
+        datos.templete || null,
+        datos.estadoTemplete || null,
+        datos.altura || null,
+        datos.anoFabricacion || null,
+        datos.bajantesElectricos || 'NO',
+        datos.baja || 'NO',
+        datos.bajaTipoCable || null,
+        datos.bajaEstado || null,
+        datos.bajaContinuidad || null,
+        datos.caja1 || null,
+        datos.caja2 || null,
+        datos.alumbrado || 'NO',
+        datos.alumbradoTipoCable || null,
+        datos.alumbradoEstado || null,
+        datos.lampara1Tipo || null,
+        datos.lampara1ExisteCodigo || null,
+        datos.lampara1Codigo || null,
+        datos.lampara1Danada || null,
+        datos.lampara1Encendida || null,
+        datos.lampara2Tipo || null,
+        datos.lampara2ExisteCodigo || null,
+        datos.lampara2Codigo || null,
+        datos.lampara2Danada || null,
+        datos.lampara2Encendida || null,
+        datos.tierraElectrica || 'NO',
+        datos.tierraEstado || null,
+        datos.tierraSuelta || null,
+        datos.tierraDesconectada || null,
+        datos.tierraRota || null,
+        datos.elementosAdicionales || 'APLICA',
+        datos.lampara || 'NO',
+        datos.camaraTv || 'NO',
+        datos.corneta || 'NO',
+        datos.aviso || 'NO',
+        datos.cajaMetalica || 'NO',
+        datos.otro || 'NO',
+        datos.posibleFraude || 'NO',
+        datos.estadoEstructura || null,
+        datos.desplomado || null,
+        datos.flectado || null,
+        datos.fracturado || null,
+        datos.hierroBase || null,
+        datos.podaArboles || null,
+        // ✅ GUARDAR OPERADORES SELECCIONADOS (ej: ['CLARO', 'MOVISTAR'])
+        JSON.stringify(datos.operadores || []),
+        usuarioId,
+        inspectorNombre,
+        usuarioId,
+        datos.ciudadId || null,
+        datos.empresaId
+      ]
+      
+      const result = await client.query(query, values)
+      await client.query('COMMIT')
+      
+      return result.rows[0]
+      
+    } catch (error) {
+      await client.query('ROLLBACK')
+      console.error('Error creando inventario parcial:', error)
+      throw error
+    } finally {
+      client.release()
+    }
+  },
+
+  // ==========================================
+  // COMPLETAR INVENTARIO (marcar como completo)
+  // ==========================================
+  completarConOperadores: async (inventarioId, usuarioId) => {
+    const query = `
+      UPDATE inventarios 
+      SET estado_completitud = 'completo',
+          updated_by = $1,
+          fecha_actualizacion = CURRENT_TIMESTAMP
+      WHERE id = $2 AND estado = 'activo'
+      RETURNING *
+    `
+    
+    const result = await pool.query(query, [usuarioId, inventarioId])
+    
+    if (result.rows.length === 0) {
+      throw new Error('Inventario no encontrado')
+    }
+    
+    return result.rows[0]
+  },
+
+  // ==========================================
+  // OBTENER TODOS LOS INVENTARIOS
+  // ==========================================
   obtenerTodos: async (filtros = {}) => {
     let query = `
       SELECT 
@@ -190,6 +365,9 @@ const inventariosService = {
     return result.rows
   },
 
+  // ==========================================
+  // OBTENER INVENTARIO POR ID
+  // ==========================================
   obtenerPorId: async (id) => {
     const query = `
       SELECT 
@@ -219,6 +397,9 @@ const inventariosService = {
     return result.rows[0]
   },
 
+  // ==========================================
+  // ACTUALIZAR INVENTARIO
+  // ==========================================
   actualizar: async (id, datos, usuarioId) => {
     const client = await pool.connect()
     
@@ -393,6 +574,9 @@ const inventariosService = {
     }
   },
 
+  // ==========================================
+  // ELIMINAR INVENTARIO
+  // ==========================================
   eliminar: async (id, usuarioId) => {
     const query = `
       UPDATE inventarios 
@@ -414,3 +598,4 @@ const inventariosService = {
 }
 
 module.exports = inventariosService
+

@@ -9,7 +9,6 @@ const Inventario = ({ setCurrentPage }) => {
     busqueda: ''
   })
 
-  // Cargar inventarios al montar el componente
   useEffect(() => {
     cargarInventarios()
   }, [])
@@ -31,9 +30,17 @@ const Inventario = ({ setCurrentPage }) => {
   }
 
   const handleEditar = (id) => {
-    // Guardar ID en localStorage para editarlo
     localStorage.setItem('editarInventarioId', id)
     setCurrentPage('agregar')
+  }
+
+  const handleContinuar = (id) => {
+    const inventario = inventarios.find(inv => inv.id === id)
+    if (inventario && inventario.operadores) {
+      localStorage.setItem('inventarioParcialId', id)
+      localStorage.setItem('operadoresSeleccionados', JSON.stringify(inventario.operadores))
+      setCurrentPage('agregar-operadores')
+    }
   }
 
   const handleVer = (id) => {
@@ -106,6 +113,11 @@ const Inventario = ({ setCurrentPage }) => {
         <>
           <div className="inventario-stats">
             <span>Total de registros: <strong>{inventariosFiltrados.length}</strong></span>
+            <span className="pendientes-count">
+              Pendientes de completar: <strong>
+                {inventariosFiltrados.filter(inv => inv.estado_completitud === 'pendiente_operadores').length}
+              </strong>
+            </span>
           </div>
 
           <div className="inventario-tabla">
@@ -113,6 +125,7 @@ const Inventario = ({ setCurrentPage }) => {
               <thead>
                 <tr>
                   <th>ID</th>
+                  <th>Estado</th>
                   <th>WayPoint</th>
                   <th>Dirección</th>
                   <th>Tipo</th>
@@ -126,7 +139,7 @@ const Inventario = ({ setCurrentPage }) => {
               <tbody>
                 {inventariosFiltrados.length === 0 ? (
                   <tr>
-                    <td colSpan="9" style={{textAlign: 'center', padding: '2rem'}}>
+                    <td colSpan="10" style={{textAlign: 'center', padding: '2rem'}}>
                       {inventarios.length === 0 
                         ? '📭 No hay inventarios registrados' 
                         : '🔍 No se encontraron resultados'}
@@ -134,8 +147,18 @@ const Inventario = ({ setCurrentPage }) => {
                   </tr>
                 ) : (
                   inventariosFiltrados.map((inv) => (
-                    <tr key={inv.id}>
+                    <tr 
+                      key={inv.id}
+                      className={inv.estado_completitud === 'pendiente_operadores' ? 'fila-pendiente' : ''}
+                    >
                       <td>{inv.id}</td>
+                      <td>
+                        {inv.estado_completitud === 'pendiente_operadores' ? (
+                          <span className="badge badge-warning">⚠️ Pendiente</span>
+                        ) : (
+                          <span className="badge badge-success">✅ Completo</span>
+                        )}
+                      </td>
                       <td><strong>{inv.waypoint || '-'}</strong></td>
                       <td>{inv.direccion_completa || '-'}</td>
                       <td>{inv.tipo || '-'}</td>
@@ -161,13 +184,25 @@ const Inventario = ({ setCurrentPage }) => {
                           >
                             👁️
                           </button>
-                          <button 
-                            className="btn-link btn-editar"
-                            onClick={() => handleEditar(inv.id)}
-                            title="Editar"
-                          >
-                            ✏️
-                          </button>
+                          
+                          {inv.estado_completitud === 'pendiente_operadores' ? (
+                            <button 
+                              className="btn-link btn-continuar"
+                              onClick={() => handleContinuar(inv.id)}
+                              title="Continuar con operadores"
+                            >
+                              ▶️
+                            </button>
+                          ) : (
+                            <button 
+                              className="btn-link btn-editar"
+                              onClick={() => handleEditar(inv.id)}
+                              title="Editar"
+                            >
+                              ✏️
+                            </button>
+                          )}
+                          
                           <button 
                             className="btn-link btn-eliminar"
                             onClick={() => handleEliminar(inv.id)}

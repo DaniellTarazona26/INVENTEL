@@ -19,6 +19,7 @@ const ciudadesRoutes = require('./routes/ciudadesRoutes');
 const barriosRoutes = require('./routes/barriosRoutes');
 const proyectosRoutes = require('./routes/proyectosRoutes');
 const inventariosRoutes = require('./routes/inventarios')
+const inventariosOperadoresRoutes = require('./routes/inventariosOperadores')
 const factibilidadesRoutes = require('./routes/factibilidades');
 const reportesRoutes = require('./routes/reportes');
 const helpersRoutes = require('./routes/helpers');
@@ -60,6 +61,7 @@ app.use('/api/ciudades', ciudadesRoutes);
 app.use('/api/barrios', barriosRoutes);
 app.use('/api/proyectos', proyectosRoutes);
 app.use('/api/inventarios', inventariosRoutes) 
+app.use('/api/inventarios-operadores', inventariosOperadoresRoutes)
 app.use('/api/factibilidades', factibilidadesRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/helpers', helpersRoutes);

@@ -4,6 +4,7 @@ import Login from './pages/Login/Login'
 import Dashboard from './pages/Dashboard/Dashboard'
 import Inventario from './pages/Inventario/Inventario'
 import AgregarPoste from './pages/AgregarPoste/AgregarPoste'
+import AgregarOperadores from './pages/AgregarOperadores/AgregarOperadores'
 import Reportes from './pages/Reportes/Reportes'
 import Factibilidad from './pages/Factibilidad/Factibilidad'
 import Importar from './pages/Importar/Importar'
@@ -19,9 +20,8 @@ function App() {
   const [cargando, setCargando] = useState(true)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [pendingDestination, setPendingDestination] = useState(null)
-  const [factibilidadEditandoId, setFactibilidadEditandoId] = useState(null) // ← AGREGAR
+  const [factibilidadEditandoId, setFactibilidadEditandoId] = useState(null)
 
-  // Verificar si hay sesión al cargar
   useEffect(() => {
     const verificarSesion = async () => {
       try {
@@ -53,14 +53,13 @@ function App() {
     setCurrentPage('inicio')
   }
 
-  const handleNavegacion = (destino, factibilidadId = null) => { // ← MODIFICADO
+  const handleNavegacion = (destino, factibilidadId = null) => {
     const enEdicion = localStorage.getItem('editarInventarioId')
     
     if (currentPage === 'agregar' && enEdicion) {
       setPendingDestination(destino)
       setShowConfirmModal(true)
     } else {
-      // ✅ Si hay ID, guardarlo para modo edición
       if (factibilidadId) {
         setFactibilidadEditandoId(factibilidadId)
       } else {
@@ -94,7 +93,6 @@ function App() {
     return <Login onLogin={handleLogin} />
   }
 
-  
   const renderPage = () => {
     switch (currentPage) {
       case 'inicio':
@@ -103,11 +101,13 @@ function App() {
         return <Inventario setCurrentPage={handleNavegacion} />
       case 'agregar':
         return <AgregarPoste setCurrentPage={handleNavegacion} />
+      case 'agregar-operadores':
+        return <AgregarOperadores setCurrentPage={handleNavegacion} />
       case 'factibilidad':
         return (
           <Factibilidad 
             setCurrentPage={handleNavegacion}
-            factibilidadEditandoId={factibilidadEditandoId} // ← PASAR EL ID
+            factibilidadEditandoId={factibilidadEditandoId}
           />
         )
       case 'reportes':
@@ -143,4 +143,3 @@ function App() {
 }
 
 export default App
-
