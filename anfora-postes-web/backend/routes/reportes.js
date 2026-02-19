@@ -53,4 +53,7 @@ router.get('/factibilidad/exportar', reportesController.exportarReporteFactibili
 // Exportar Reporte de Pérdidas
 router.get('/perdidas/exportar', reportesController.exportarReportePerdidas);
 
+router.get('/dashboard-stats', reportesController.getDashboardStats)
+
+
 module.exports = router;

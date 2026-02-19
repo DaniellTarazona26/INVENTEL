@@ -2,7 +2,9 @@
 import React from 'react'
 import './Header.css'
 
-const Header = ({ onLogout }) => {
+const Header = ({ onLogout, usuario }) => {
+  const nombreUsuario = usuario?.nombre || 'Usuario'
+
   return (
     <header className="header">
       <div className="header-left">
@@ -12,7 +14,7 @@ const Header = ({ onLogout }) => {
       <div className="header-right">
         <div className="user-info">
           <span className="user-icon">👤</span>
-          <span className="user-name">GEORLIN</span>
+          <span className="user-name">{nombreUsuario.toUpperCase()}</span>
         </div>
         {onLogout && (
           <button className="btn-logout" onClick={onLogout} title="Cerrar Sesión">
@@ -25,3 +27,4 @@ const Header = ({ onLogout }) => {
 }
 
 export default Header
+

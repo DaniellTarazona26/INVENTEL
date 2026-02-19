@@ -28,12 +28,8 @@ const Login = ({ onLogin }) => {
 
     try {
       const respuesta = await authService.login(formData.email, formData.password)
-      
       console.log('✅ Login exitoso:', respuesta.usuario)
-      
-      // Llamar al callback de App.jsx
       onLogin(respuesta.usuario)
-      
     } catch (error) {
       console.error('❌ Error en login:', error)
       setError(error || 'Error al iniciar sesión. Verifica tus credenciales.')
@@ -45,20 +41,14 @@ const Login = ({ onLogin }) => {
   return (
     <div className="login-page">
       <div className="login-container">
-        {/* Logo ESSA */}
-        <div className="login-header">
-          <div className="logo-essa">
-            <span className="logo-text">ESSA</span>
-          </div>
-        </div>
 
-        {/* Título del sistema */}
+        {/* Título del sistema — sin logo ESSA */}
         <div className="login-title">
           <h1>INVENTEL</h1>
           <p className="login-subtitle">Sistema de Gestión de Inventario</p>
         </div>
 
-        {/* Formulario de login */}
+        {/* Formulario */}
         <form className="login-form" onSubmit={handleSubmit}>
           <h2 className="form-title">Iniciar Sesión</h2>
 
@@ -72,7 +62,6 @@ const Login = ({ onLogin }) => {
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <div className="input-wrapper">
-              <span className="input-icon-text">👤</span>
               <input
                 type="email"
                 id="email"
@@ -89,7 +78,6 @@ const Login = ({ onLogin }) => {
           <div className="form-group">
             <label htmlFor="password">Contraseña</label>
             <div className="input-wrapper">
-              <span className="input-icon-text">🔒</span>
               <input
                 type={mostrarContrasena ? 'text' : 'password'}
                 id="password"
@@ -122,7 +110,10 @@ const Login = ({ onLogin }) => {
               />
               <span>Recordarme</span>
             </label>
-            <a href="#" className="forgot-password" onClick={(e) => e.preventDefault()}>
+            <a
+              href="mailto:info.inventel@gmail.com?subject=Recuperación de contraseña&body=Hola, necesito recuperar el acceso a mi cuenta INVENTEL. Mi email registrado es: "
+              className="forgot-password"
+            >
               ¿Olvidó su contraseña?
             </a>
           </div>
@@ -132,8 +123,13 @@ const Login = ({ onLogin }) => {
           </button>
 
           <div className="login-footer-links">
-            <a href="#" onClick={(e) => e.preventDefault()}>
-              Ayuda
+            <a
+              href="https://drive.google.com/drive/folders/1mA-DFNSQkPSJcuy5is-MJMmxM-0t_4bq?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-descargar-app"
+            >
+              📱 Descargar App Móvil
             </a>
           </div>
         </form>

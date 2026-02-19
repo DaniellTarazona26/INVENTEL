@@ -44,10 +44,11 @@ const Inventario = ({ setCurrentPage }) => {
   }
 
   const handleVer = (id) => {
-    const inventario = inventarios.find(inv => inv.id === id)
-    console.log('Ver inventario:', inventario)
-    alert(`Inventario #${id}\nWayPoint: ${inventario.waypoint}\nTipo: ${inventario.tipo}`)
-  }
+  const inventario = inventarios.find(inv => inv.id === id)
+  console.log('Ver inventario:', inventario)
+  alert(`Inventario #${id}\nCódigo: ${inventario.codigo_estructura || '-'}\nWayPoint: ${inventario.waypoint}\nTipo: ${inventario.tipo}`)
+}
+
 
   const handleEliminar = async (id) => {
     if (window.confirm('¿Está seguro de eliminar este inventario?')) {
@@ -121,103 +122,106 @@ const Inventario = ({ setCurrentPage }) => {
           </div>
 
           <div className="inventario-tabla">
-            <table>
-              <thead>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Estado</th>
+                <th>Código</th>
+                <th>WayPoint</th>
+                <th>Dirección</th>
+                <th>Tipo</th>
+                <th>Material</th>
+                <th>Altura</th>
+                <th>Operadores</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {inventariosFiltrados.length === 0 ? (
                 <tr>
-                  <th>ID</th>
-                  <th>Estado</th>
-                  <th>WayPoint</th>
-                  <th>Dirección</th>
-                  <th>Tipo</th>
-                  <th>Material</th>
-                  <th>Altura</th>
-                  <th>Operadores</th>
-                  <th>Fecha</th>
-                  <th>Acciones</th>
+                  <td colSpan="11" style={{textAlign: 'center', padding: '2rem'}}>
+                    {inventarios.length === 0 
+                      ? '📭 No hay inventarios registrados' 
+                      : '🔍 No se encontraron resultados'}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {inventariosFiltrados.length === 0 ? (
-                  <tr>
-                    <td colSpan="10" style={{textAlign: 'center', padding: '2rem'}}>
-                      {inventarios.length === 0 
-                        ? '📭 No hay inventarios registrados' 
-                        : '🔍 No se encontraron resultados'}
+              ) : (
+                inventariosFiltrados.map((inv) => (
+                  <tr 
+                    key={inv.id}
+                    className={inv.estado_completitud === 'pendiente_operadores' ? 'fila-pendiente' : ''}
+                  >
+                    <td>{inv.id}</td>
+                    <td>
+                      {inv.estado_completitud === 'pendiente_operadores' ? (
+                        <span className="badge badge-warning">⚠️ Pendiente</span>
+                      ) : (
+                        <span className="badge badge-success">✅ Completo</span>
+                      )}
+                    </td>
+                    <td><strong>{inv.codigo_estructura || '-'}</strong></td>
+                    <td><strong>{inv.waypoint || '-'}</strong></td>
+                    <td>{inv.direccion_completa || '-'}</td>
+                    <td>{inv.tipo || '-'}</td>
+                    <td>{inv.material || '-'}</td>
+                    <td>{inv.altura || '-'}</td>
+                    <td>
+                      {inv.operadores && inv.operadores.length > 0 
+                        ? inv.operadores.slice(0, 2).join(', ') + 
+                          (inv.operadores.length > 2 ? '...' : '')
+                        : '-'}
+                    </td>
+                    <td>
+                      {inv.fecha_registro 
+                        ? new Date(inv.fecha_registro).toLocaleDateString('es-CO')
+                        : '-'}
+                    </td>
+                    <td>
+                      <div className="acciones-btns">
+                        <button 
+                          className="btn-link btn-ver"
+                          onClick={() => handleVer(inv.id)}
+                          title="Ver detalles"
+                        >
+                          👁️
+                        </button>
+                        
+                        {inv.estado_completitud === 'pendiente_operadores' ? (
+                          <button 
+                            className="btn-link btn-continuar"
+                            onClick={() => handleContinuar(inv.id)}
+                            title="Continuar con operadores"
+                          >
+                            ▶️
+                          </button>
+                        ) : (
+                          <button 
+                            className="btn-link btn-editar"
+                            onClick={() => handleEditar(inv.id)}
+                            title="Editar"
+                          >
+                            ✏️
+                          </button>
+                        )}
+                        
+                        <button 
+                          className="btn-link btn-eliminar"
+                          onClick={() => handleEliminar(inv.id)}
+                          title="Eliminar"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                ) : (
-                  inventariosFiltrados.map((inv) => (
-                    <tr 
-                      key={inv.id}
-                      className={inv.estado_completitud === 'pendiente_operadores' ? 'fila-pendiente' : ''}
-                    >
-                      <td>{inv.id}</td>
-                      <td>
-                        {inv.estado_completitud === 'pendiente_operadores' ? (
-                          <span className="badge badge-warning">⚠️ Pendiente</span>
-                        ) : (
-                          <span className="badge badge-success">✅ Completo</span>
-                        )}
-                      </td>
-                      <td><strong>{inv.waypoint || '-'}</strong></td>
-                      <td>{inv.direccion_completa || '-'}</td>
-                      <td>{inv.tipo || '-'}</td>
-                      <td>{inv.material || '-'}</td>
-                      <td>{inv.altura || '-'}</td>
-                      <td>
-                        {inv.operadores && inv.operadores.length > 0 
-                          ? inv.operadores.slice(0, 2).join(', ') + 
-                            (inv.operadores.length > 2 ? '...' : '')
-                          : '-'}
-                      </td>
-                      <td>
-                        {inv.fecha_registro 
-                          ? new Date(inv.fecha_registro).toLocaleDateString('es-CO')
-                          : '-'}
-                      </td>
-                      <td>
-                        <div className="acciones-btns">
-                          <button 
-                            className="btn-link btn-ver"
-                            onClick={() => handleVer(inv.id)}
-                            title="Ver detalles"
-                          >
-                            👁️
-                          </button>
-                          
-                          {inv.estado_completitud === 'pendiente_operadores' ? (
-                            <button 
-                              className="btn-link btn-continuar"
-                              onClick={() => handleContinuar(inv.id)}
-                              title="Continuar con operadores"
-                            >
-                              ▶️
-                            </button>
-                          ) : (
-                            <button 
-                              className="btn-link btn-editar"
-                              onClick={() => handleEditar(inv.id)}
-                              title="Editar"
-                            >
-                              ✏️
-                            </button>
-                          )}
-                          
-                          <button 
-                            className="btn-link btn-eliminar"
-                            onClick={() => handleEliminar(inv.id)}
-                            title="Eliminar"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
         </>
       )}
     </div>

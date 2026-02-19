@@ -10,15 +10,24 @@ const { verificarToken } = require('../middleware/authMiddleware')
 // ==========================================
 router.post('/', verificarToken, async (req, res) => {
   try {
+    console.log('📥 RECIBIENDO DATOS DE OPERADOR')
+    console.log('Body completo:', JSON.stringify(req.body, null, 2))
+    
     const { inventarioId, operadorNombre, datos } = req.body
     
+    console.log('📋 inventarioId:', inventarioId)
+    console.log('📋 operadorNombre:', operadorNombre)
+    console.log('📋 datos:', datos)
+    
     if (!inventarioId || !operadorNombre) {
+      console.error('❌ Faltan campos obligatorios')
       return res.status(400).json({
         success: false,
         error: 'inventarioId y operadorNombre son obligatorios'
       })
     }
     
+    console.log('✅ Llamando a servicio.crear...')
     const operador = await inventariosOperadoresService.crear(
       inventarioId,
       operadorNombre,
@@ -26,19 +35,22 @@ router.post('/', verificarToken, async (req, res) => {
       req.usuario.id
     )
     
+    console.log('✅ Operador creado:', operador.id)
+    
     res.status(201).json({
       success: true,
       message: 'Datos de operador guardados exitosamente',
       operador
     })
   } catch (error) {
-    console.error('Error guardando datos de operador:', error)
+    console.error('❌ ERROR guardando datos de operador:', error)
     res.status(500).json({
       success: false,
       error: error.message || 'Error al guardar datos de operador'
     })
   }
 })
+
 
 // ==========================================
 // OBTENER OPERADORES DE UN INVENTARIO

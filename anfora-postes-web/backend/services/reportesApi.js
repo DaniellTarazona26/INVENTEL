@@ -1,11 +1,11 @@
-// backend/services/reportesApi.js
-const pool = require('../config/database');
+const pool = require('../config/database')
 
 const reportesApi = {
+
   // ========== INVENTARIO POR OPERADOR ==========
-  async getInventarioOperador(filtros) {
-    const { operador, ciudad, empresa, fechaInicial, fechaFinal } = filtros;
-    
+  getInventarioOperador: async (filtros) => {
+    const { operador, ciudad, empresa, fechaInicial, fechaFinal } = filtros
+
     let query = `
       SELECT 
         i.id,
@@ -13,131 +13,172 @@ const reportesApi = {
         i.waypoint,
         c.nombre as ciudad,
         b.nombre as barrio,
-        CONCAT_WS(' ', 
-          i.direccion_campo1, 
-          i.direccion_campo2, 
-          i.direccion_campo3, 
-          i.direccion_campo4
-        ) as direccion_completa,
+        i.direccion_completa,
         i.codigo_estructura,
+        i.consecutivo_poste,
         i.tipo,
         i.material,
-        i.altura
-      FROM inventario i
+        i.altura,
+        i.estado_estructura,
+        i.baja,
+        i.alumbrado,
+        i.tierra_electrica,
+        COALESCE(
+          (SELECT STRING_AGG(io.operador_nombre, ', ') 
+           FROM inventarios_operadores io 
+           WHERE io.inventario_id = i.id),
+          'SIN OPERADORES'
+        ) as operadores_lista
+      FROM inventarios i
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE 1=1
-    `;
-    
-    const params = [];
-    
+      WHERE i.estado = 'activo'
+    `
+
+    const params = []
+    let paramCount = 1
+
     if (operador) {
       query += ` AND EXISTS (
-        SELECT 1 FROM inventario_operadores io
-        INNER JOIN operadores o ON io.operador_id = o.id
-        WHERE io.inventario_id = i.id AND o.nombre = ?
-      )`;
-      params.push(operador);
+        SELECT 1 FROM inventarios_operadores io
+        WHERE io.inventario_id = i.id
+        AND io.operador_nombre = $${paramCount}
+      )`
+      params.push(operador)
+      paramCount++
     }
-    
+
     if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
     }
-    
+
     if (empresa) {
-      query += ` AND i.proyecto_id = ?`;
-      params.push(empresa);
+      query += ` AND i.empresa_id = $${paramCount}`
+      params.push(empresa)
+      paramCount++
     }
-    
+
     if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= ?`;
-      params.push(fechaInicial);
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
     }
-    
+
     if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= ?`;
-      params.push(fechaFinal);
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
     }
-    
-    query += ` ORDER BY i.fecha_registro DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
+
+    query += ` ORDER BY i.fecha_registro DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
   },
 
-  async getInventarioOperadorCompleto(filtros) {
-    const { operador, ciudad, empresa, fechaInicial, fechaFinal } = filtros;
-    
+  getInventarioOperadorCompleto: async (filtros) => {
+    const { operador, ciudad, empresa, fechaInicial, fechaFinal } = filtros
+
+    // Una fila por operador por poste
     let query = `
       SELECT 
+        i.id as consecutivo,
         i.fecha_registro,
         i.waypoint,
         c.nombre as ciudad,
         b.nombre as barrio,
-        CONCAT_WS(' ', 
-          i.direccion_campo1, 
-          i.direccion_campo2, 
-          i.direccion_campo3, 
-          i.direccion_campo4
-        ) as direccion_completa,
+        i.direccion_completa,
         i.codigo_estructura,
+        i.consecutivo_poste,
         i.tipo,
         i.material,
         i.altura,
         i.ano_fabricacion,
         i.templete,
         i.estado_templete,
+        i.estado_estructura,
         i.baja,
         i.alumbrado,
-        i.tierra_electrica
-      FROM inventario i
+        i.tierra_electrica,
+        io.operador_nombre,
+        io.herrajes,
+        io.coaxial,
+        io.telefonico,
+        io.fibra_optica,
+        io.utp,
+        io.guaya,
+        io.total_cables,
+        io.marquilla,
+        io.cruce_via,
+        io.cruce_estado,
+        io.cruce_diagonal,
+        io.cruce_sin_red,
+        io.cruce_acometida,
+        io.cruce_desalineado,
+        io.activo_amplificador,
+        io.activo_nodo_optico,
+        io.activo_fuente_poder,
+        io.activo_amplificador_110v,
+        io.activo_nodo_optico_110v,
+        io.activo_fuente_poder_110v,
+        io.activo_switch_110v,
+        io.pasivo_caja_nap,
+        io.pasivo_caja_empalme,
+        io.pasivo_reserva,
+        io.pasivo_bajante,
+        io.observaciones as operador_observaciones
+      FROM inventarios i
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE 1=1
-    `;
-    
-    const params = [];
-    
+      INNER JOIN inventarios_operadores io ON io.inventario_id = i.id
+      WHERE i.estado = 'activo'
+    `
+
+    const params = []
+    let paramCount = 1
+
     if (operador) {
-      query += ` AND EXISTS (
-        SELECT 1 FROM inventario_operadores io
-        INNER JOIN operadores o ON io.operador_id = o.id
-        WHERE io.inventario_id = i.id AND o.nombre = ?
-      )`;
-      params.push(operador);
+      query += ` AND io.operador_nombre = $${paramCount}`
+      params.push(operador)
+      paramCount++
     }
-    
+
     if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
     }
-    
+
     if (empresa) {
-      query += ` AND i.proyecto_id = ?`;
-      params.push(empresa);
+      query += ` AND i.empresa_id = $${paramCount}`
+      params.push(empresa)
+      paramCount++
     }
-    
+
     if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= ?`;
-      params.push(fechaInicial);
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
     }
-    
+
     if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= ?`;
-      params.push(fechaFinal);
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
     }
-    
-    query += ` ORDER BY i.fecha_registro DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
+
+    query += ` ORDER BY i.fecha_registro DESC, io.operador_nombre ASC`
+
+    const result = await pool.query(query, params)
+    return result.rows
   },
 
   // ========== INVENTARIO POR INSPECTOR ==========
-  async getInventarioInspector(filtros) {
-    const { inspector, ciudad, empresa, fechaInicial, fechaFinal } = filtros;
-    
+  getInventarioInspector: async (filtros) => {
+    const { inspector, ciudad, empresa, fechaInicial, fechaFinal } = filtros
+
     let query = `
       SELECT 
         i.id,
@@ -145,115 +186,159 @@ const reportesApi = {
         i.waypoint,
         c.nombre as ciudad,
         b.nombre as barrio,
-        CONCAT_WS(' ', 
-          i.direccion_campo1, 
-          i.direccion_campo2, 
-          i.direccion_campo3, 
-          i.direccion_campo4
-        ) as direccion_completa,
-        i.inspector
-      FROM inventario i
-      LEFT JOIN ciudades c ON i.ciudad_id = c.id
-      LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE 1=1
-    `;
-    
-    const params = [];
-    
-    if (inspector) {
-      query += ` AND i.inspector = ?`;
-      params.push(inspector);
-    }
-    
-    if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
-    }
-    
-    if (empresa) {
-      query += ` AND i.proyecto_id = ?`;
-      params.push(empresa);
-    }
-    
-    if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= ?`;
-      params.push(fechaInicial);
-    }
-    
-    if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= ?`;
-      params.push(fechaFinal);
-    }
-    
-    query += ` ORDER BY i.fecha_registro DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
-  },
-
-  async getInventarioInspectorCompleto(filtros) {
-    const { inspector, ciudad, empresa, fechaInicial, fechaFinal } = filtros;
-    
-    let query = `
-      SELECT 
-        i.fecha_registro,
-        i.waypoint,
-        c.nombre as ciudad,
-        b.nombre as barrio,
-        CONCAT_WS(' ', 
-          i.direccion_campo1, 
-          i.direccion_campo2, 
-          i.direccion_campo3, 
-          i.direccion_campo4
-        ) as direccion_completa,
+        i.direccion_completa,
         i.codigo_estructura,
         i.tipo,
         i.material,
         i.altura,
-        i.inspector
-      FROM inventario i
+        i.estado_estructura,
+        i.baja,
+        i.alumbrado,
+        i.tierra_electrica,
+        i.inspector_nombre,
+        COALESCE(
+          (SELECT COUNT(*) FROM inventarios_operadores io WHERE io.inventario_id = i.id),
+          0
+        ) as total_operadores
+      FROM inventarios i
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE 1=1
-    `;
-    
-    const params = [];
-    
+      WHERE i.estado = 'activo'
+    `
+
+    const params = []
+    let paramCount = 1
+
     if (inspector) {
-      query += ` AND i.inspector = ?`;
-      params.push(inspector);
+      query += ` AND i.inspector_nombre = $${paramCount}`
+      params.push(inspector)
+      paramCount++
     }
-    
+
     if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
     }
-    
+
     if (empresa) {
-      query += ` AND i.proyecto_id = ?`;
-      params.push(empresa);
+      query += ` AND i.empresa_id = $${paramCount}`
+      params.push(empresa)
+      paramCount++
     }
-    
+
     if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= ?`;
-      params.push(fechaInicial);
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
     }
-    
+
     if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= ?`;
-      params.push(fechaFinal);
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
     }
-    
-    query += ` ORDER BY i.fecha_registro DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
+
+    query += ` ORDER BY i.fecha_registro DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
+  },
+
+  getInventarioInspectorCompleto: async (filtros) => {
+    const { inspector, ciudad, empresa, fechaInicial, fechaFinal } = filtros
+
+    let query = `
+      SELECT 
+        i.id as consecutivo,
+        i.fecha_registro,
+        i.waypoint,
+        c.nombre as ciudad,
+        b.nombre as barrio,
+        i.direccion_completa,
+        i.codigo_estructura,
+        i.consecutivo_poste,
+        i.tipo,
+        i.marcada,
+        i.material,
+        i.carga_rotura,
+        i.altura,
+        i.ano_fabricacion,
+        i.templete,
+        i.estado_templete,
+        i.estado_estructura,
+        i.desplomado,
+        i.flectado,
+        i.fracturado,
+        i.hierro_base,
+        i.baja,
+        i.baja_tipo_cable,
+        i.baja_estado_red,
+        i.alumbrado,
+        i.alumbrado_tipo_cable,
+        i.tierra_electrica,
+        i.tierra_estado,
+        i.bajantes_electricos,
+        i.inspector_nombre,
+        COALESCE(
+          (SELECT STRING_AGG(io.operador_nombre, ', ') 
+           FROM inventarios_operadores io 
+           WHERE io.inventario_id = i.id),
+          'SIN OPERADORES'
+        ) as operadores_lista,
+        COALESCE(
+          (SELECT COUNT(*) FROM inventarios_operadores io WHERE io.inventario_id = i.id),
+          0
+        ) as total_operadores
+      FROM inventarios i
+      LEFT JOIN ciudades c ON i.ciudad_id = c.id
+      LEFT JOIN barrios b ON i.barrio_id = b.id
+      WHERE i.estado = 'activo'
+    `
+
+    const params = []
+    let paramCount = 1
+
+    if (inspector) {
+      query += ` AND i.inspector_nombre = $${paramCount}`
+      params.push(inspector)
+      paramCount++
+    }
+
+    if (ciudad) {
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
+    }
+
+    if (empresa) {
+      query += ` AND i.empresa_id = $${paramCount}`
+      params.push(empresa)
+      paramCount++
+    }
+
+    if (fechaInicial) {
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
+    }
+
+    if (fechaFinal) {
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
+    }
+
+    query += ` ORDER BY i.fecha_registro DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
   },
 
   // ========== REPORTE DE REDES ==========
-  async getReporteRedes(filtros) {
-    const { ciudad, barrio, empresa, fechaInicial, fechaFinal } = filtros;
-    
+  getReporteRedes: async (filtros) => {
+    const { ciudad, barrio, empresa, fechaInicial, fechaFinal } = filtros
+
     let query = `
       SELECT 
         i.id,
@@ -261,126 +346,180 @@ const reportesApi = {
         i.waypoint,
         c.nombre as ciudad,
         b.nombre as barrio,
-        CONCAT_WS(' ', 
-          i.direccion_campo1, 
-          i.direccion_campo2, 
-          i.direccion_campo3, 
-          i.direccion_campo4
-        ) as direccion_completa,
+        i.direccion_completa,
+        i.tipo,
+        i.consecutivo_poste,
+        i.marcada,
         i.material,
+        i.carga_rotura,
+        i.codigo_estructura,
+        i.templete,
+        i.estado_templete,
         i.altura,
+        i.ano_fabricacion,
+        i.estado_estructura,
         i.baja,
         i.baja_tipo_cable,
+        i.baja_estado_red,
+        i.caja1,
+        i.caja2,
         i.alumbrado,
-        i.alumbrado_tipo_cable
-      FROM inventario i
+        i.alumbrado_tipo_cable,
+        i.alumbrado_estado_red,
+        i.lampara1_tipo,
+        i.lampara1_codigo,
+        i.lampara1_danada,
+        i.lampara1_encendida,
+        i.lampara2_tipo,
+        i.lampara2_codigo,
+        i.lampara2_danada,
+        i.lampara2_encendida,
+        i.tierra_electrica,
+        i.tierra_estado,
+        i.bajantes_electricos
+      FROM inventarios i
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE 1=1
-    `;
-    
-    const params = [];
-    
+      WHERE i.estado = 'activo'
+    `
+
+    const params = []
+    let paramCount = 1
+
     if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
     }
-    
+
     if (barrio) {
-      query += ` AND b.nombre = ?`;
-      params.push(barrio);
+      query += ` AND b.nombre = $${paramCount}`
+      params.push(barrio)
+      paramCount++
     }
-    
+
     if (empresa) {
-      query += ` AND i.proyecto_id = ?`;
-      params.push(empresa);
+      query += ` AND i.empresa_id = $${paramCount}`
+      params.push(empresa)
+      paramCount++
     }
-    
+
     if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= ?`;
-      params.push(fechaInicial);
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
     }
-    
+
     if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= ?`;
-      params.push(fechaFinal);
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
     }
-    
-    query += ` ORDER BY i.fecha_registro DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
+
+    query += ` ORDER BY i.fecha_registro DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
   },
 
-  async getReporteRedesCompleto(filtros) {
-    const { ciudad, barrio, empresa, fechaInicial, fechaFinal } = filtros;
-    
+  getReporteRedesCompleto: async (filtros) => {
+    const { ciudad, barrio, empresa, fechaInicial, fechaFinal } = filtros
+
     let query = `
       SELECT 
-        i.fecha_registro,
-        i.waypoint,
+        i.id as consecutivo,
         c.nombre as ciudad,
         b.nombre as barrio,
-        CONCAT_WS(' ', 
-          i.direccion_campo1, 
-          i.direccion_campo2, 
-          i.direccion_campo3, 
-          i.direccion_campo4
-        ) as direccion_completa,
+        i.direccion_completa,
+        i.tipo,
+        i.consecutivo_poste,
+        i.marcada,
         i.material,
+        i.carga_rotura,
+        i.codigo_estructura,
+        i.templete,
+        i.estado_templete,
         i.altura,
+        i.ano_fabricacion,
+        i.estado_estructura,
         i.baja,
         i.baja_tipo_cable,
         i.baja_estado_red,
         i.baja_continuidad_electrica,
+        i.caja1,
+        i.caja2,
         i.alumbrado,
         i.alumbrado_tipo_cable,
         i.alumbrado_estado_red,
+        i.lampara1_tipo,
+        i.lampara1_codigo,
+        i.lampara1_danada,
+        i.lampara1_encendida,
+        i.lampara2_tipo,
+        i.lampara2_codigo,
+        i.lampara2_danada,
+        i.lampara2_encendida,
         i.tierra_electrica,
-        i.tierra_estado
-      FROM inventario i
+        i.tierra_estado,
+        i.tierra_suelta,
+        i.tierra_desconectada,
+        i.tierra_rota,
+        i.bajantes_electricos,
+        i.lampara,
+        i.camara_tv,
+        i.corneta,
+        i.aviso,
+        i.caja_metalica,
+        i.otro
+      FROM inventarios i
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE 1=1
-    `;
-    
-    const params = [];
-    
+      WHERE i.estado = 'activo'
+    `
+
+    const params = []
+    let paramCount = 1
+
     if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
     }
-    
+
     if (barrio) {
-      query += ` AND b.nombre = ?`;
-      params.push(barrio);
+      query += ` AND b.nombre = $${paramCount}`
+      params.push(barrio)
+      paramCount++
     }
-    
+
     if (empresa) {
-      query += ` AND i.proyecto_id = ?`;
-      params.push(empresa);
+      query += ` AND i.empresa_id = $${paramCount}`
+      params.push(empresa)
+      paramCount++
     }
-    
+
     if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= ?`;
-      params.push(fechaInicial);
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
     }
-    
+
     if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= ?`;
-      params.push(fechaFinal);
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
     }
-    
-    query += ` ORDER BY i.fecha_registro DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
+
+    query += ` ORDER BY i.fecha_registro DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
   },
 
   // ========== REPORTE DE PODA ==========
-  async getReportePoda(filtros) {
-    const { ciudad, empresa, fechaInicial, fechaFinal } = filtros;
-    
+  getReportePoda: async (filtros) => {
+    const { ciudad, empresa, fechaInicial, fechaFinal } = filtros
+
     let query = `
       SELECT 
         i.id,
@@ -388,51 +527,51 @@ const reportesApi = {
         i.waypoint,
         c.nombre as ciudad,
         b.nombre as barrio,
-        CONCAT_WS(' ', 
-          i.direccion_campo1, 
-          i.direccion_campo2, 
-          i.direccion_campo3, 
-          i.direccion_campo4
-        ) as direccion_completa,
+        i.direccion_completa,
         i.poda_arboles
-      FROM inventario i
+      FROM inventarios i
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE i.poda_arboles = 'SI'
-    `;
-    
-    const params = [];
-    
+      WHERE i.estado = 'activo' AND i.poda_arboles = 'SI'
+    `
+
+    const params = []
+    let paramCount = 1
+
     if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
     }
-    
+
     if (empresa) {
-      query += ` AND i.proyecto_id = ?`;
-      params.push(empresa);
+      query += ` AND i.empresa_id = $${paramCount}`
+      params.push(empresa)
+      paramCount++
     }
-    
+
     if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= ?`;
-      params.push(fechaInicial);
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
     }
-    
+
     if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= ?`;
-      params.push(fechaFinal);
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
     }
-    
-    query += ` ORDER BY i.fecha_registro DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
+
+    query += ` ORDER BY i.fecha_registro DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
   },
 
   // ========== REPORTE DE ESTRUCTURAS ==========
-  async getReporteEstructuras(filtros) {
-    const { ciudad, empresa, fechaInicial, fechaFinal } = filtros;
-    
+  getReporteEstructuras: async (filtros) => {
+    const { ciudad, empresa, fechaInicial, fechaFinal } = filtros
+
     let query = `
       SELECT 
         i.id,
@@ -440,67 +579,13 @@ const reportesApi = {
         i.waypoint,
         c.nombre as ciudad,
         b.nombre as barrio,
-        CONCAT_WS(' ', 
-          i.direccion_campo1, 
-          i.direccion_campo2, 
-          i.direccion_campo3, 
-          i.direccion_campo4
-        ) as direccion_completa,
+        i.direccion_completa,
         i.tipo,
+        i.consecutivo_poste,
+        i.marcada,
         i.material,
-        i.altura,
-        i.estado_estructura
-      FROM inventario i
-      LEFT JOIN ciudades c ON i.ciudad_id = c.id
-      LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE 1=1
-    `;
-    
-    const params = [];
-    
-    if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
-    }
-    
-    if (empresa) {
-      query += ` AND i.proyecto_id = ?`;
-      params.push(empresa);
-    }
-    
-    if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= ?`;
-      params.push(fechaInicial);
-    }
-    
-    if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= ?`;
-      params.push(fechaFinal);
-    }
-    
-    query += ` ORDER BY i.fecha_registro DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
-  },
-
-  async getReporteEstructurasCompleto(filtros) {
-    const { ciudad, empresa, fechaInicial, fechaFinal } = filtros;
-    
-    let query = `
-      SELECT 
-        i.fecha_registro,
-        i.waypoint,
-        c.nombre as ciudad,
-        b.nombre as barrio,
-        CONCAT_WS(' ', 
-          i.direccion_campo1, 
-          i.direccion_campo2, 
-          i.direccion_campo3, 
-          i.direccion_campo4
-        ) as direccion_completa,
-        i.tipo,
-        i.material,
+        i.carga_rotura,
+        i.codigo_estructura,
         i.altura,
         i.ano_fabricacion,
         i.templete,
@@ -510,44 +595,117 @@ const reportesApi = {
         i.flectado,
         i.fracturado,
         i.hierro_base
-      FROM inventario i
+      FROM inventarios i
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE 1=1
-    `;
-    
-    const params = [];
-    
+      WHERE i.estado = 'activo'
+    `
+
+    const params = []
+    let paramCount = 1
+
     if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
     }
-    
+
     if (empresa) {
-      query += ` AND i.proyecto_id = ?`;
-      params.push(empresa);
+      query += ` AND i.empresa_id = $${paramCount}`
+      params.push(empresa)
+      paramCount++
     }
-    
+
     if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= ?`;
-      params.push(fechaInicial);
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
     }
-    
+
     if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= ?`;
-      params.push(fechaFinal);
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
     }
-    
-    query += ` ORDER BY i.fecha_registro DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
+
+    query += ` ORDER BY i.fecha_registro DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
+  },
+
+  getReporteEstructurasCompleto: async (filtros) => {
+    const { ciudad, empresa, fechaInicial, fechaFinal } = filtros
+
+    let query = `
+      SELECT 
+        i.id as consecutivo,
+        i.fecha_registro,
+        i.waypoint,
+        c.nombre as ciudad,
+        b.nombre as barrio,
+        i.direccion_completa,
+        i.tipo,
+        i.consecutivo_poste,
+        i.marcada,
+        i.material,
+        i.carga_rotura,
+        i.codigo_estructura,
+        i.altura,
+        i.ano_fabricacion,
+        i.templete,
+        i.estado_templete,
+        i.estado_estructura,
+        i.desplomado,
+        i.flectado,
+        i.fracturado,
+        i.hierro_base,
+        i.bajantes_electricos,
+        i.poda_arboles,
+        i.posible_fraude
+      FROM inventarios i
+      LEFT JOIN ciudades c ON i.ciudad_id = c.id
+      LEFT JOIN barrios b ON i.barrio_id = b.id
+      WHERE i.estado = 'activo'
+    `
+
+    const params = []
+    let paramCount = 1
+
+    if (ciudad) {
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
+    }
+
+    if (empresa) {
+      query += ` AND i.empresa_id = $${paramCount}`
+      params.push(empresa)
+      paramCount++
+    }
+
+    if (fechaInicial) {
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
+    }
+
+    if (fechaFinal) {
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
+    }
+
+    query += ` ORDER BY i.fecha_registro DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
   },
 
   // ========== REPORTE DE PÉRDIDAS ==========
-  async getReportePerdidas(filtros) {
-    const { ciudad, empresa, fechaInicial, fechaFinal } = filtros;
-    
+  getReportePerdidas: async (filtros) => {
+    const { ciudad, empresa, fechaInicial, fechaFinal } = filtros
+
     let query = `
       SELECT 
         i.id,
@@ -555,51 +713,51 @@ const reportesApi = {
         i.waypoint,
         c.nombre as ciudad,
         b.nombre as barrio,
-        CONCAT_WS(' ', 
-          i.direccion_campo1, 
-          i.direccion_campo2, 
-          i.direccion_campo3, 
-          i.direccion_campo4
-        ) as direccion_completa,
+        i.direccion_completa,
         i.posible_fraude
-      FROM inventario i
+      FROM inventarios i
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE i.posible_fraude = 'SI'
-    `;
-    
-    const params = [];
-    
+      WHERE i.estado = 'activo' AND i.posible_fraude = 'SI'
+    `
+
+    const params = []
+    let paramCount = 1
+
     if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
     }
-    
+
     if (empresa) {
-      query += ` AND i.proyecto_id = ?`;
-      params.push(empresa);
+      query += ` AND i.empresa_id = $${paramCount}`
+      params.push(empresa)
+      paramCount++
     }
-    
+
     if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= ?`;
-      params.push(fechaInicial);
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
     }
-    
+
     if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= ?`;
-      params.push(fechaFinal);
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
     }
-    
-    query += ` ORDER BY i.fecha_registro DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
+
+    query += ` ORDER BY i.fecha_registro DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
   },
 
   // ========== REPORTE DE FACTIBILIDAD ==========
-  async getReporteFactibilidad(filtros) {
-    const { ciudad, barrio, operario, proyecto, fechaInicial, fechaFinal } = filtros;
-    
+  getReporteFactibilidad: async (filtros) => {
+    const { ciudad, barrio, operador, proyecto, fechaInicial, fechaFinal } = filtros
+
     let query = `
       SELECT 
         f.id,
@@ -607,120 +765,147 @@ const reportesApi = {
         f.codigo_poste,
         c.nombre as ciudad,
         b.nombre as barrio,
-        f.direccion,
-        f.operario,
-        p.nombre as proyecto
-      FROM factibilidad f
+        f.direccion_via as direccion,
+        o.nombre as operador,
+        p.nombre as proyecto,
+        f.poste_material as tipo_poste,
+        f.poste_altura as altura_poste
+      FROM factibilidades f
       LEFT JOIN ciudades c ON f.ciudad_id = c.id
       LEFT JOIN barrios b ON f.barrio_id = b.id
       LEFT JOIN proyectos p ON f.proyecto_id = p.id
-      WHERE 1=1
-    `;
-    
-    const params = [];
-    
+      LEFT JOIN operadores o ON f.operador_id = o.id
+      WHERE f.estado = 'activo'
+    `
+
+    const params = []
+    let paramCount = 1
+
     if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
     }
-    
+
     if (barrio) {
-      query += ` AND b.nombre = ?`;
-      params.push(barrio);
+      query += ` AND b.nombre = $${paramCount}`
+      params.push(barrio)
+      paramCount++
     }
-    
-    if (operario) {
-      query += ` AND f.operario = ?`;
-      params.push(operario);
+
+    if (operador) {
+      query += ` AND f.operador_id = $${paramCount}`
+      params.push(operador)
+      paramCount++
     }
-    
+
     if (proyecto) {
-      query += ` AND f.proyecto_id = ?`;
-      params.push(proyecto);
+      query += ` AND f.proyecto_id = $${paramCount}`
+      params.push(proyecto)
+      paramCount++
     }
-    
+
     if (fechaInicial) {
-      query += ` AND DATE(f.created_at) >= ?`;
-      params.push(fechaInicial);
+      query += ` AND DATE(f.created_at) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
     }
-    
+
     if (fechaFinal) {
-      query += ` AND DATE(f.created_at) <= ?`;
-      params.push(fechaFinal);
+      query += ` AND DATE(f.created_at) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
     }
-    
-    query += ` ORDER BY f.created_at DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
+
+    query += ` ORDER BY f.created_at DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
   },
 
-  async getReporteFactibilidadCompleto(filtros) {
-    const { ciudad, barrio, operario, proyecto, fechaInicial, fechaFinal } = filtros;
-    
+  getReporteFactibilidadCompleto: async (filtros) => {
+    const { ciudad, barrio, operador, proyecto, fechaInicial, fechaFinal } = filtros
+
     let query = `
       SELECT 
         f.created_at,
         f.codigo_poste,
         c.nombre as ciudad,
         b.nombre as barrio,
-        f.direccion,
-        f.operario,
+        f.direccion_via as direccion,
+        o.nombre as operador,
         p.nombre as proyecto,
-        f.tipo_poste,
-        f.altura_poste,
-        f.coordenadas,
+        f.poste_material as tipo_poste,
+        f.poste_altura as altura_poste,
+        CONCAT(f.latitud, ', ', f.longitud) as coordenadas,
         f.observaciones
-      FROM factibilidad f
+      FROM factibilidades f
       LEFT JOIN ciudades c ON f.ciudad_id = c.id
       LEFT JOIN barrios b ON f.barrio_id = b.id
       LEFT JOIN proyectos p ON f.proyecto_id = p.id
-      WHERE 1=1
-    `;
-    
-    const params = [];
-    
-    if (empresa) {
-        query += ` AND p.operador_id = $${paramCount}`;
-        params.push(empresa);
-        paramCount++;
-    }
+      LEFT JOIN operadores o ON f.operador_id = o.id
+      WHERE f.estado = 'activo'
+    `
+
+    const params = []
+    let paramCount = 1
 
     if (ciudad) {
-      query += ` AND c.nombre = ?`;
-      params.push(ciudad);
+      query += ` AND c.nombre = $${paramCount}`
+      params.push(ciudad)
+      paramCount++
     }
-    
-    if (barrio) {
-      query += ` AND b.nombre = ?`;
-      params.push(barrio);
-    }
-    
-    if (operario) {
-      query += ` AND f.operario = ?`;
-      params.push(operario);
-    }
-    
-    if (proyecto) {
-      query += ` AND f.proyecto_id = ?`;
-      params.push(proyecto);
-    }
-    
-    if (fechaInicial) {
-      query += ` AND DATE(f.created_at) >= ?`;
-      params.push(fechaInicial);
-    }
-    
-    if (fechaFinal) {
-      query += ` AND DATE(f.created_at) <= ?`;
-      params.push(fechaFinal);
-    }
-    
-    query += ` ORDER BY f.created_at DESC`;
-    
-    const [datos] = await pool.query(query, params);
-    return datos;
-  }
-};
 
-module.exports = reportesApi;
+    if (barrio) {
+      query += ` AND b.nombre = $${paramCount}`
+      params.push(barrio)
+      paramCount++
+    }
+
+    if (operador) {
+      query += ` AND f.operador_id = $${paramCount}`
+      params.push(operador)
+      paramCount++
+    }
+
+    if (proyecto) {
+      query += ` AND f.proyecto_id = $${paramCount}`
+      params.push(proyecto)
+      paramCount++
+    }
+
+    if (fechaInicial) {
+      query += ` AND DATE(f.created_at) >= $${paramCount}`
+      params.push(fechaInicial)
+      paramCount++
+    }
+
+    if (fechaFinal) {
+      query += ` AND DATE(f.created_at) <= $${paramCount}`
+      params.push(fechaFinal)
+      paramCount++
+    }
+
+    query += ` ORDER BY f.created_at DESC`
+
+    const result = await pool.query(query, params)
+    return result.rows
+  },
+
+  getDashboardStats: async () => {
+    const query = `
+      SELECT
+        COUNT(*) as total_postes,
+        COUNT(CASE WHEN estado_completitud = 'completo' THEN 1 END) as inventario_completo,
+        COUNT(CASE WHEN estado_completitud = 'pendiente_operadores' THEN 1 END) as pendiente_operadores
+      FROM inventarios
+      WHERE estado = 'activo'
+    `
+    const result = await pool.query(query)
+    return result.rows[0]
+  }
+
+
+}
+
+module.exports = reportesApi

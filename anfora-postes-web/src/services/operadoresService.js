@@ -1,4 +1,3 @@
-// src/services/operadoresService.js
 import api from './api';
 
 const operadoresService = {
@@ -25,7 +24,18 @@ const operadoresService = {
   eliminar: async (id) => {
     const response = await api.delete(`/operadores/${id}`);
     return response.data;
+  },
+
+  obtenerOperadoresDeInventarios: async () => {
+    try {
+      const response = await api.get('/helpers/operadores');
+      return response.data.data || [];
+    } catch (error) {
+      console.error('Error obteniendo operadores de inventarios:', error);
+      return [];
+    }
   }
 };
 
 export default operadoresService;
+

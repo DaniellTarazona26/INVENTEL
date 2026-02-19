@@ -87,7 +87,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
   const [loading, setLoading] = useState(false)
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' })
   const [modoEdicion, setModoEdicion] = useState(false)
-  const [allowNavigation, setAllowNavigation] = useState(false)
 
   useEffect(() => {
     cargarCiudades()
@@ -109,19 +108,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
       cargarInventario(inventarioIdEditar)
     }
   }, [inventarioIdEditar])
-
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (modoEdicion && !allowNavigation) {
-        e.preventDefault()
-        e.returnValue = '¿Estás seguro de que quieres salir? Los cambios en edición se perderán.'
-        return e.returnValue
-      }
-    }
-    
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [modoEdicion, allowNavigation])
 
   const cargarCiudades = async () => {
     try {
@@ -176,7 +162,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
       
       if (response.success) {
         const inv = response.inventario
-
+        
         let empresaIdDelInventario = inv.empresa_id || ''
         
         setFormData({
@@ -629,14 +615,13 @@ const AgregarPoste = ({ setCurrentPage }) => {
         localStorage.setItem('inventarioParcialId', response.inventario.id)
         localStorage.setItem('operadoresSeleccionados', JSON.stringify(operadoresSeleccionados))
         
-        setAllowNavigation(true)
         setModoEdicion(false)
         
         mostrarMensaje('success', '✅ Datos guardados. Redirigiendo a operadores...')
         
         setTimeout(() => {
           setCurrentPage('agregar-operadores')
-        }, 1500)
+        }, 500)
       }
 
     } catch (error) {
@@ -2044,7 +2029,6 @@ const AgregarPoste = ({ setCurrentPage }) => {
               <button 
                 className="btn-guardar-continuar"
                 onClick={() => {
-                  setAllowNavigation(true)
                   localStorage.setItem('editarInventarioId', inventarioIdEditar)
                   setCurrentPage('agregar-operadores')
                 }}
@@ -2071,3 +2055,4 @@ const AgregarPoste = ({ setCurrentPage }) => {
 }
 
 export default AgregarPoste
+

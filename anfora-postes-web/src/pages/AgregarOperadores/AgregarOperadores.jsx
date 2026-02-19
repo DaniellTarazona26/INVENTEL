@@ -48,7 +48,7 @@ const OBSERVACIONES_PREDEFINIDAS = [
 
 const AgregarOperadores = ({ setCurrentPage }) => {
   
-  const inventarioId = localStorage.getItem('inventarioParcialId')
+  const inventarioId = localStorage.getItem('inventarioParcialId') || localStorage.getItem('editarInventarioId')
   const operadoresSeleccionados = JSON.parse(localStorage.getItem('operadoresSeleccionados') || '[]')
 
   const [inventario, setInventario] = useState(null)
@@ -181,12 +181,99 @@ const AgregarOperadores = ({ setCurrentPage }) => {
           const ops = response.inventario.operadores
           localStorage.setItem('operadoresSeleccionados', JSON.stringify(ops))
           
-          const datosOps = {}
-          ops.forEach(op => {
-            datosOps[op] = { ...formDataInicial }
-          })
-          
-          setDatosOperadores(datosOps)
+          try {
+            const datosResponse = await inventarioOperadoresService.obtenerPorInventario(idInventario)
+            
+            if (datosResponse.success && datosResponse.operadores && datosResponse.operadores.length > 0) {
+              const nuevosDatosOperadores = {}
+              
+              datosResponse.operadores.forEach(op => {
+                nuevosDatosOperadores[op.operador_nombre] = {
+                  herrajes: op.herrajes || '',
+                  coaxial: op.coaxial || '',
+                  telefonico: op.telefonico || '',
+                  fibra_optica: op.fibra_optica || '',
+                  utp: op.utp || '',
+                  guaya: op.guaya || '',
+                  marquilla: op.marquilla || '',
+                  cruce_via: op.cruce_via || '',
+                  cruce_estado: op.cruce_estado || '',
+                  cruce_diagonal: op.cruce_diagonal || '',
+                  cruce_sin_red: op.cruce_sin_red || '',
+                  cruce_acometida: op.cruce_acometida || '',
+                  cruce_desalineado: op.cruce_desalineado || '',
+                  activo_amplificador: op.activo_amplificador || false,
+                  activo_nodo_optico: op.activo_nodo_optico || false,
+                  activo_fuente_poder: op.activo_fuente_poder || false,
+                  activo_amplificador_110v: op.activo_amplificador_110v || false,
+                  activo_nodo_optico_110v: op.activo_nodo_optico_110v || false,
+                  activo_fuente_poder_110v: op.activo_fuente_poder_110v || false,
+                  activo_switch_110v: op.activo_switch_110v || false,
+                  pasivo_caja_nap: op.pasivo_caja_nap || false,
+                  pasivo_caja_empalme: op.pasivo_caja_empalme || false,
+                  pasivo_reserva: op.pasivo_reserva || false,
+                  pasivo_bajante: op.pasivo_bajante || false,
+                  reserva1: op.reserva1 || '',
+                  reserva1_chipa_raqueta: op.reserva1_chipa_raqueta || '',
+                  reserva1_ubicacion: op.reserva1_ubicacion || '',
+                  reserva1_marquilla: op.reserva1_marquilla || '',
+                  reserva2: op.reserva2 || '',
+                  reserva2_chipa_raqueta: op.reserva2_chipa_raqueta || '',
+                  reserva2_ubicacion: op.reserva2_ubicacion || '',
+                  reserva2_marquilla: op.reserva2_marquilla || '',
+                  caja1: op.caja1 || '',
+                  caja1_ubicacion: op.caja1_ubicacion || '',
+                  caja1_marquilla: op.caja1_marquilla || '',
+                  caja2: op.caja2 || '',
+                  caja2_ubicacion: op.caja2_ubicacion || '',
+                  caja2_marquilla: op.caja2_marquilla || '',
+                  caja3: op.caja3 || '',
+                  caja3_ubicacion: op.caja3_ubicacion || '',
+                  caja3_marquilla: op.caja3_marquilla || '',
+                  empalme1: op.empalme1 || '',
+                  empalme1_ubicacion: op.empalme1_ubicacion || '',
+                  empalme1_marquilla: op.empalme1_marquilla || '',
+                  empalme2: op.empalme2 || '',
+                  empalme2_ubicacion: op.empalme2_ubicacion || '',
+                  empalme2_marquilla: op.empalme2_marquilla || '',
+                  empalme3: op.empalme3 || '',
+                  empalme3_ubicacion: op.empalme3_ubicacion || '',
+                  empalme3_marquilla: op.empalme3_marquilla || '',
+                  empalme4: op.empalme4 || '',
+                  empalme4_ubicacion: op.empalme4_ubicacion || '',
+                  empalme4_marquilla: op.empalme4_marquilla || '',
+                  bajante1: op.bajante1 || '',
+                  bajante1_cables: op.bajante1_cables || '',
+                  bajante1_diametro: op.bajante1_diametro || '',
+                  bajante1_material: op.bajante1_material || '',
+                  bajante1_fibra: op.bajante1_fibra || '',
+                  bajante1_telefonico: op.bajante1_telefonico || '',
+                  bajante1_utp: op.bajante1_utp || '',
+                  bajante1_coaxial: op.bajante1_coaxial || '',
+                  observaciones: op.observaciones || '',
+                  observaciones_checkboxes: typeof op.observaciones_checkboxes === 'string'
+                    ? JSON.parse(op.observaciones_checkboxes)
+                    : (Array.isArray(op.observaciones_checkboxes) ? op.observaciones_checkboxes : [])
+                }
+              })
+              
+              setDatosOperadores(nuevosDatosOperadores)
+              mostrarMensaje('success', 'Datos cargados para edición')
+            } else {
+              const datosOps = {}
+              ops.forEach(op => {
+                datosOps[op] = { ...formDataInicial }
+              })
+              setDatosOperadores(datosOps)
+            }
+          } catch (errorOps) {
+            console.error('Error cargando datos de operadores:', errorOps)
+            const datosOps = {}
+            ops.forEach(op => {
+              datosOps[op] = { ...formDataInicial }
+            })
+            setDatosOperadores(datosOps)
+          }
         } else {
           inicializarDatosOperadores()
         }
@@ -291,7 +378,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
 
       setAllowNavigation(true)
 
-      mostrarMensaje('success', '✅ Inventario completado exitosamente')
+      mostrarMensaje('success', 'Inventario completado exitosamente')
 
       setTimeout(() => {
         localStorage.removeItem('inventarioParcialId')
@@ -299,10 +386,9 @@ const AgregarOperadores = ({ setCurrentPage }) => {
         localStorage.removeItem('editarInventarioId')
         setCurrentPage('inventario')
       }, 2000)
-
     } catch (error) {
       console.error('Error guardando datos:', error)
-      mostrarMensaje('error', '❌ Error al guardar datos de operadores')
+      mostrarMensaje('error', 'Error al guardar datos de operadores')
     } finally {
       setLoading(false)
     }
@@ -1109,12 +1195,11 @@ const AgregarOperadores = ({ setCurrentPage }) => {
             type="button"
             className="btn-secondary"
             onClick={() => {
-              setAllowNavigation(true)
-              const editarId = localStorage.getItem('editarInventarioId')
-              if (editarId) {
-                localStorage.setItem('editarInventarioId', editarId)
+              const inventarioId = localStorage.getItem('inventarioParcialId') || localStorage.getItem('editarInventarioId')
+              if (inventarioId) {
+                localStorage.setItem('editarInventarioId', inventarioId)
               }
-              setCurrentPage('agregar-poste')
+              setCurrentPage('agregar')
             }}
             disabled={loading}
           >
@@ -1145,3 +1230,4 @@ const AgregarOperadores = ({ setCurrentPage }) => {
 }
 
 export default AgregarOperadores
+

@@ -10,7 +10,6 @@ import Factibilidad from './pages/Factibilidad/Factibilidad'
 import Importar from './pages/Importar/Importar'
 import Opciones from './pages/Opciones/Opciones'
 import authService from './services/authService'
-import ConfirmModal from './components/common/ConfirmModal'
 import './App.css'
 
 function App() {
@@ -18,8 +17,6 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [usuario, setUsuario] = useState(null)
   const [cargando, setCargando] = useState(true)
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [pendingDestination, setPendingDestination] = useState(null)
   const [factibilidadEditandoId, setFactibilidadEditandoId] = useState(null)
 
   useEffect(() => {
@@ -54,31 +51,12 @@ function App() {
   }
 
   const handleNavegacion = (destino, factibilidadId = null) => {
-    const enEdicion = localStorage.getItem('editarInventarioId')
-    
-    if (currentPage === 'agregar' && enEdicion) {
-      setPendingDestination(destino)
-      setShowConfirmModal(true)
+    if (factibilidadId) {
+      setFactibilidadEditandoId(factibilidadId)
     } else {
-      if (factibilidadId) {
-        setFactibilidadEditandoId(factibilidadId)
-      } else {
-        setFactibilidadEditandoId(null)
-      }
-      setCurrentPage(destino)
+      setFactibilidadEditandoId(null)
     }
-  }
-
-  const confirmarNavegacion = () => {
-    localStorage.removeItem('editarInventarioId')
-    setCurrentPage(pendingDestination)
-    setShowConfirmModal(false)
-    setPendingDestination(null)
-  }
-
-  const cancelarNavegacion = () => {
-    setShowConfirmModal(false)
-    setPendingDestination(null)
+    setCurrentPage(destino)
   }
 
   if (cargando) {
@@ -122,24 +100,16 @@ function App() {
   }
 
   return (
-    <>
-      <ConfirmModal
-        show={showConfirmModal}
-        message="Estás editando un registro. Si sales ahora, los cambios no guardados se perderán. ¿Deseas continuar?"
-        onConfirm={confirmarNavegacion}
-        onCancel={cancelarNavegacion}
-      />
-      
-      <MainLayout 
-        currentPage={currentPage} 
-        setCurrentPage={handleNavegacion}
-        onLogout={handleLogout}
-        usuario={usuario}
-      >
-        {renderPage()}
-      </MainLayout>
-    </>
+    <MainLayout 
+      currentPage={currentPage} 
+      setCurrentPage={handleNavegacion}
+      onLogout={handleLogout}
+      usuario={usuario}
+    >
+      {renderPage()}
+    </MainLayout>
   )
 }
 
 export default App
+

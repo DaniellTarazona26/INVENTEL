@@ -13,6 +13,20 @@ const inventariosService = {
     try {
       await client.query('BEGIN')
       
+      
+      if (datos.codigoEstructura) {
+      const checkCodigo = await client.query(
+        'SELECT id FROM inventarios WHERE codigo_estructura = $1 AND estado = $2',
+        [datos.codigoEstructura, 'activo']
+      )
+      
+      if (checkCodigo.rows.length > 0) {
+        throw new Error(`El código de estructura "${datos.codigoEstructura}" ya existe`)
+      }
+    }
+
+
+
       let barrioId = datos.barrio
       
       if (datos.barrio && isNaN(datos.barrio)) {
@@ -405,6 +419,19 @@ const inventariosService = {
     
     try {
       await client.query('BEGIN')
+
+
+
+      if (datos.codigoEstructura) {
+      const checkCodigo = await client.query(
+        'SELECT id FROM inventarios WHERE codigo_estructura = $1 AND estado = $2 AND id != $3',
+        [datos.codigoEstructura, 'activo', id]
+      )
+      
+      if (checkCodigo.rows.length > 0) {
+        throw new Error(`El código de estructura "${datos.codigoEstructura}" ya existe`)
+      }
+    }
       
       let barrioId = datos.barrio
       

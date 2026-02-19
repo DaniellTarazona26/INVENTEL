@@ -1,110 +1,113 @@
-// src/pages/Reportes/ReporteInventarioOperador.jsx
-import React, { useState, useEffect } from 'react'
-import './ReportesComun.css'
-import helpersService from '../../services/helpersService'
-import reportesService from '../../services/reportesService'
+import React, { useState, useEffect } from "react";
+import "./ReportesComun.css";
+import ciudadesService from "../../services/ciudadesService";
+import empresasService from "../../services/empresasService";
+import operadoresService from "../../services/operadoresService";
+import reportesService from "../../services/reportesService";
 
 const ReporteInventarioOperador = () => {
   const [filtros, setFiltros] = useState({
-    operador: '',
-    ciudad: '',
-    empresa: '',
-    fechaInicial: '2026-01-01',
-    fechaFinal: '2026-01-31'
-  })
+    operador: "",
+    ciudad: "",
+    empresa: "",
+    fechaInicial: "",
+    fechaFinal: ""
+  });
 
-  const [datos, setDatos] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [exportando, setExportando] = useState(false)
+  const [datos, setDatos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [exportando, setExportando] = useState(false);
+  const [operadores, setOperadores] = useState([]);
+  const [ciudades, setCiudades] = useState([]);
+  const [proyectos, setProyectos] = useState([]);
 
-  // Estados para dropdowns
-  const [operadores, setOperadores] = useState([])
-  const [ciudades, setCiudades] = useState([])
-  const [proyectos, setProyectos] = useState([])
-
-  // Cargar datos al montar el componente
   useEffect(() => {
-    cargarDatosIniciales()
-  }, [])
+    cargarDatosIniciales();
+  }, []);
 
   const cargarDatosIniciales = async () => {
     try {
       const [operadoresData, ciudadesData, proyectosData] = await Promise.all([
-        helpersService.obtenerOperadores(),
-        helpersService.obtenerCiudades(),
-        helpersService.obtenerProyectos()
-      ])
+        operadoresService.obtenerOperadoresDeInventarios(),
+        ciudadesService.obtenerTodas(),
+        empresasService.obtenerTodas()
+      ]);
 
-      console.log('Operadores cargados:', operadoresData)
-      console.log('Ciudades cargadas:', ciudadesData)
-      console.log('Proyectos cargados:', proyectosData)
+      const listaOperadores = operadoresData.operadores || operadoresData;
+      const listaEmpresas = proyectosData.empresas || proyectosData;
 
-      setOperadores(operadoresData)
-      setCiudades(ciudadesData)
-      setProyectos(proyectosData)
+      setOperadores(Array.isArray(listaOperadores) ? listaOperadores : []);
+      setCiudades(Array.isArray(ciudadesData) ? ciudadesData : []);
+      setProyectos(Array.isArray(listaEmpresas) ? listaEmpresas : []);
+
     } catch (error) {
-      console.error('Error al cargar datos iniciales:', error)
+      console.error("Error al cargar datos iniciales:", error);
+      alert("Error al cargar listas de filtros");
     }
-  }
+  };
 
   const handleFiltroChange = (campo, valor) => {
-    setFiltros(prev => ({ ...prev, [campo]: valor }))
-  }
+    setFiltros(prev => ({ ...prev, [campo]: valor }));
+  };
 
   const handleBuscar = async () => {
-    setLoading(true)
-    try {
-      const datosObtenidos = await reportesService.getInventarioOperador(filtros)
-      console.log('Datos obtenidos:', datosObtenidos)
-      setDatos(datosObtenidos)
-    } catch (error) {
-      console.error('Error al buscar:', error)
-      alert('Error al cargar los datos')
-    } finally {
-      setLoading(false)
-    }
+  setLoading(true);
+  try {
+    const datosObtenidos = await reportesService.getInventarioOperador(filtros);
+    setDatos(Array.isArray(datosObtenidos) ? datosObtenidos : []);
+  } catch (error) {
+    console.error("❌ Error completo:", error);
+    console.error("❌ Response data:", error.response?.data);
+    console.error("❌ Status:", error.response?.status);
+    console.error("❌ URL:", error.config?.url);
+    alert(`Error: ${error.response?.data?.error || error.message}\nDetalle: ${error.response?.data?.detail || 'Sin detalle'}`);
+  } finally {
+    setLoading(false);
   }
+};
+
 
   const handleExportar = async () => {
-    setExportando(true)
+    setExportando(true);
     try {
-      await reportesService.exportarInventarioOperador(filtros)
-      alert('Reporte exportado exitosamente')
+      await reportesService.exportarInventarioOperador(filtros);
     } catch (error) {
-      console.error('Error al exportar:', error)
-      alert('Error al exportar el reporte')
+      console.error("Error al exportar:", error);
+      alert("Error al exportar el reporte");
     } finally {
-      setExportando(false)
+      setExportando(false);
     }
-  }
+  };
 
   return (
     <div className="reporte-container">
       <div className="reporte-header">
-        <h2>Reporte de inventario por Operador</h2>
+        <h2>📡 Reporte de Inventario por Operador</h2>
       </div>
 
       <div className="filtros-container">
         <div className="filtro-group">
           <label>Operador:</label>
-          <select 
-            value={filtros.operador} 
-            onChange={(e) => handleFiltroChange('operador', e.target.value)}
+          <select
+            value={filtros.operador}
+            onChange={e => handleFiltroChange("operador", e.target.value)}
           >
-            <option value="">Seleccione un operador</option>
+            <option value="">Todos</option>
             {operadores.map(op => (
-              <option key={op.id} value={op.nombre}>{op.nombre}</option>
+              <option key={op.id || op.nombre} value={op.nombre}>
+                {op.nombre}
+              </option>
             ))}
           </select>
         </div>
 
         <div className="filtro-group">
           <label>Ciudad:</label>
-          <select 
-            value={filtros.ciudad} 
-            onChange={(e) => handleFiltroChange('ciudad', e.target.value)}
+          <select
+            value={filtros.ciudad}
+            onChange={e => handleFiltroChange("ciudad", e.target.value)}
           >
-            <option value="">Seleccione una ciudad</option>
+            <option value="">Todas las ciudades</option>
             {ciudades.map(c => (
               <option key={c.id} value={c.nombre}>{c.nombre}</option>
             ))}
@@ -112,12 +115,12 @@ const ReporteInventarioOperador = () => {
         </div>
 
         <div className="filtro-group">
-          <label>Empresa:</label>
-          <select 
-            value={filtros.empresa} 
-            onChange={(e) => handleFiltroChange('empresa', e.target.value)}
+          <label>Empresa / Proyecto:</label>
+          <select
+            value={filtros.empresa}
+            onChange={e => handleFiltroChange("empresa", e.target.value)}
           >
-            <option value="">Seleccione una Empresa</option>
+            <option value="">Todos los proyectos</option>
             {proyectos.map(p => (
               <option key={p.id} value={p.id}>{p.nombre}</option>
             ))}
@@ -126,47 +129,50 @@ const ReporteInventarioOperador = () => {
 
         <div className="filtro-group">
           <label>Fecha inicial:</label>
-          <input 
-            type="date" 
+          <input
+            type="date"
             value={filtros.fechaInicial}
-            onChange={(e) => handleFiltroChange('fechaInicial', e.target.value)}
+            onChange={e => handleFiltroChange("fechaInicial", e.target.value)}
           />
         </div>
 
         <div className="filtro-group">
-          <label>Fecha Final:</label>
-          <input 
-            type="date" 
+          <label>Fecha final:</label>
+          <input
+            type="date"
             value={filtros.fechaFinal}
-            onChange={(e) => handleFiltroChange('fechaFinal', e.target.value)}
+            onChange={e => handleFiltroChange("fechaFinal", e.target.value)}
           />
         </div>
 
         <div className="filtro-actions">
-          <button 
-            className="btn-buscar" 
+          <button
+            className="btn-buscar"
             onClick={handleBuscar}
             disabled={loading}
           >
-            {loading ? 'Buscando...' : 'Buscar'}
+            {loading ? "🔄 Buscando..." : "🔍 Buscar"}
           </button>
-          <button 
-            className="btn-exportar" 
+          <button
+            className="btn-exportar"
             onClick={handleExportar}
             disabled={exportando || datos.length === 0}
           >
-            {exportando ? 'Exportando...' : 'Exportar'}
+            {exportando ? "⏳ Exportando..." : "📥 Exportar a Excel"}
           </button>
         </div>
       </div>
 
       <div className="reporte-resultados">
         {loading ? (
-          <div className="loading">Cargando datos...</div>
+          <div className="loading">
+            <div className="spinner"></div>
+            <p>Cargando datos...</p>
+          </div>
         ) : datos.length > 0 ? (
           <>
             <p className="resultados-count">
-              Se encontraron {datos.length} registros
+              ✅ Se encontraron {datos.length} registros
             </p>
             <div className="tabla-container">
               <table className="tabla-reporte">
@@ -174,23 +180,33 @@ const ReporteInventarioOperador = () => {
                   <tr>
                     <th>#</th>
                     <th>Fecha</th>
-                    <th>Estructura</th>
+                    <th>WayPoint</th>
                     <th>Ciudad</th>
                     <th>Barrio</th>
                     <th>Dirección</th>
                     <th>Código</th>
+                    <th>Tipo</th>
+                    <th>Material</th>
+                    <th>Altura</th>
                   </tr>
                 </thead>
                 <tbody>
                   {datos.map((registro, index) => (
-                    <tr key={registro.id}>
+                    <tr key={registro.id || index}>
                       <td>{index + 1}</td>
-                      <td>{registro.fecha_registro ? new Date(registro.fecha_registro).toLocaleDateString('es-CO') : ''}</td>
-                      <td>{registro.waypoint || ''}</td>
-                      <td>{registro.ciudad || ''}</td>
-                      <td>{registro.barrio || ''}</td>
-                      <td>{registro.direccion_completa || ''}</td>
-                      <td>{registro.codigo_estructura || ''}</td>
+                      <td>
+                        {registro.fecha_registro
+                          ? new Date(registro.fecha_registro).toLocaleDateString("es-CO")
+                          : "-"}
+                      </td>
+                      <td><strong>{registro.waypoint || "-"}</strong></td>
+                      <td>{registro.ciudad || "-"}</td>
+                      <td>{registro.barrio || "-"}</td>
+                      <td>{registro.direccion_completa || "-"}</td>
+                      <td>{registro.codigo_estructura || "-"}</td>
+                      <td>{registro.tipo || "-"}</td>
+                      <td>{registro.material || "-"}</td>
+                      <td>{registro.altura || "-"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -199,12 +215,15 @@ const ReporteInventarioOperador = () => {
           </>
         ) : (
           <div className="no-data">
-            <p>ℹ️ No se ha encontrado información disponible para mostrar.</p>
+            <p>ℹ️ No se encontraron registros con los filtros seleccionados</p>
+            <p>Selecciona filtros y presiona "Buscar"</p>
           </div>
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ReporteInventarioOperador
+export default ReporteInventarioOperador;
+
+
