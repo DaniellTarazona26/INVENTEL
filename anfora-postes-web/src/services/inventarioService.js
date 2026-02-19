@@ -2,7 +2,7 @@
 
 import axios from 'axios'
 
-const API_URL = 'http://localhost:5000/api'
+const API_URL = 'https://inventel-production.up.railway.app/api'
 
 const getAuthHeader = () => {
   const token = localStorage.getItem('token')
