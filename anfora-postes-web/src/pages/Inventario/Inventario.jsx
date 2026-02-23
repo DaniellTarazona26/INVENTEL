@@ -44,9 +44,8 @@ const Inventario = ({ setCurrentPage }) => {
   }
 
   const handleVer = (id) => {
-  const inventario = inventarios.find(inv => inv.id === id)
-  console.log('Ver inventario:', inventario)
-  alert(`Inventario #${id}\nCódigo: ${inventario.codigo_estructura || '-'}\nWayPoint: ${inventario.waypoint}\nTipo: ${inventario.tipo}`)
+  localStorage.setItem('verInventarioId', id)
+  setCurrentPage('ver-inventario')
 }
 
 

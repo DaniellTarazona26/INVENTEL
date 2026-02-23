@@ -776,51 +776,200 @@ const reportesController = {
     }
   },
 
-  exportarReporteFactibilidad: async (req, res) => {
-    try {
-      console.log('📋 exportarReporteFactibilidad - filtros:', req.query)
-      const datos = await reportesApi.getReporteFactibilidadCompleto(req.query)
+exportarReporteFactibilidad: async (req, res) => {
+  try {
+    console.log('📋 exportarReporteFactibilidad - filtros:', req.query)
+    const datos = await reportesApi.getReporteFactibilidadCompleto(req.query)
 
-      const workbook = new ExcelJS.Workbook()
-      const worksheet = workbook.addWorksheet('REPORTE FACTIBILIDAD')
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('REPORTE FACTIBILIDAD')
 
-      worksheet.columns = [
-        { header: 'FECHA', key: 'created_at', width: 12 },
-        { header: 'CÓDIGO POSTE', key: 'codigo_poste', width: 15 },
-        { header: 'CIUDAD', key: 'ciudad', width: 15 },
-        { header: 'BARRIO', key: 'barrio', width: 20 },
-        { header: 'DIRECCIÓN', key: 'direccion', width: 30 },
-        { header: 'OPERADOR', key: 'operador', width: 20 },
-        { header: 'PROYECTO', key: 'proyecto', width: 20 },
-        { header: 'TIPO POSTE', key: 'tipo_poste', width: 15 },
-        { header: 'ALTURA', key: 'altura_poste', width: 12 },
-        { header: 'COORDENADAS', key: 'coordenadas', width: 25 },
-        { header: 'OBSERVACIONES', key: 'observaciones', width: 40 }
-      ]
+    // ── Fila 1: Grupos ──
+    worksheet.getRow(1).values = [
+      'FECHA',        // A
+      'CÓDIGO POSTE', // B
+      'CIUDAD',       // C
+      'BARRIO',       // D
+      'DIRECCIÓN',    // E
+      'OPERADOR',     // F
+      'PROYECTO',     // G
+      'COORDENADAS',  // H
+      'POSTE',        // I (merge I1:N1)
+      '', '', '', '', '',
+      'RED ELÉCTRICA',       // O (merge O1:X1)
+      '', '', '', '', '', '', '', '', '',
+      'TELEC. PASIVOS',      // Y (merge Y1:AH1)
+      '', '', '', '', '', '', '', '', '',
+      'TELEC. ACTIVOS',      // AI (merge AI1:AM1)
+      '', '', '', '',
+      'MÉTODO DE TENDIDO',   // AN (merge AN1:AT1)
+      '', '', '', '', '', '',
+      'OBSERVACIONES',       // AU (merge AU1:AW1)
+      '', ''
+    ]
 
-      const headerRow = worksheet.getRow(1)
-      headerRow.height = 30
-      headerRow.eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
+    // ── Fila 2: Subcolumnas ──
+    worksheet.getRow(2).values = [
+      '', '', '', '', '', '', '', '',  // A-H merged
+      'MATERIAL',      // I
+      'ALTURA',        // J
+      'RESISTENCIA',   // K
+      'USO/CARGA',     // L
+      'RETENIDA',      // M
+      'ESTADO',        // N
+      'NIV.AT',        // O
+      'NIV.MT',        // P
+      'NIV.BT',        // Q
+      'NIV.AP',        // R
+      'TRANSFORM.',    // S
+      'SECCIONAD.',    // T
+      'CORTA CIRC.',   // U
+      'MEDIDOR',       // V
+      'BAJANTE EL.',   // W
+      'TIERRA EL.',    // X
+      'CABLES',        // Y
+      'COAXIAL',       // Z
+      'FIBRA',         // AA
+      'DROP',          // AB
+      'RG11',          // AC
+      'CAJ.EMPALME',   // AD
+      'CAJ.GPON',      // AE
+      'STP',           // AF
+      'BAJANTES',      // AG
+      'RESERVAS',      // AH
+      'AMPLIF.',       // AI
+      'FUENTES',       // AJ
+      'NODO ÓPT.',     // AK
+      'ANTENA',        // AL
+      'CÁMARA VIG.',   // AM
+      'MTH RETEN.',    // AN
+      'MTH SUSPEN.',   // AO
+      'RETENCIÓN',     // AP
+      'CAB.COAXIAL',   // AQ
+      'CAB.FIBRA',     // AR
+      'TIPO CABLE',    // AS
+      'FIJ.HERRAJE',   // AT
+      'OBS.TENDIDO',   // AU
+      'RESTRICCIONES', // AV
+      'SUGERENCIAS'    // AW
+    ]
 
-      datos.forEach((r, index) => {
-        const row = worksheet.addRow({
-          ...r,
-          created_at: r.created_at ? new Date(r.created_at).toLocaleDateString('es-CO') : ''
-        })
-        applyDataRow(row, index)
-      })
+    // ── Merges ──
+    worksheet.mergeCells('A1:A2')
+    worksheet.mergeCells('B1:B2')
+    worksheet.mergeCells('C1:C2')
+    worksheet.mergeCells('D1:D2')
+    worksheet.mergeCells('E1:E2')
+    worksheet.mergeCells('F1:F2')
+    worksheet.mergeCells('G1:G2')
+    worksheet.mergeCells('H1:H2')
+    worksheet.mergeCells('I1:N1')   // POSTE (6 cols)
+    worksheet.mergeCells('O1:X1')   // RED ELÉCTRICA (10 cols)
+    worksheet.mergeCells('Y1:AH1')  // TELEC. PASIVOS (10 cols)
+    worksheet.mergeCells('AI1:AM1') // TELEC. ACTIVOS (5 cols)
+    worksheet.mergeCells('AN1:AT1') // MÉTODO TENDIDO (7 cols)
+    worksheet.mergeCells('AU1:AW1') // OBSERVACIONES (3 cols)
 
-      worksheet.views = [{ state: 'frozen', ySplit: 1 }]
+    worksheet.getRow(1).height = 30
+    worksheet.getRow(2).height = 40
+    worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
+    worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
 
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      res.setHeader('Content-Disposition', `attachment; filename=REPORTE_FACTIBILIDAD_${new Date().toISOString().split('T')[0]}.xlsx`)
-      await workbook.xlsx.write(res)
-      res.end()
-    } catch (error) {
-      console.error('❌ exportarReporteFactibilidad ERROR:', { message: error.message, detail: error.detail, hint: error.hint })
-      res.status(500).json({ success: false, error: error.message, detail: error.detail || null })
+    // ── Anchos ──
+    const colWidths = [
+      12, 15, 15, 20, 30, 20, 20, 25,  // A-H
+      12, 10, 12, 12, 10, 14,           // I-N poste
+      8, 8, 8, 8, 12, 12, 12, 10, 12, 10, // O-X red eléctrica
+      10, 10, 10, 10, 10, 12, 10, 10, 10, 10, // Y-AH pasivos
+      10, 10, 12, 10, 12,               // AI-AM activos
+      12, 12, 12, 12, 12, 15, 14,       // AN-AT método tendido
+      30, 35, 35                         // AU-AW observaciones
+    ]
+    colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
+
+    // ── Datos ──
+    const bool = v => v === true ? 'SI' : v === false ? 'NO' : (v || '')
+
+    const parseCheck = (val) => {
+      try {
+        const arr = typeof val === 'string' ? JSON.parse(val) : (val || [])
+        return Array.isArray(arr) ? arr.join(', ') : ''
+      } catch { return '' }
     }
-  },
+
+    datos.forEach((r, index) => {
+      const row = worksheet.addRow([
+        r.created_at ? new Date(r.created_at).toLocaleDateString('es-CO') : '',
+        r.codigo_poste || '',
+        r.ciudad || '',
+        r.barrio || '',
+        r.direccion || '',
+        r.operador || '',
+        r.proyecto || '',
+        r.coordenadas || '',
+        // POSTE
+        r.poste_material || '',
+        r.poste_altura || '',
+        r.poste_resistencia || '',
+        r.poste_uso_carga || '',
+        r.poste_retenida || '',
+        r.poste_estado || '',
+        // RED ELÉCTRICA
+        bool(r.nivel_tension_at),
+        bool(r.nivel_tension_mt),
+        bool(r.nivel_tension_bt),
+        bool(r.nivel_tension_ap),
+        bool(r.elem_transformador),
+        bool(r.elem_seccionador),
+        bool(r.elem_corta_circuito),
+        bool(r.elem_medidor),
+        bool(r.elem_bajante_electrico),
+        bool(r.tierra_electrica),
+        // TELEC. PASIVOS
+        r.telp_pas_cables || '',
+        r.telp_pas_c_coaxial || '',
+        r.telp_pas_c_fibra || '',
+        r.telp_pas_c_drop || '',
+        r.telp_pas_c_rg11 || '',
+        r.telp_pas_cajempalme || '',
+        r.telp_pas_cajgpon || '',
+        r.telp_pas_stp || '',
+        r.telp_pas_bajantes || '',
+        r.telp_pas_reservas || '',
+        // TELEC. ACTIVOS
+        r.telp_act_amplificadores || '',
+        r.telp_act_fuentes || '',
+        r.telp_act_nodooptico || '',
+        r.telp_act_antena || '',
+        r.telp_act_camara_vigil || '',
+        // MÉTODO DE TENDIDO
+        r.telp_mth_retencion || '',
+        r.telp_mth_suspencion || '',
+        r.telp_retencion || '',
+        r.telp_ccoaxial || '',
+        r.telp_cfibra || '',
+        r.tipo_cable || '',
+        r.fijacion_herraje || '',
+        // OBSERVACIONES
+        r.observacion_tendido || '',
+        parseCheck(r.checkboxes_tendido),
+        parseCheck(r.checkboxes_sugerencias)
+      ])
+      applyDataRow(row, index)
+    })
+
+    worksheet.views = [{ state: 'frozen', xSplit: 8, ySplit: 2 }]
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.setHeader('Content-Disposition', `attachment; filename=REPORTE_FACTIBILIDAD_${new Date().toISOString().split('T')[0]}.xlsx`)
+    await workbook.xlsx.write(res)
+    res.end()
+  } catch (error) {
+    console.error('❌ exportarReporteFactibilidad ERROR:', { message: error.message, detail: error.detail, hint: error.hint })
+    res.status(500).json({ success: false, error: error.message, detail: error.detail || null })
+  }
+},
+
 
   
   // ========== DASHBOARD STATS ==========

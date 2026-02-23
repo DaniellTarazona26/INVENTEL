@@ -43,13 +43,19 @@ const AgregarPoste = ({ setCurrentPage }) => {
     altura: '',
     anoFabricacion: '',
     bajantesElectricos: '',  
-    baja: '',  
+    baja: '',
     bajaTipoCable: '',
     bajaEstado: '',
     bajaContinuidad: '',
     caja1: '',
     caja2: '',
-    alumbrado: '',  
+    media: '',
+    mediaTipoCable: '',
+    mediaEstado: '',
+    mediaContinuidad: '',
+    caja3: '',
+    caja4: '',
+    alumbrado: '',
     alumbradoTipoCable: '',
     alumbradoEstado: '',
     lampara1Tipo: '',
@@ -191,6 +197,12 @@ const AgregarPoste = ({ setCurrentPage }) => {
           bajaContinuidad: inv.baja_continuidad_electrica || '',
           caja1: inv.caja1 || '',
           caja2: inv.caja2 || '',
+          media: inv.media || '',
+          mediaTipoCable: inv.media_tipo_cable || '',
+          mediaEstado: inv.media_estado_red || '',
+          mediaContinuidad: inv.media_continuidad_electrica || '',
+          caja3: inv.caja3 || '',
+          caja4: inv.caja4 || '',
           alumbrado: inv.alumbrado || '',
           alumbradoTipoCable: inv.alumbrado_tipo_cable || '',
           alumbradoEstado: inv.alumbrado_estado_red || '',
@@ -270,7 +282,17 @@ const AgregarPoste = ({ setCurrentPage }) => {
           if (!formData.caja1 || !formData.caja2) {
             completo = false
           }
+      }
+
+        if (formData.media === 'SI') {
+          if (!formData.mediaTipoCable || !formData.mediaEstado || !formData.mediaContinuidad) {
+            completo = false
+          }
+          if (!formData.caja3 || !formData.caja4) {
+            completo = false
+          }
         }
+
         
         if (formData.alumbrado === 'SI') {
           if (!formData.alumbradoTipoCable || !formData.alumbradoEstado) {
@@ -450,6 +472,34 @@ const AgregarPoste = ({ setCurrentPage }) => {
       }
       if (!formData.caja2) {
         mostrarMensaje('error', '❌ Caja #2 es obligatoria')
+        return
+      }
+    }
+
+      if (!formData.media) {
+    mostrarMensaje('error', '❌ El campo Media es obligatorio')
+    return
+    }
+
+    if (formData.media === 'SI') {
+      if (!formData.mediaTipoCable) {
+        mostrarMensaje('error', '❌ Tipo de cable (Media) es obligatorio')
+        return
+      }
+      if (!formData.mediaEstado) {
+        mostrarMensaje('error', '❌ Estado de la red (Media) es obligatorio')
+        return
+      }
+      if (!formData.mediaContinuidad) {
+        mostrarMensaje('error', '❌ Continuidad eléctrica (Media) es obligatoria')
+        return
+      }
+      if (!formData.caja3) {
+        mostrarMensaje('error', '❌ Caja #3 es obligatoria')
+        return
+      }
+      if (!formData.caja4) {
+        mostrarMensaje('error', '❌ Caja #4 es obligatoria')
         return
       }
     }
@@ -716,6 +766,36 @@ const AgregarPoste = ({ setCurrentPage }) => {
         return
       }
     }
+    
+    if (!formData.media) {
+    mostrarMensaje('error', '❌ El campo Media es obligatorio')
+    return
+      }
+
+      if (formData.media === 'SI') {
+        if (!formData.mediaTipoCable) {
+          mostrarMensaje('error', '❌ Tipo de cable (Media) es obligatorio')
+          return
+        }
+        if (!formData.mediaEstado) {
+          mostrarMensaje('error', '❌ Estado de la red (Media) es obligatorio')
+          return
+        }
+        if (!formData.mediaContinuidad) {
+          mostrarMensaje('error', '❌ Continuidad eléctrica (Media) es obligatoria')
+          return
+        }
+        if (!formData.caja3) {
+          mostrarMensaje('error', '❌ Caja #3 es obligatoria')
+          return
+        }
+        if (!formData.caja4) {
+          mostrarMensaje('error', '❌ Caja #4 es obligatoria')
+          return
+        }
+      }
+
+
 
     if (!formData.alumbrado) {
       mostrarMensaje('error', '❌ El campo Alumbrado es obligatorio')
@@ -932,6 +1012,12 @@ const AgregarPoste = ({ setCurrentPage }) => {
         bajaContinuidad: '',
         caja1: '',
         caja2: '',
+        media: '',
+        mediaTipoCable: '',
+        mediaEstado: '',
+        mediaContinuidad: '',
+        caja3: '',
+        caja4: '',
         alumbrado: '',
         alumbradoTipoCable: '',
         alumbradoEstado: '',
@@ -1000,6 +1086,12 @@ const AgregarPoste = ({ setCurrentPage }) => {
         bajaContinuidad: '',
         caja1: '',
         caja2: '',
+        media: '',
+        mediaTipoCable: '',
+        mediaEstado: '',
+        mediaContinuidad: '',
+        caja3: '',
+        caja4: '',
         alumbrado: '',
         alumbradoTipoCable: '',
         alumbradoEstado: '',
@@ -1320,10 +1412,10 @@ const AgregarPoste = ({ setCurrentPage }) => {
                 >
                   <option value=""></option>
                   <option value="NO EXISTE">NO EXISTE</option>
-                  <option value="ANCLAJE RIENDA">ANCLAJE RIENDA</option>
-                  <option value="TORNAPUNTA">TORNAPUNTA</option>
-                  <option value="PALO MUERTO">PALO MUERTO</option>
-                  <option value="OTRO">OTRO</option>
+                  <option value="NORMAL">NORMAL</option>
+                  <option value="VERTICAL">VERTICAL</option>
+                  <option value="PIE DE AMIGO">PIE DE AMIGO</option>
+                  <option value="STOCK">STOCK</option>
                 </select>
               </div>
 
@@ -1336,8 +1428,8 @@ const AgregarPoste = ({ setCurrentPage }) => {
                 >
                   <option value=""></option>
                   <option value="BUENO">BUENO</option>
-                  <option value="REGULAR">REGULAR</option>
-                  <option value="MALO">MALO</option>
+                  <option value="SUELTO">SUELTO</option>
+                  <option value="ROTO">ROTO</option>
                 </select>
               </div>
             </div>
@@ -1422,16 +1514,16 @@ const AgregarPoste = ({ setCurrentPage }) => {
 
                 <div className="form-group">
                   <label>Tipo cable:</label>
-                  <select 
-                    value={formData.bajaTipoCable}
-                    onChange={(e) => handleInputChange('bajaTipoCable', e.target.value)}
-                    disabled={formData.baja !== 'SI'}
-                  >
-                    <option value=""></option>
-                    <option value="DUPLEX">DUPLEX</option>
-                    <option value="TRIPLEX">TRIPLEX</option>
-                    <option value="CUADRUPLEX">CUADRUPLEX</option>
-                  </select>
+                  <select
+                  value={formData.bajaTipoCable}
+                  onChange={(e) => handleInputChange('bajaTipoCable', e.target.value)}
+                  disabled={formData.baja !== 'SI'}
+                >
+                  <option value=""></option>
+                  <option value="TRENZADO">TRENZADO</option>
+                  <option value="RED ABIERTA">RED ABIERTA</option>
+                </select>
+
                 </div>
 
                 <div className="form-group">
@@ -1443,8 +1535,8 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   >
                     <option value=""></option>
                     <option value="BUENO">BUENO</option>
-                    <option value="REGULAR">REGULAR</option>
-                    <option value="MALO">MALO</option>
+                    <option value="DISTENSIONADA">DISTENSIONADA</option>
+                    <option value="MUY TENSIONADA">MUY TENSIONADA</option>
                   </select>
                 </div>
 
@@ -1497,6 +1589,98 @@ const AgregarPoste = ({ setCurrentPage }) => {
                 </div>
               )}
             </div>
+            
+
+            <div className="subsection subsection-media">
+            <h4 className="subsection-title">MEDIA</h4>
+            <div className="form-grid form-grid-4">
+              <div className="form-group">
+                <label>Media</label>
+                <select
+                  value={formData.media}
+                  onChange={(e) => handleInputChange('media', e.target.value)}
+                >
+                  <option value=""></option>
+                  <option value="NO">NO</option>
+                  <option value="SI">SI</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Tipo cable</label>
+                <select
+                  value={formData.mediaTipoCable}
+                  onChange={(e) => handleInputChange('mediaTipoCable', e.target.value)}
+                  disabled={formData.media !== 'SI'}
+                >
+                  <option value=""></option>
+                  <option value="TRENZADO">TRENZADO</option>
+                  <option value="RED ABIERTA">RED ABIERTA</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Estado de la red</label>
+                <select
+                  value={formData.mediaEstado}
+                  onChange={(e) => handleInputChange('mediaEstado', e.target.value)}
+                  disabled={formData.media !== 'SI'}
+                >
+                  <option value=""></option>
+                  <option value="BUENO">BUENO</option>
+                  <option value="DISTENSIONADA">DISTENSIONADA</option>
+                  <option value="MUY TENSIONADA">MUY TENSIONADA</option>
+
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Continuidad eléctrica</label>
+                <select
+                  value={formData.mediaContinuidad}
+                  onChange={(e) => handleInputChange('mediaContinuidad', e.target.value)}
+                  disabled={formData.media !== 'SI'}
+                >
+                  <option value=""></option>
+                  <option value="SI">SI</option>
+                  <option value="NO">NO</option>
+                </select>
+              </div>
+            </div>
+
+            {formData.media === 'SI' && (
+              <div className="subsection-inner">
+                <h5 className="subsection-subtitle">CAJAS DISTRIBUCIÓN ELÉCTRICA</h5>
+                <div className="form-grid form-grid-2">
+                  <div className="form-group">
+                    <label>Caja 3</label>
+                    <select
+                      value={formData.caja3}
+                      onChange={(e) => handleInputChange('caja3', e.target.value)}
+                    >
+                      <option value=""></option>
+                      <option value="NO EXISTE">NO EXISTE</option>
+                      <option value="BUENA">BUENA</option>
+                      <option value="ABIERTA">ABIERTA</option>
+                      <option value="SIN TAPA">SIN TAPA</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Caja 4</label>
+                    <select
+                      value={formData.caja4}
+                      onChange={(e) => handleInputChange('caja4', e.target.value)}
+                    >
+                      <option value=""></option>
+                      <option value="NO EXISTE">NO EXISTE</option>
+                      <option value="BUENA">BUENA</option>
+                      <option value="ABIERTA">ABIERTA</option>
+                      <option value="SIN TAPA">SIN TAPA</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+
 
             <div className="subsection subsection-alumbrado">
               <h4 className="subsection-title">ALUMBRADO</h4>
@@ -1521,9 +1705,8 @@ const AgregarPoste = ({ setCurrentPage }) => {
                     disabled={formData.alumbrado !== 'SI'}
                   >
                     <option value=""></option>
-                    <option value="DUPLEX">DUPLEX</option>
-                    <option value="TRIPLEX">TRIPLEX</option>
-                    <option value="CUADRUPLEX">CUADRUPLEX</option>
+                    <option value="TRENZADO">TRENZADO</option>
+                    <option value="RED ABIERTA">RED ABIERTA</option>
                   </select>
                 </div>
 
@@ -1536,8 +1719,8 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   >
                     <option value=""></option>
                     <option value="BUENO">BUENO</option>
-                    <option value="REGULAR">REGULAR</option>
-                    <option value="MALO">MALO</option>
+                    <option value="DISTENSIONADA">DISTENSIONADA</option>
+                    <option value="MUY TENSIONADA">MUY TENSIONADA</option>
                   </select>
                 </div>
               </div>

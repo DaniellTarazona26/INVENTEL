@@ -3,6 +3,7 @@ import MainLayout from './layouts/MainLayout'
 import Login from './pages/Login/Login'
 import Dashboard from './pages/Dashboard/Dashboard'
 import Inventario from './pages/Inventario/Inventario'
+import VerInventario from './pages/Inventario/VerInventario'
 import AgregarPoste from './pages/AgregarPoste/AgregarPoste'
 import AgregarOperadores from './pages/AgregarOperadores/AgregarOperadores'
 import Reportes from './pages/Reportes/Reportes'
@@ -77,6 +78,8 @@ function App() {
         return <Dashboard />
       case 'inventario':
         return <Inventario setCurrentPage={handleNavegacion} />
+      case 'ver-inventario':
+        return <VerInventario setCurrentPage={handleNavegacion} />
       case 'agregar':
         return <AgregarPoste setCurrentPage={handleNavegacion} />
       case 'agregar-operadores':
