@@ -1,7 +1,6 @@
 const reportesApi = require('../services/reportesApi')
 const ExcelJS = require('exceljs')
 
-// ── Estilos reutilizables ──
 const HEADER_STYLE = {
   font: { bold: true, color: { argb: 'FFFFFFFF' } },
   fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F4E79' } },
@@ -66,104 +65,99 @@ const reportesController = {
       const workbook = new ExcelJS.Workbook()
       const worksheet = workbook.addWorksheet('REPORTE OPERADOR')
 
-      // ── Fila 1: Grupos ──
       worksheet.getRow(1).values = [
-        'CONSEC.',    // A
-        'FECHA',      // B
-        'WAYPOINT',   // C
-        'CIUDAD',     // D
-        'BARRIO',     // E
-        'DIRECCIÓN',  // F
-        'ESTRUCTURA', // G (merge G1:P1)
+        'CONSEC.',
+        'FECHA',
+        'WAYPOINT',
+        'CIUDAD',
+        'BARRIO',
+        'DIRECCIÓN',
+        'ESTRUCTURA',
         '', '', '', '', '', '', '', '', '',
-        'OPERADOR',   // Q
-        'NIVELES DE OCUPACIÓN', // R (merge R1:Y1)
+        'OPERADOR',
+        'NIVELES DE OCUPACIÓN',
         '', '', '', '', '', '', '',
-        'CRUCE EN VÍA', // Z (merge Z1:AE1)
+        'CRUCE EN VÍA',
         '', '', '', '', '',
-        'ACTIVOS EXISTENTES', // AF (merge AF1:AL1)
+        'ACTIVOS EXISTENTES',
         '', '', '', '', '', '',
-        'PASIVOS EXISTENTES', // AM (merge AM1:AP1)
+        'PASIVOS EXISTENTES',
         '', '', '',
-        'OBSERVACIONES' // AQ
+        'OBSERVACIONES'
       ]
 
-      // ── Fila 2: Subcolumnas ──
       worksheet.getRow(2).values = [
-        '', '', '', '', '', '',     // A-F (merged)
-        'TIPO',        // G
-        'CONSEC.',     // H
-        'MARCADA',     // I
-        'MATERIAL',    // J
-        'C.ROTURA',    // K
-        'COD.',        // L
-        'TEMPLETE',    // M
-        'EST.TEMP.',   // N
-        'ALTURA',      // O
-        'AÑO FAB.',    // P
-        '',            // Q - OPERADOR (merged)
-        'HERRAJES',    // R
-        'COAXIAL',     // S
-        'TELEFÓNICO',  // T
-        'FIBRA',       // U
-        'UTP',         // V
-        'GUAYA',       // W
-        'TOTAL CAB.',  // X
-        'MARQUILLA',   // Y
-        'EXISTE',      // Z
-        'ESTADO',      // AA
-        'DIAGONAL',    // AB
-        'SIN RED',     // AC
-        'ACOMETIDA',   // AD
-        'DESALIN.',    // AE
-        'AMPLIF.',     // AF
-        'NODO ÓPT.',   // AG
-        'FUENTE',      // AH
-        'AMP.110V',    // AI
-        'NODO.110V',   // AJ
-        'FUENTE.110V', // AK
-        'SWITCH.110V', // AL
-        'CAJA NAP',    // AM
-        'C.EMPALME',   // AN
-        'RESERVA',     // AO
-        'BAJANTE',     // AP
-        ''             // AQ - OBSERVACIONES (merged)
+        '', '', '', '', '', '',
+        'TIPO',
+        'CONSEC.',
+        'MARCADA',
+        'MATERIAL',
+        'C.ROTURA',
+        'COD.',
+        'TEMPLETE',
+        'EST.TEMP.',
+        'ALTURA',
+        'AÑO FAB.',
+        '',
+        'HERRAJES',
+        'COAXIAL',
+        'TELEFÓNICO',
+        'FIBRA',
+        'UTP',
+        'GUAYA',
+        'TOTAL CAB.',
+        'MARQUILLA',
+        'EXISTE',
+        'ESTADO',
+        'DIAGONAL',
+        'SIN RED',
+        'ACOMETIDA',
+        'DESALIN.',
+        'AMPLIF.',
+        'NODO ÓPT.',
+        'FUENTE',
+        'AMP.110V',
+        'NODO.110V',
+        'FUENTE.110V',
+        'SWITCH.110V',
+        'CAJA NAP',
+        'C.EMPALME',
+        'RESERVA',
+        'BAJANTE',
+        ''
       ]
 
-      // ── Merges ──
       worksheet.mergeCells('A1:A2')
       worksheet.mergeCells('B1:B2')
       worksheet.mergeCells('C1:C2')
       worksheet.mergeCells('D1:D2')
       worksheet.mergeCells('E1:E2')
       worksheet.mergeCells('F1:F2')
-      worksheet.mergeCells('G1:P1')   // ESTRUCTURA (10 cols)
-      worksheet.mergeCells('Q1:Q2')   // OPERADOR
-      worksheet.mergeCells('R1:Y1')   // OCUPACIÓN (8 cols)
-      worksheet.mergeCells('Z1:AE1')  // CRUCE VÍA (6 cols)
-      worksheet.mergeCells('AF1:AL1') // ACTIVOS (7 cols)
-      worksheet.mergeCells('AM1:AP1') // PASIVOS (4 cols)
-      worksheet.mergeCells('AQ1:AQ2') // OBSERVACIONES
+      worksheet.mergeCells('G1:P1')
+      worksheet.mergeCells('Q1:Q2')
+      worksheet.mergeCells('R1:Y1')
+      worksheet.mergeCells('Z1:AE1')
+      worksheet.mergeCells('AF1:AL1')
+      worksheet.mergeCells('AM1:AP1')
+      worksheet.mergeCells('AQ1:AQ2')
 
       worksheet.getRow(1).height = 30
       worksheet.getRow(2).height = 40
       worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
       worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
 
-      // ── Anchos ──
       const colWidths = [
-        10, 12, 14, 15, 20, 30,        // A-F
-        12, 12, 10, 12, 10, 15, 12, 12, 10, 10, // G-P estructura
-        18,                             // Q operador
-        10, 10, 10, 10, 10, 10, 12, 10, // R-Y ocupación
-        8, 12, 10, 10, 10, 10,          // Z-AE cruce
-        10, 12, 10, 10, 12, 12, 12,     // AF-AL activos
-        10, 12, 10, 10,                 // AM-AP pasivos
-        35                              // AQ observaciones
+        10, 12, 14, 15, 20, 30,
+        12, 12, 10, 12, 10, 15, 12, 12, 10, 10,
+        18,
+        10, 10, 10, 10, 10, 10, 12, 10,
+        8, 12, 10, 10, 10, 10,
+        10, 12, 10, 10, 12, 12, 12,
+        10, 12, 10, 10,
+        35
       ]
       colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
 
-      // ── Datos ──
       const bool = v => v === true ? 'SI' : v === false ? 'NO' : ''
 
       datos.forEach((r, index) => {
@@ -248,54 +242,60 @@ const reportesController = {
       const workbook = new ExcelJS.Workbook()
       const worksheet = workbook.addWorksheet('REPORTE INSPECTOR')
 
-      // ── Fila 1: Grupos ──
       worksheet.getRow(1).values = [
-        'CONSEC.',     // A
-        'FECHA',       // B
-        'INSPECTOR',   // C
-        'WAYPOINT',    // D
-        'CIUDAD',      // E
-        'BARRIO',      // F
-        'DIRECCIÓN',   // G
-        'ESTRUCTURA',  // H (merge H1:Q1)
+        'CONSEC.',
+        'FECHA',
+        'INSPECTOR',
+        'WAYPOINT',
+        'CIUDAD',
+        'BARRIO',
+        'DIRECCIÓN',
+        'ESTRUCTURA',
         '', '', '', '', '', '', '', '', '',
-        'ESTADO ESTRUCTURA', // R (merge R1:V1)
+        'ESTADO ESTRUCTURA',
         '', '', '', '',
-        'REDES',       // S (merge W1:AB1) — ajustado abajo
-        '', '', '', '', '',
-        'OPERADORES',  // AC (merge AC1:AD1)
+        'BAJA',
+        '', '', '',
+        'MEDIA',
+        '', '', '',
+        'ALUMBRADO',
+        '', '',
+        'OPERADORES',
         ''
       ]
 
-      // ── Fila 2: Subcolumnas ──
       worksheet.getRow(2).values = [
-        '', '', '', '', '', '', '',   // A-G merged
-        'TIPO',        // H
-        'CONSEC.',     // I
-        'MARCADA',     // J
-        'MATERIAL',    // K
-        'C.ROTURA',    // L
-        'COD.',        // M
-        'TEMPLETE',    // N
-        'EST.TEMP.',   // O
-        'ALTURA',      // P
-        'AÑO FAB.',    // Q
-        'ESTADO',      // R
-        'DESPLOMADO',  // S
-        'FLECTADO',    // T
-        'FRACTURADO',  // U
-        'HIERRO BASE', // V
-        'BAJA',        // W
-        'TIPO CABLE',  // X
-        'ESTADO RED',  // Y
-        'ALUMBRADO',   // Z
-        'TIPO CAB.ALU',// AA
-        'TIERRA',      // AB
-        'CANTIDAD',    // AC
-        'LISTA'        // AD
+        '', '', '', '', '', '', '',
+        'TIPO',
+        'CONSEC.',
+        'MARCADA',
+        'MATERIAL',
+        'C.ROTURA',
+        'COD.',
+        'TEMPLETE',
+        'EST.TEMP.',
+        'ALTURA',
+        'AÑO FAB.',
+        'ESTADO',
+        'DESPLOMADO',
+        'FLECTADO',
+        'FRACTURADO',
+        'HIERRO BASE',
+        'EXISTE',
+        'TIPO CABLE',
+        'ESTADO RED',
+        'CONTINUIDAD',
+        'EXISTE',
+        'TIPO CABLE',
+        'ESTADO RED',
+        'CONTINUIDAD',
+        'EXISTE',
+        'TIPO CAB.ALU',
+        'TIERRA',
+        'CANTIDAD',
+        'LISTA'
       ]
 
-      // ── Merges ──
       worksheet.mergeCells('A1:A2')
       worksheet.mergeCells('B1:B2')
       worksheet.mergeCells('C1:C2')
@@ -305,25 +305,27 @@ const reportesController = {
       worksheet.mergeCells('G1:G2')
       worksheet.mergeCells('H1:Q1')  // ESTRUCTURA (10 cols)
       worksheet.mergeCells('R1:V1')  // ESTADO ESTRUCTURA (5 cols)
-      worksheet.mergeCells('W1:AB1') // REDES (6 cols)
-      worksheet.mergeCells('AC1:AD1')// OPERADORES (2 cols)
+      worksheet.mergeCells('W1:Z1')  // BAJA (4 cols)
+      worksheet.mergeCells('AA1:AD1') // MEDIA (4 cols)
+      worksheet.mergeCells('AE1:AG1') // ALUMBRADO (3 cols)
+      worksheet.mergeCells('AH1:AI1') // OPERADORES (2 cols)
 
       worksheet.getRow(1).height = 30
       worksheet.getRow(2).height = 40
       worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
       worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
 
-      // ── Anchos ──
       const colWidths = [
         10, 12, 22, 14, 15, 20, 30,  // A-G
         12, 12, 10, 12, 10, 15, 12, 12, 10, 10, // H-Q estructura
         14, 12, 10, 12, 12,          // R-V estado estructura
-        8, 15, 12, 8, 15, 8,         // W-AB redes
-        10, 35                        // AC-AD operadores
+        8, 15, 12, 12,               // W-Z baja
+        8, 15, 12, 12,               // AA-AD media
+        8, 15, 8,                    // AE-AG alumbrado
+        10, 35                       // AH-AI operadores
       ]
       colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
 
-      // ── Datos ──
       datos.forEach((r, index) => {
         const row = worksheet.addRow([
           r.consecutivo || '',
@@ -351,6 +353,11 @@ const reportesController = {
           r.baja || '',
           r.baja_tipo_cable || '',
           r.baja_estado_red || '',
+          r.baja_continuidad_electrica || '',
+          r.media || '',
+          r.media_tipo_cable || '',
+          r.media_estado_red || '',
+          r.media_continuidad_electrica || '',
           r.alumbrado || '',
           r.alumbrado_tipo_cable || '',
           r.tierra_electrica || '',
@@ -404,7 +411,8 @@ const reportesController = {
         'LAMPARA 2', '', '', '',
         'TIERRA', '', '', '', '',
         'ELEMENTOS ADICIONALES', '', '', '', '', '',
-        'BAJANTES'
+        'BAJANTES',
+        'OPERADORES'
       ]
 
       worksheet.getRow(2).values = [
@@ -419,6 +427,7 @@ const reportesController = {
         'TIPO', 'CÓDIGO', 'DAÑADA', 'ENCENDIDA',
         'EXISTE', 'ESTADO', 'SUELTA', 'DESCONECT.', 'ROTA',
         'LÁMPARA', 'CÁMARA TV', 'CORNETA', 'AVISO', 'CAJA MET.', 'OTRO',
+        '',
         ''
       ]
 
@@ -436,6 +445,7 @@ const reportesController = {
       worksheet.mergeCells('AG1:AK1')
       worksheet.mergeCells('AL1:AQ1')
       worksheet.mergeCells('AR1:AR2')
+      worksheet.mergeCells('AS1:AS2')
 
       worksheet.getRow(1).height = 30
       worksheet.getRow(2).height = 40
@@ -453,7 +463,8 @@ const reportesController = {
         12, 15, 10, 12,
         8, 14, 10, 12, 10,
         10, 10, 10, 10, 10, 10,
-        14
+        14,
+        25
       ]
       colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
 
@@ -502,7 +513,8 @@ const reportesController = {
           r.aviso || '',
           r.caja_metalica || '',
           r.otro || '',
-          r.bajantes_electricos || ''
+          r.bajantes_electricos || '',
+          r.operadores_lista || ''
         ])
         applyDataRow(row, index)
       })
@@ -598,71 +610,97 @@ const reportesController = {
       const workbook = new ExcelJS.Workbook()
       const worksheet = workbook.addWorksheet('REPORTE ESTRUCTURAS')
 
-      // ── Fila 1: Grupos ──
       worksheet.getRow(1).values = [
-        'CONSEC.',    // A
-        'FECHA',      // B
-        'WAYPOINT',   // C
-        'CIUDAD',     // D
-        'BARRIO',     // E
-        'DIRECCIÓN',  // F
-        'ESTRUCTURA', // G (merge G1:P1)
+        'CONSEC.',
+        'FECHA',
+        'WAYPOINT',
+        'CIUDAD',
+        'BARRIO',
+        'DIRECCIÓN',
+        'ESTRUCTURA',
         '', '', '', '', '', '', '', '', '',
-        'ESTADO ESTRUCTURA', // Q (merge Q1:U1)
+        'ESTADO ESTRUCTURA',
         '', '', '', '',
-        'NOVEDADES',  // V (merge V1:X1)
+        'BAJA',
+        '', '', '',
+        'MEDIA',
+        '', '', '',
+        'CAJAS',
+        '', '', '',
+        'ALUMBRADO',
+        '', '',
+        'NOVEDADES',
         '', ''
       ]
 
-      // ── Fila 2: Subcolumnas ──
       worksheet.getRow(2).values = [
-        '', '', '', '', '', '',  // A-F merged
-        'TIPO',        // G
-        'CONSEC.',     // H
-        'MARCADA',     // I
-        'MATERIAL',    // J
-        'C.ROTURA',    // K
-        'COD.',        // L
-        'TEMPLETE',    // M
-        'EST.TEMP.',   // N
-        'ALTURA',      // O
-        'AÑO FAB.',    // P
-        'ESTADO',      // Q
-        'DESPLOMADO',  // R
-        'FLECTADO',    // S
-        'FRACTURADO',  // T
-        'HIERRO BASE', // U
-        'BAJANTES',    // V
-        'PODA',        // W
-        'POSIBLE FRAUDE' // X
+        '', '', '', '', '', '',
+        'TIPO',
+        'CONSEC.',
+        'MARCADA',
+        'MATERIAL',
+        'C.ROTURA',
+        'COD.',
+        'TEMPLETE',
+        'EST.TEMP.',
+        'ALTURA',
+        'AÑO FAB.',
+        'ESTADO',
+        'DESPLOMADO',
+        'FLECTADO',
+        'FRACTURADO',
+        'HIERRO BASE',
+        'EXISTE',
+        'TIPO CABLE',
+        'ESTADO RED',
+        'CONTINUIDAD',
+        'EXISTE',
+        'TIPO CABLE',
+        'ESTADO RED',
+        'CONTINUIDAD',
+        'CAJA 1',
+        'CAJA 2',
+        'CAJA 3',
+        'CAJA 4',
+        'EXISTE',
+        'TIPO CABLE',
+        'ESTADO RED',
+        'BAJANTES',
+        'PODA',
+        'POSIBLE FRAUDE'
       ]
 
-      // ── Merges ──
       worksheet.mergeCells('A1:A2')
       worksheet.mergeCells('B1:B2')
       worksheet.mergeCells('C1:C2')
       worksheet.mergeCells('D1:D2')
       worksheet.mergeCells('E1:E2')
       worksheet.mergeCells('F1:F2')
-      worksheet.mergeCells('G1:P1')  // ESTRUCTURA (10 cols)
-      worksheet.mergeCells('Q1:U1')  // ESTADO ESTRUCTURA (5 cols)
-      worksheet.mergeCells('V1:X1')  // NOVEDADES (3 cols)
+      worksheet.mergeCells('G1:P1')   // ESTRUCTURA (10 cols)
+      worksheet.mergeCells('Q1:U1')   // ESTADO ESTRUCTURA (5 cols)
+      worksheet.mergeCells('V1:Y1')   // BAJA (4 cols)
+      worksheet.mergeCells('Z1:AC1')  // MEDIA (4 cols)
+      worksheet.mergeCells('AD1:AG1') // CAJAS (4 cols)
+      worksheet.mergeCells('AH1:AJ1') // ALUMBRADO (3 cols)
+      worksheet.mergeCells('AK1:AM1') // NOVEDADES (3 cols)
 
       worksheet.getRow(1).height = 30
       worksheet.getRow(2).height = 40
       worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
       worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
 
-      // ── Anchos ──
       const colWidths = [
-        10, 12, 14, 15, 20, 30,        // A-F
+        10, 12, 14, 15, 20, 30,          // A-F
         12, 12, 10, 12, 10, 15, 12, 12, 10, 10, // G-P estructura
-        14, 12, 10, 12, 12,            // Q-U estado
-        14, 10, 15                      // V-X novedades
+        14, 12, 10, 12, 12,              // Q-U estado estructura
+        8, 15, 12, 12,                   // V-Y baja
+        8, 15, 12, 12,                   // Z-AC media
+        12, 12, 12, 12,                  // AD-AG cajas
+        8, 15, 12,                       // AH-AJ alumbrado
+        14, 10, 15                       // AK-AM novedades
       ]
       colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
 
-      // ── Datos ──
       datos.forEach((r, index) => {
         const row = worksheet.addRow([
           r.consecutivo || '',
@@ -686,6 +724,21 @@ const reportesController = {
           r.flectado || '',
           r.fracturado || '',
           r.hierro_base || '',
+          r.baja || '',
+          r.baja_tipo_cable || '',
+          r.baja_estado_red || '',
+          r.baja_continuidad_electrica || '',
+          r.media || '',
+          r.media_tipo_cable || '',
+          r.media_estado_red || '',
+          r.media_continuidad_electrica || '',
+          r.caja1 || '',
+          r.caja2 || '',
+          r.caja3 || '',
+          r.caja4 || '',
+          r.alumbrado || '',
+          r.alumbrado_tipo_cable || '',
+          r.alumbrado_estado_red || '',
           r.bajantes_electricos || '',
           r.poda_arboles || '',
           r.posible_fraude || ''
@@ -776,214 +829,201 @@ const reportesController = {
     }
   },
 
-exportarReporteFactibilidad: async (req, res) => {
-  try {
-    console.log('📋 exportarReporteFactibilidad - filtros:', req.query)
-    const datos = await reportesApi.getReporteFactibilidadCompleto(req.query)
+  exportarReporteFactibilidad: async (req, res) => {
+    try {
+      console.log('📋 exportarReporteFactibilidad - filtros:', req.query)
+      const datos = await reportesApi.getReporteFactibilidadCompleto(req.query)
 
-    const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet('REPORTE FACTIBILIDAD')
+      const workbook = new ExcelJS.Workbook()
+      const worksheet = workbook.addWorksheet('REPORTE FACTIBILIDAD')
 
-    // ── Fila 1: Grupos ──
-    worksheet.getRow(1).values = [
-      'FECHA',        // A
-      'CÓDIGO POSTE', // B
-      'CIUDAD',       // C
-      'BARRIO',       // D
-      'DIRECCIÓN',    // E
-      'OPERADOR',     // F
-      'PROYECTO',     // G
-      'COORDENADAS',  // H
-      'POSTE',        // I (merge I1:N1)
-      '', '', '', '', '',
-      'RED ELÉCTRICA',       // O (merge O1:X1)
-      '', '', '', '', '', '', '', '', '',
-      'TELEC. PASIVOS',      // Y (merge Y1:AH1)
-      '', '', '', '', '', '', '', '', '',
-      'TELEC. ACTIVOS',      // AI (merge AI1:AM1)
-      '', '', '', '',
-      'MÉTODO DE TENDIDO',   // AN (merge AN1:AT1)
-      '', '', '', '', '', '',
-      'OBSERVACIONES',       // AU (merge AU1:AW1)
-      '', ''
-    ]
+      worksheet.getRow(1).values = [
+        'FECHA',
+        'CÓDIGO POSTE',
+        'CIUDAD',
+        'BARRIO',
+        'DIRECCIÓN',
+        'OPERADOR',
+        'PROYECTO',
+        'COORDENADAS',
+        'POSTE',
+        '', '', '', '', '',
+        'RED ELÉCTRICA',
+        '', '', '', '', '', '', '', '', '',
+        'TELEC. PASIVOS',
+        '', '', '', '', '', '', '', '', '',
+        'TELEC. ACTIVOS',
+        '', '', '', '',
+        'MÉTODO DE TENDIDO',
+        '', '', '', '', '', '',
+        'OBSERVACIONES',
+        '', ''
+      ]
 
-    // ── Fila 2: Subcolumnas ──
-    worksheet.getRow(2).values = [
-      '', '', '', '', '', '', '', '',  // A-H merged
-      'MATERIAL',      // I
-      'ALTURA',        // J
-      'RESISTENCIA',   // K
-      'USO/CARGA',     // L
-      'RETENIDA',      // M
-      'ESTADO',        // N
-      'NIV.AT',        // O
-      'NIV.MT',        // P
-      'NIV.BT',        // Q
-      'NIV.AP',        // R
-      'TRANSFORM.',    // S
-      'SECCIONAD.',    // T
-      'CORTA CIRC.',   // U
-      'MEDIDOR',       // V
-      'BAJANTE EL.',   // W
-      'TIERRA EL.',    // X
-      'CABLES',        // Y
-      'COAXIAL',       // Z
-      'FIBRA',         // AA
-      'DROP',          // AB
-      'RG11',          // AC
-      'CAJ.EMPALME',   // AD
-      'CAJ.GPON',      // AE
-      'STP',           // AF
-      'BAJANTES',      // AG
-      'RESERVAS',      // AH
-      'AMPLIF.',       // AI
-      'FUENTES',       // AJ
-      'NODO ÓPT.',     // AK
-      'ANTENA',        // AL
-      'CÁMARA VIG.',   // AM
-      'MTH RETEN.',    // AN
-      'MTH SUSPEN.',   // AO
-      'RETENCIÓN',     // AP
-      'CAB.COAXIAL',   // AQ
-      'CAB.FIBRA',     // AR
-      'TIPO CABLE',    // AS
-      'FIJ.HERRAJE',   // AT
-      'OBS.TENDIDO',   // AU
-      'RESTRICCIONES', // AV
-      'SUGERENCIAS'    // AW
-    ]
+      worksheet.getRow(2).values = [
+        '', '', '', '', '', '', '', '',
+        'MATERIAL',
+        'ALTURA',
+        'RESISTENCIA',
+        'USO/CARGA',
+        'RETENIDA',
+        'ESTADO',
+        'NIV.AT',
+        'NIV.MT',
+        'NIV.BT',
+        'NIV.AP',
+        'TRANSFORM.',
+        'SECCIONAD.',
+        'CORTA CIRC.',
+        'MEDIDOR',
+        'BAJANTE EL.',
+        'TIERRA EL.',
+        'CABLES',
+        'COAXIAL',
+        'FIBRA',
+        'DROP',
+        'RG11',
+        'CAJ.EMPALME',
+        'CAJ.GPON',
+        'STP',
+        'BAJANTES',
+        'RESERVAS',
+        'AMPLIF.',
+        'FUENTES',
+        'NODO ÓPT.',
+        'ANTENA',
+        'CÁMARA VIG.',
+        'MTH RETEN.',
+        'MTH SUSPEN.',
+        'RETENCIÓN',
+        'CAB.COAXIAL',
+        'CAB.FIBRA',
+        'TIPO CABLE',
+        'FIJ.HERRAJE',
+        'OBS.TENDIDO',
+        'RESTRICCIONES',
+        'SUGERENCIAS'
+      ]
 
-    // ── Merges ──
-    worksheet.mergeCells('A1:A2')
-    worksheet.mergeCells('B1:B2')
-    worksheet.mergeCells('C1:C2')
-    worksheet.mergeCells('D1:D2')
-    worksheet.mergeCells('E1:E2')
-    worksheet.mergeCells('F1:F2')
-    worksheet.mergeCells('G1:G2')
-    worksheet.mergeCells('H1:H2')
-    worksheet.mergeCells('I1:N1')   // POSTE (6 cols)
-    worksheet.mergeCells('O1:X1')   // RED ELÉCTRICA (10 cols)
-    worksheet.mergeCells('Y1:AH1')  // TELEC. PASIVOS (10 cols)
-    worksheet.mergeCells('AI1:AM1') // TELEC. ACTIVOS (5 cols)
-    worksheet.mergeCells('AN1:AT1') // MÉTODO TENDIDO (7 cols)
-    worksheet.mergeCells('AU1:AW1') // OBSERVACIONES (3 cols)
+      worksheet.mergeCells('A1:A2')
+      worksheet.mergeCells('B1:B2')
+      worksheet.mergeCells('C1:C2')
+      worksheet.mergeCells('D1:D2')
+      worksheet.mergeCells('E1:E2')
+      worksheet.mergeCells('F1:F2')
+      worksheet.mergeCells('G1:G2')
+      worksheet.mergeCells('H1:H2')
+      worksheet.mergeCells('I1:N1')
+      worksheet.mergeCells('O1:X1')
+      worksheet.mergeCells('Y1:AH1')
+      worksheet.mergeCells('AI1:AM1')
+      worksheet.mergeCells('AN1:AT1')
+      worksheet.mergeCells('AU1:AW1')
 
-    worksheet.getRow(1).height = 30
-    worksheet.getRow(2).height = 40
-    worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
-    worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
+      worksheet.getRow(1).height = 30
+      worksheet.getRow(2).height = 40
+      worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
+      worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
 
-    // ── Anchos ──
-    const colWidths = [
-      12, 15, 15, 20, 30, 20, 20, 25,  // A-H
-      12, 10, 12, 12, 10, 14,           // I-N poste
-      8, 8, 8, 8, 12, 12, 12, 10, 12, 10, // O-X red eléctrica
-      10, 10, 10, 10, 10, 12, 10, 10, 10, 10, // Y-AH pasivos
-      10, 10, 12, 10, 12,               // AI-AM activos
-      12, 12, 12, 12, 12, 15, 14,       // AN-AT método tendido
-      30, 35, 35                         // AU-AW observaciones
-    ]
-    colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
+      const colWidths = [
+        12, 15, 15, 20, 30, 20, 20, 25,
+        12, 10, 12, 12, 10, 14,
+        8, 8, 8, 8, 12, 12, 12, 10, 12, 10,
+        10, 10, 10, 10, 10, 12, 10, 10, 10, 10,
+        10, 10, 12, 10, 12,
+        12, 12, 12, 12, 12, 15, 14,
+        30, 35, 35
+      ]
+      colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
 
-    // ── Datos ──
-    const bool = v => v === true ? 'SI' : v === false ? 'NO' : (v || '')
+      const bool = v => v === true ? 'SI' : v === false ? 'NO' : (v || '')
 
-    const parseCheck = (val) => {
-      try {
-        const arr = typeof val === 'string' ? JSON.parse(val) : (val || [])
-        return Array.isArray(arr) ? arr.join(', ') : ''
-      } catch { return '' }
+      const parseCheck = (val) => {
+        try {
+          const arr = typeof val === 'string' ? JSON.parse(val) : (val || [])
+          return Array.isArray(arr) ? arr.join(', ') : ''
+        } catch { return '' }
+      }
+
+      datos.forEach((r, index) => {
+        const row = worksheet.addRow([
+          r.created_at ? new Date(r.created_at).toLocaleDateString('es-CO') : '',
+          r.codigo_poste || '',
+          r.ciudad || '',
+          r.barrio || '',
+          r.direccion || '',
+          r.operador || '',
+          r.proyecto || '',
+          r.coordenadas || '',
+          r.poste_material || '',
+          r.poste_altura || '',
+          r.poste_resistencia || '',
+          r.poste_uso_carga || '',
+          r.poste_retenida || '',
+          r.poste_estado || '',
+          bool(r.nivel_tension_at),
+          bool(r.nivel_tension_mt),
+          bool(r.nivel_tension_bt),
+          bool(r.nivel_tension_ap),
+          bool(r.elem_transformador),
+          bool(r.elem_seccionador),
+          bool(r.elem_corta_circuito),
+          bool(r.elem_medidor),
+          bool(r.elem_bajante_electrico),
+          bool(r.tierra_electrica),
+          r.telp_pas_cables || '',
+          r.telp_pas_c_coaxial || '',
+          r.telp_pas_c_fibra || '',
+          r.telp_pas_c_drop || '',
+          r.telp_pas_c_rg11 || '',
+          r.telp_pas_cajempalme || '',
+          r.telp_pas_cajgpon || '',
+          r.telp_pas_stp || '',
+          r.telp_pas_bajantes || '',
+          r.telp_pas_reservas || '',
+          r.telp_act_amplificadores || '',
+          r.telp_act_fuentes || '',
+          r.telp_act_nodooptico || '',
+          r.telp_act_antena || '',
+          r.telp_act_camara_vigil || '',
+          r.telp_mth_retencion || '',
+          r.telp_mth_suspencion || '',
+          r.telp_retencion || '',
+          r.telp_ccoaxial || '',
+          r.telp_cfibra || '',
+          r.tipo_cable || '',
+          r.fijacion_herraje || '',
+          r.observacion_tendido || '',
+          parseCheck(r.checkboxes_tendido),
+          parseCheck(r.checkboxes_sugerencias)
+        ])
+        applyDataRow(row, index)
+      })
+
+      worksheet.views = [{ state: 'frozen', xSplit: 8, ySplit: 2 }]
+
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+      res.setHeader('Content-Disposition', `attachment; filename=REPORTE_FACTIBILIDAD_${new Date().toISOString().split('T')[0]}.xlsx`)
+      await workbook.xlsx.write(res)
+      res.end()
+    } catch (error) {
+      console.error('❌ exportarReporteFactibilidad ERROR:', { message: error.message, detail: error.detail, hint: error.hint })
+      res.status(500).json({ success: false, error: error.message, detail: error.detail || null })
     }
+  },
 
-    datos.forEach((r, index) => {
-      const row = worksheet.addRow([
-        r.created_at ? new Date(r.created_at).toLocaleDateString('es-CO') : '',
-        r.codigo_poste || '',
-        r.ciudad || '',
-        r.barrio || '',
-        r.direccion || '',
-        r.operador || '',
-        r.proyecto || '',
-        r.coordenadas || '',
-        // POSTE
-        r.poste_material || '',
-        r.poste_altura || '',
-        r.poste_resistencia || '',
-        r.poste_uso_carga || '',
-        r.poste_retenida || '',
-        r.poste_estado || '',
-        // RED ELÉCTRICA
-        bool(r.nivel_tension_at),
-        bool(r.nivel_tension_mt),
-        bool(r.nivel_tension_bt),
-        bool(r.nivel_tension_ap),
-        bool(r.elem_transformador),
-        bool(r.elem_seccionador),
-        bool(r.elem_corta_circuito),
-        bool(r.elem_medidor),
-        bool(r.elem_bajante_electrico),
-        bool(r.tierra_electrica),
-        // TELEC. PASIVOS
-        r.telp_pas_cables || '',
-        r.telp_pas_c_coaxial || '',
-        r.telp_pas_c_fibra || '',
-        r.telp_pas_c_drop || '',
-        r.telp_pas_c_rg11 || '',
-        r.telp_pas_cajempalme || '',
-        r.telp_pas_cajgpon || '',
-        r.telp_pas_stp || '',
-        r.telp_pas_bajantes || '',
-        r.telp_pas_reservas || '',
-        // TELEC. ACTIVOS
-        r.telp_act_amplificadores || '',
-        r.telp_act_fuentes || '',
-        r.telp_act_nodooptico || '',
-        r.telp_act_antena || '',
-        r.telp_act_camara_vigil || '',
-        // MÉTODO DE TENDIDO
-        r.telp_mth_retencion || '',
-        r.telp_mth_suspencion || '',
-        r.telp_retencion || '',
-        r.telp_ccoaxial || '',
-        r.telp_cfibra || '',
-        r.tipo_cable || '',
-        r.fijacion_herraje || '',
-        // OBSERVACIONES
-        r.observacion_tendido || '',
-        parseCheck(r.checkboxes_tendido),
-        parseCheck(r.checkboxes_sugerencias)
-      ])
-      applyDataRow(row, index)
-    })
-
-    worksheet.views = [{ state: 'frozen', xSplit: 8, ySplit: 2 }]
-
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    res.setHeader('Content-Disposition', `attachment; filename=REPORTE_FACTIBILIDAD_${new Date().toISOString().split('T')[0]}.xlsx`)
-    await workbook.xlsx.write(res)
-    res.end()
-  } catch (error) {
-    console.error('❌ exportarReporteFactibilidad ERROR:', { message: error.message, detail: error.detail, hint: error.hint })
-    res.status(500).json({ success: false, error: error.message, detail: error.detail || null })
-  }
-},
-
-
-  
   // ========== DASHBOARD STATS ==========
-getDashboardStats: async (req, res) => {
-  try {
-    const stats = await reportesApi.getDashboardStats()
-    res.json({ success: true, data: stats })
-  } catch (error) {
-    console.error('❌ getDashboardStats ERROR:', { message: error.message })
-    res.status(500).json({ success: false, error: error.message })
+  getDashboardStats: async (req, res) => {
+    try {
+      const stats = await reportesApi.getDashboardStats()
+      res.json({ success: true, data: stats })
+    } catch (error) {
+      console.error('❌ getDashboardStats ERROR:', { message: error.message })
+      res.status(500).json({ success: false, error: error.message })
+    }
   }
-}
-
 
 }
 
 module.exports = reportesController
+

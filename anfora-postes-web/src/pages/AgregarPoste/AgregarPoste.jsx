@@ -1737,10 +1737,11 @@ const AgregarPoste = ({ setCurrentPage }) => {
                       >
                         <option value=""></option>
                         <option value="NO EXISTE">NO EXISTE</option>
+                        <option value="AHORRADOR">AHORRADOR</option>
+                        <option value="HALOGENO">HALOGENO</option>
+                        <option value="INCANDESCENTE">INCANDESCENTE</option>
                         <option value="LED">LED</option>
                         <option value="SODIO">SODIO</option>
-                        <option value="MERCURIO">MERCURIO</option>
-                        <option value="OTRO">OTRO</option>
                       </select>
                     </div>
 
@@ -1805,10 +1806,11 @@ const AgregarPoste = ({ setCurrentPage }) => {
                       >
                         <option value=""></option>
                         <option value="NO EXISTE">NO EXISTE</option>
+                        <option value="AHORRADOR">AHORRADOR</option>
+                        <option value="HALOGENO">HALOGENO</option>
+                        <option value="INCANDESCENTE">INCANDESCENTE</option>
                         <option value="LED">LED</option>
                         <option value="SODIO">SODIO</option>
-                        <option value="MERCURIO">MERCURIO</option>
-                        <option value="OTRO">OTRO</option>
                       </select>
                     </div>
 
@@ -2057,19 +2059,19 @@ const AgregarPoste = ({ setCurrentPage }) => {
           <div className="section-content">
             <div className="form-grid form-grid-1">
               <div className="form-group">
-                <label>¿La estructura está en buen estado?: *</label>
+                <label>¿Estado de la estructura?: *</label>
                 <select 
                   value={formData.estadoEstructura}
                   onChange={(e) => handleInputChange('estadoEstructura', e.target.value)}
                 >
                   <option value=""></option>
-                  <option value="SI">SI</option>
-                  <option value="NO">NO</option>
+                  <option value="BUENO">BUENO</option>
+                  <option value="MALO">MALO</option>
                 </select>
               </div>
             </div>
 
-            {formData.estadoEstructura === 'NO' && (
+            {formData.estadoEstructura === 'MALO' && (
               <div className="form-grid form-grid-4">
                 <div className="form-group">
                   <label>¿Desplomado?:</label>
