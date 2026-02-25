@@ -1,20 +1,15 @@
-// src/pages/Factibilidad/Factibilidad.jsx
 import React, { useState } from 'react'
 import './Factibilidad.css'
 import AgregarFactibilidad from './AgregarFactibilidad'
 import VerRegistrosFactibilidad from './VerRegistrosFactibilidad'
 
-
-const Factibilidad = () => {
-  const [vistaActual, setVistaActual] = useState('agregar') // 'agregar' o 'ver'
-
+const Factibilidad = ({ setCurrentPage, factibilidadEditandoId }) => {
+  const [vistaActual, setVistaActual] = useState('agregar')
 
   return (
     <div className="factibilidad-container">
       <h1 className="page-main-title">📊 Factibilidad</h1>
 
-
-      {/* Tabs: Agregar vs Ver Registros */}
       <div className="tabs-principales">
         <button
           className={`tab-btn ${vistaActual === 'agregar' ? 'active' : ''}`}
@@ -30,15 +25,17 @@ const Factibilidad = () => {
         </button>
       </div>
 
-
-      {/* Contenido dinámico según selección */}
       <div className="factibilidad-content">
-        {vistaActual === 'agregar' && <AgregarFactibilidad />}
-        {vistaActual === 'ver' && <VerRegistrosFactibilidad />}
+        {vistaActual === 'agregar' && (
+          <AgregarFactibilidad setCurrentPage={setCurrentPage} />
+        )}
+        {vistaActual === 'ver' && (
+          <VerRegistrosFactibilidad setVistaActual={setVistaActual} />
+        )}
       </div>
     </div>
   )
 }
 
-
 export default Factibilidad
+

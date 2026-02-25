@@ -1,11 +1,8 @@
-// src/pages/Factibilidad/Factibilidad.jsx
 import React, { useState, useEffect } from 'react'
 import './VerRegistros.css'
 import factibilidadService from '../../services/factibilidadService'
 
-
-
-const VerRegistrosFactibilidad = () => {
+const VerRegistrosFactibilidad = ({ setVistaActual }) => {
   const [fechaInicial, setFechaInicial] = useState('')
   const [fechaFinal, setFechaFinal] = useState('')
   const [busqueda, setBusqueda] = useState('')
@@ -14,28 +11,18 @@ const VerRegistrosFactibilidad = () => {
   const [cargando, setCargando] = useState(false)
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' })
   const [paginaActual, setPaginaActual] = useState(1)
+  const [modalDetalles, setModalDetalles] = useState(null)
+  const [cargandoDetalles, setCargandoDetalles] = useState(false)
   const registrosPorPagina = 50
 
-
-
-  // =============================================
-  // CARGAR DATOS AL MONTAR
-  // =============================================
   useEffect(() => {
     cargarFactibilidades()
   }, [paginaActual])
 
-
-
-  // =============================================
-  // FUNCIÓN: CARGAR FACTIBILIDADES
-  // =============================================
   const cargarFactibilidades = async () => {
     try {
       setCargando(true)
       setMensaje({ tipo: '', texto: '' })
-
-
 
       const filtros = {
         fecha_inicio: fechaInicial || undefined,
@@ -46,11 +33,7 @@ const VerRegistrosFactibilidad = () => {
         offset: (paginaActual - 1) * registrosPorPagina
       }
 
-
-
       const respuesta = await factibilidadService.obtenerTodas(filtros)
-
-
 
       if (respuesta.success) {
         setFactibilidades(respuesta.factibilidades)
@@ -67,21 +50,11 @@ const VerRegistrosFactibilidad = () => {
     }
   }
 
-
-
-  // =============================================
-  // FUNCIÓN: BUSCAR
-  // =============================================
   const handleBuscar = () => {
-    setPaginaActual(1) // Resetear a página 1
+    setPaginaActual(1)
     cargarFactibilidades()
   }
 
-
-
-  // =============================================
-  // FUNCIÓN: LIMPIAR FILTROS
-  // =============================================
   const handleLimpiarFiltros = () => {
     setFechaInicial('')
     setFechaFinal('')
@@ -90,25 +63,16 @@ const VerRegistrosFactibilidad = () => {
     setTimeout(() => cargarFactibilidades(), 100)
   }
 
-
-
-  // =============================================
-  // FUNCIÓN: ELIMINAR
-  // =============================================
   const handleEliminar = async (id, codigoPoste) => {
     if (!window.confirm(`¿Está seguro de eliminar la factibilidad "${codigoPoste}"?`)) {
       return
     }
 
-
-
     try {
       setCargando(true)
       await factibilidadService.eliminar(id)
-     
       setMensaje({ tipo: 'success', texto: '✅ Factibilidad eliminada exitosamente' })
       setTimeout(() => setMensaje({ tipo: '', texto: '' }), 3000)
-     
       cargarFactibilidades()
     } catch (error) {
       console.error('Error al eliminar:', error)
@@ -122,71 +86,37 @@ const VerRegistrosFactibilidad = () => {
     }
   }
 
-
-
-  // =============================================
-  // FUNCIÓN: VER DETALLES
-  // =============================================
-  const [modalDetalles, setModalDetalles] = useState(null)
-const [cargandoDetalles, setCargandoDetalles] = useState(false)
-
-
-
-// Función para ver detalles
-const handleVerDetalles = async (id) => {
-  try {
-    setCargandoDetalles(true)
-    const respuesta = await factibilidadService.obtenerPorId(id)
-   
-    if (respuesta.success) {
-      setModalDetalles(respuesta.factibilidad)
-    } else {
-      setModalDetalles(respuesta)
+  const handleVerDetalles = async (id) => {
+    try {
+      setCargandoDetalles(true)
+      const respuesta = await factibilidadService.obtenerPorId(id)
+      if (respuesta.success) {
+        setModalDetalles(respuesta.factibilidad)
+      } else {
+        setModalDetalles(respuesta)
+      }
+    } catch (error) {
+      console.error('Error al cargar detalles:', error)
+      setMensaje({
+        tipo: 'error',
+        texto: 'Error al cargar detalles: ' + (error.message || 'Error desconocido')
+      })
+      setTimeout(() => setMensaje({ tipo: '', texto: '' }), 3000)
+    } finally {
+      setCargandoDetalles(false)
     }
-  } catch (error) {
-    console.error('Error al cargar detalles:', error)
-    setMensaje({
-      tipo: 'error',
-      texto: 'Error al cargar detalles: ' + (error.message || 'Error desconocido')
-    })
-    setTimeout(() => setMensaje({ tipo: '', texto: '' }), 3000)
-  } finally {
-    setCargandoDetalles(false)
   }
-}
 
+  const cerrarModalDetalles = () => {
+    setModalDetalles(null)
+  }
 
-
-// Función para cerrar modal
-const cerrarModalDetalles = () => {
-  setModalDetalles(null)
-}
-
-
-
-  // =============================================
-  // FUNCIÓN: EDITAR
-  // =============================================
   const handleEditar = (id) => {
-    localStorage.setItem('editarFactibilidadId', id);
-    setMensaje({ 
-      tipo: 'info', 
-      texto: '🔄 Cargando factibilidad para edición...' 
-    });
-    
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
+    localStorage.setItem('editarFactibilidadId', id)
+    setVistaActual('agregar')
   }
 
-
-
-  // =============================================
-  // PAGINACIÓN
-  // =============================================
   const totalPaginas = Math.ceil(total / registrosPorPagina)
-
-
 
   const handlePaginaAnterior = () => {
     if (paginaActual > 1) {
@@ -194,35 +124,22 @@ const cerrarModalDetalles = () => {
     }
   }
 
-
-
   const handlePaginaSiguiente = () => {
     if (paginaActual < totalPaginas) {
       setPaginaActual(paginaActual + 1)
     }
   }
 
-
-
-  // =============================================
-  // RENDER
-  // =============================================
   return (
     <div className="ver-registros-container">
       <h2 className="page-subtitle">Ver Registros Factibilidad</h2>
 
-
-
-      {/* Mensaje de estado */}
       {mensaje.texto && (
         <div className={`mensaje-estado mensaje-${mensaje.tipo}`}>
           {mensaje.texto}
         </div>
       )}
 
-
-
-      {/* Filtros */}
       <div className="filtros-container">
         <input
           type="text"
@@ -232,7 +149,7 @@ const cerrarModalDetalles = () => {
           onChange={(e) => setBusqueda(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleBuscar()}
         />
-       
+
         <div className="fecha-group">
           <label>Fecha inicial:</label>
           <input
@@ -241,8 +158,6 @@ const cerrarModalDetalles = () => {
             onChange={(e) => setFechaInicial(e.target.value)}
           />
         </div>
-
-
 
         <div className="fecha-group">
           <label>Fecha final:</label>
@@ -253,8 +168,6 @@ const cerrarModalDetalles = () => {
           />
         </div>
 
-
-
         <button
           className="btn-buscar"
           onClick={handleBuscar}
@@ -262,8 +175,6 @@ const cerrarModalDetalles = () => {
         >
           {cargando ? 'Buscando...' : 'Buscar'}
         </button>
-
-
 
         <button
           className="btn-limpiar"
@@ -274,9 +185,6 @@ const cerrarModalDetalles = () => {
         </button>
       </div>
 
-
-
-      {/* Indicador de resultados */}
       <div className="resultados-info">
         {total > 0 ? (
           <p>
@@ -289,9 +197,6 @@ const cerrarModalDetalles = () => {
         )}
       </div>
 
-
-
-      {/* Tabla */}
       {cargando ? (
         <div className="loading-container">
           <div className="spinner"></div>
@@ -369,9 +274,6 @@ const cerrarModalDetalles = () => {
             </table>
           </div>
 
-
-
-          {/* Paginación */}
           {totalPaginas > 1 && (
             <div className="paginacion">
               <button
@@ -381,11 +283,11 @@ const cerrarModalDetalles = () => {
               >
                 ← Anterior
               </button>
-             
+
               <span className="paginacion-info">
                 Página {paginaActual} de {totalPaginas}
               </span>
-             
+
               <button
                 className="btn-paginacion"
                 onClick={handlePaginaSiguiente}
@@ -398,9 +300,6 @@ const cerrarModalDetalles = () => {
         </>
       )}
 
-
-
-      {/* Modal de detalles */}
       {modalDetalles && (
         <div className="modal-overlay" onClick={cerrarModalDetalles}>
           <div className="modal-detalles" onClick={(e) => e.stopPropagation()}>
@@ -408,9 +307,8 @@ const cerrarModalDetalles = () => {
               <h2>📋 Detalles de Factibilidad #{modalDetalles.id}</h2>
               <button className="btn-cerrar-modal" onClick={cerrarModalDetalles}>✕</button>
             </div>
-           
+
             <div className="modal-body">
-              {/* Sección 1: Información General */}
               <div className="detalle-seccion">
                 <h3>📍 Información General</h3>
                 <div className="detalle-grid">
@@ -422,9 +320,6 @@ const cerrarModalDetalles = () => {
                 </div>
               </div>
 
-
-
-              {/* Sección 2: Ubicación */}
               <div className="detalle-seccion">
                 <h3>🗺️ Ubicación</h3>
                 <div className="detalle-grid">
@@ -437,9 +332,6 @@ const cerrarModalDetalles = () => {
                 </div>
               </div>
 
-
-
-              {/* Sección 3: Características del Poste */}
               <div className="detalle-seccion">
                 <h3>🏗️ Características del Poste</h3>
                 <div className="detalle-grid">
@@ -452,9 +344,6 @@ const cerrarModalDetalles = () => {
                 </div>
               </div>
 
-
-
-              {/* Sección 4: Red Eléctrica */}
               <div className="detalle-seccion">
                 <h3>⚡ Red Eléctrica</h3>
                 <div className="detalle-checkboxes">
@@ -469,9 +358,6 @@ const cerrarModalDetalles = () => {
                 </div>
               </div>
 
-
-
-              {/* Sección 5: Observaciones */}
               {modalDetalles.observaciones && (
                 <div className="detalle-seccion">
                   <h3>📝 Observaciones</h3>
@@ -479,9 +365,6 @@ const cerrarModalDetalles = () => {
                 </div>
               )}
 
-
-
-              {/* Sección 6: Fechas */}
               <div className="detalle-seccion">
                 <h3>📅 Fechas</h3>
                 <div className="detalle-grid">
@@ -493,8 +376,6 @@ const cerrarModalDetalles = () => {
               </div>
             </div>
 
-
-
             <div className="modal-footer">
               <button className="btn-cerrar" onClick={cerrarModalDetalles}>
                 Cerrar
@@ -503,14 +384,9 @@ const cerrarModalDetalles = () => {
           </div>
         </div>
       )}
-
-
-
-
     </div>
   )
 }
 
-
-
 export default VerRegistrosFactibilidad
+
