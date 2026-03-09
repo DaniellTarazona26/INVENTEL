@@ -8,11 +8,11 @@ const OPCIONES = {
   cables: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'],
   telefonico_utp_guaya: ['0', '1', '2', '3', '4', '5'],
   marquilla: ['', 'NO', 'SI'],
-  cruce: ['', '0', '1'],
+  cruce: ['', 'NO', 'SI'],
   cruce_estado: ['', 'BUENO', 'MAL ESTADO'],
   chipa_raqueta: ['', 'CHIPA', 'RAQUETA'],
   ubicacion: ['', 'POSTE', 'VANO'],
-  caja_empalme: ['0', '1'],
+  caja_empalme: ['NO', 'SI'],
   bajante_cables: ['', 'BUENO', 'MAL ESTADO'],
   bajante_diametro: ['', '1', '1.5', '2', '3', '4'],
   bajante_material: ['', 'GALVANIZADO', 'EMT', 'PVC']
@@ -379,7 +379,6 @@ const AgregarOperadores = ({ setCurrentPage }) => {
       setAllowNavigation(true)
 
       mostrarMensaje('success', 'Inventario completado exitosamente')
-
       setTimeout(() => {
         localStorage.removeItem('inventarioParcialId')
         localStorage.removeItem('operadoresSeleccionados')
@@ -600,7 +599,6 @@ const AgregarOperadores = ({ setCurrentPage }) => {
                 ))}
               </select>
             </div>
-
           </div>
         </div>
       </section>
@@ -616,7 +614,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
                 onChange={(e) => handleInputChange(operadorNombre, 'cruce_via', e.target.value)}
               >
                 {OPCIONES.cruce.map(opt => (
-                  <option key={opt} value={opt}>{opt === '' ? '-' : opt === '0' ? 'NO' : 'SI'}</option>
+                  <option key={opt} value={opt}>{opt || '-'}</option>
                 ))}
               </select>
             </div>
@@ -626,7 +624,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.cruce_estado}
                 onChange={(e) => handleInputChange(operadorNombre, 'cruce_estado', e.target.value)}
-                disabled={datosActuales.cruce_via !== '1'}
+                disabled={datosActuales.cruce_via !== 'SI'}
               >
                 {OPCIONES.cruce_estado.map(opt => (
                   <option key={opt} value={opt}>{opt || '-'}</option>
@@ -639,10 +637,10 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.cruce_diagonal}
                 onChange={(e) => handleInputChange(operadorNombre, 'cruce_diagonal', e.target.value)}
-                disabled={datosActuales.cruce_via !== '1'}
+                disabled={datosActuales.cruce_via !== 'SI'}
               >
                 {OPCIONES.cruce.map(opt => (
-                  <option key={opt} value={opt}>{opt === '' ? '-' : opt === '0' ? 'NO' : 'SI'}</option>
+                  <option key={opt} value={opt}>{opt || '-'}</option>
                 ))}
               </select>
             </div>
@@ -652,10 +650,10 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.cruce_sin_red}
                 onChange={(e) => handleInputChange(operadorNombre, 'cruce_sin_red', e.target.value)}
-                disabled={datosActuales.cruce_via !== '1'}
+                disabled={datosActuales.cruce_via !== 'SI'}
               >
                 {OPCIONES.cruce.map(opt => (
-                  <option key={opt} value={opt}>{opt === '' ? '-' : opt === '0' ? 'NO' : 'SI'}</option>
+                  <option key={opt} value={opt}>{opt || '-'}</option>
                 ))}
               </select>
             </div>
@@ -667,10 +665,10 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.cruce_acometida}
                 onChange={(e) => handleInputChange(operadorNombre, 'cruce_acometida', e.target.value)}
-                disabled={datosActuales.cruce_via !== '1'}
+                disabled={datosActuales.cruce_via !== 'SI'}
               >
                 {OPCIONES.cruce.map(opt => (
-                  <option key={opt} value={opt}>{opt === '' ? '-' : opt === '0' ? 'NO' : 'SI'}</option>
+                  <option key={opt} value={opt}>{opt || '-'}</option>
                 ))}
               </select>
             </div>
@@ -680,10 +678,10 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.cruce_desalineado}
                 onChange={(e) => handleInputChange(operadorNombre, 'cruce_desalineado', e.target.value)}
-                disabled={datosActuales.cruce_via !== '1'}
+                disabled={datosActuales.cruce_via !== 'SI'}
               >
                 {OPCIONES.cruce.map(opt => (
-                  <option key={opt} value={opt}>{opt === '' ? '-' : opt === '0' ? 'NO' : 'SI'}</option>
+                  <option key={opt} value={opt}>{opt || '-'}</option>
                 ))}
               </select>
             </div>
@@ -859,7 +857,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               >
                 <option value="">-</option>
                 {OPCIONES.caja_empalme.map(opt => (
-                  <option key={opt} value={opt}>{opt === '0' ? 'NO' : 'SI'}</option>
+                  <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
             </div>
@@ -869,7 +867,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.caja1_ubicacion}
                 onChange={(e) => handleInputChange(operadorNombre, 'caja1_ubicacion', e.target.value)}
-                disabled={datosActuales.caja1 !== '1'}
+                disabled={datosActuales.caja1 !== 'SI'}
               >
                 {OPCIONES.ubicacion.map(opt => (
                   <option key={opt} value={opt}>{opt || '-'}</option>
@@ -882,7 +880,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.caja1_marquilla}
                 onChange={(e) => handleInputChange(operadorNombre, 'caja1_marquilla', e.target.value)}
-                disabled={datosActuales.caja1 !== '1'}
+                disabled={datosActuales.caja1 !== 'SI'}
               >
                 {OPCIONES.marquilla.map(opt => (
                   <option key={opt} value={opt}>{opt || '-'}</option>
@@ -902,7 +900,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               >
                 <option value="">-</option>
                 {OPCIONES.caja_empalme.map(opt => (
-                  <option key={opt} value={opt}>{opt === '0' ? 'NO' : 'SI'}</option>
+                  <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
             </div>
@@ -912,7 +910,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.caja2_ubicacion}
                 onChange={(e) => handleInputChange(operadorNombre, 'caja2_ubicacion', e.target.value)}
-                disabled={datosActuales.caja2 !== '1'}
+                disabled={datosActuales.caja2 !== 'SI'}
               >
                 {OPCIONES.ubicacion.map(opt => (
                   <option key={opt} value={opt}>{opt || '-'}</option>
@@ -925,7 +923,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.caja2_marquilla}
                 onChange={(e) => handleInputChange(operadorNombre, 'caja2_marquilla', e.target.value)}
-                disabled={datosActuales.caja2 !== '1'}
+                disabled={datosActuales.caja2 !== 'SI'}
               >
                 {OPCIONES.marquilla.map(opt => (
                   <option key={opt} value={opt}>{opt || '-'}</option>
@@ -945,7 +943,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               >
                 <option value="">-</option>
                 {OPCIONES.caja_empalme.map(opt => (
-                  <option key={opt} value={opt}>{opt === '0' ? 'NO' : 'SI'}</option>
+                  <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
             </div>
@@ -955,7 +953,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.caja3_ubicacion}
                 onChange={(e) => handleInputChange(operadorNombre, 'caja3_ubicacion', e.target.value)}
-                disabled={datosActuales.caja3 !== '1'}
+                disabled={datosActuales.caja3 !== 'SI'}
               >
                 {OPCIONES.ubicacion.map(opt => (
                   <option key={opt} value={opt}>{opt || '-'}</option>
@@ -968,7 +966,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.caja3_marquilla}
                 onChange={(e) => handleInputChange(operadorNombre, 'caja3_marquilla', e.target.value)}
-                disabled={datosActuales.caja3 !== '1'}
+                disabled={datosActuales.caja3 !== 'SI'}
               >
                 {OPCIONES.marquilla.map(opt => (
                   <option key={opt} value={opt}>{opt || '-'}</option>
@@ -995,7 +993,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
                   >
                     <option value="">-</option>
                     {OPCIONES.caja_empalme.map(opt => (
-                      <option key={opt} value={opt}>{opt === '0' ? 'NO' : 'SI'}</option>
+                      <option key={opt} value={opt}>{opt}</option>
                     ))}
                   </select>
                 </div>
@@ -1005,7 +1003,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
                   <select
                     value={datosActuales[`empalme${num}_ubicacion`]}
                     onChange={(e) => handleInputChange(operadorNombre, `empalme${num}_ubicacion`, e.target.value)}
-                    disabled={datosActuales[`empalme${num}`] !== '1'}
+                    disabled={datosActuales[`empalme${num}`] !== 'SI'}
                   >
                     {OPCIONES.ubicacion.map(opt => (
                       <option key={opt} value={opt}>{opt || '-'}</option>
@@ -1018,7 +1016,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
                   <select
                     value={datosActuales[`empalme${num}_marquilla`]}
                     onChange={(e) => handleInputChange(operadorNombre, `empalme${num}_marquilla`, e.target.value)}
-                    disabled={datosActuales[`empalme${num}`] !== '1'}
+                    disabled={datosActuales[`empalme${num}`] !== 'SI'}
                   >
                     {OPCIONES.marquilla.map(opt => (
                       <option key={opt} value={opt}>{opt || '-'}</option>
@@ -1045,7 +1043,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               >
                 <option value="">-</option>
                 {OPCIONES.caja_empalme.map(opt => (
-                  <option key={opt} value={opt}>{opt === '0' ? 'NO' : 'SI'}</option>
+                  <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
             </div>
@@ -1055,7 +1053,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.bajante1_cables}
                 onChange={(e) => handleInputChange(operadorNombre, 'bajante1_cables', e.target.value)}
-                disabled={datosActuales.bajante1 !== '1'}
+                disabled={datosActuales.bajante1 !== 'SI'}
               >
                 {OPCIONES.bajante_cables.map(opt => (
                   <option key={opt} value={opt}>{opt || '-'}</option>
@@ -1068,7 +1066,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.bajante1_diametro}
                 onChange={(e) => handleInputChange(operadorNombre, 'bajante1_diametro', e.target.value)}
-                disabled={datosActuales.bajante1 !== '1'}
+                disabled={datosActuales.bajante1 !== 'SI'}
               >
                 {OPCIONES.bajante_diametro.map(opt => (
                   <option key={opt} value={opt}>{opt || '-'}</option>
@@ -1081,7 +1079,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.bajante1_material}
                 onChange={(e) => handleInputChange(operadorNombre, 'bajante1_material', e.target.value)}
-                disabled={datosActuales.bajante1 !== '1'}
+                disabled={datosActuales.bajante1 !== 'SI'}
               >
                 {OPCIONES.bajante_material.map(opt => (
                   <option key={opt} value={opt}>{opt || '-'}</option>
@@ -1096,7 +1094,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.bajante1_fibra}
                 onChange={(e) => handleInputChange(operadorNombre, 'bajante1_fibra', e.target.value)}
-                disabled={datosActuales.bajante1 !== '1'}
+                disabled={datosActuales.bajante1 !== 'SI'}
               >
                 <option value="">-</option>
                 {OPCIONES.cables.map(opt => (
@@ -1110,7 +1108,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.bajante1_telefonico}
                 onChange={(e) => handleInputChange(operadorNombre, 'bajante1_telefonico', e.target.value)}
-                disabled={datosActuales.bajante1 !== '1'}
+                disabled={datosActuales.bajante1 !== 'SI'}
               >
                 <option value="">-</option>
                 {OPCIONES.cables.map(opt => (
@@ -1124,7 +1122,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.bajante1_utp}
                 onChange={(e) => handleInputChange(operadorNombre, 'bajante1_utp', e.target.value)}
-                disabled={datosActuales.bajante1 !== '1'}
+                disabled={datosActuales.bajante1 !== 'SI'}
               >
                 <option value="">-</option>
                 {OPCIONES.cables.map(opt => (
@@ -1138,7 +1136,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
               <select
                 value={datosActuales.bajante1_coaxial}
                 onChange={(e) => handleInputChange(operadorNombre, 'bajante1_coaxial', e.target.value)}
-                disabled={datosActuales.bajante1 !== '1'}
+                disabled={datosActuales.bajante1 !== 'SI'}
               >
                 <option value="">-</option>
                 {OPCIONES.cables.map(opt => (
@@ -1230,4 +1228,5 @@ const AgregarOperadores = ({ setCurrentPage }) => {
 }
 
 export default AgregarOperadores
+
 

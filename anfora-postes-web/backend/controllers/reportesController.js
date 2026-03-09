@@ -56,137 +56,224 @@ const reportesController = {
   },
 
   exportarInventarioOperador: async (req, res) => {
-    try {
-      const datos = await reportesApi.getInventarioOperadorCompleto(req.query)
+  try {
+    const datos = await reportesApi.getInventarioOperadorCompleto(req.query)
 
-      const workbook = new ExcelJS.Workbook()
-      const worksheet = workbook.addWorksheet('REPORTE OPERADOR')
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('REPORTE OPERADOR')
 
-      worksheet.getRow(1).values = [
-        'CONSEC.', 'FECHA', 'WAYPOINT', 'CIUDAD', 'BARRIO', 'DIRECCIÓN',
-        'ESTRUCTURA', '', '', '', '', '', '', '', '', '',
-        'OPERADOR',
-        'NIVELES DE OCUPACIÓN', '', '', '', '', '', '', '',
-        'CRUCE EN VÍA', '', '', '', '', '',
-        'ACTIVOS EXISTENTES', '', '', '', '', '', '',
-        'PASIVOS EXISTENTES', '', '', '',
-        'OBSERVACIONES'
-      ]
+    worksheet.getRow(1).values = [
+      'CONSEC.', 'FECHA', 'WAYPOINT', 'CIUDAD', 'BARRIO', 'DIRECCIÓN',
+      'ESTRUCTURA', '', '', '', '', '', '', '', '', '',
+      'OPERADOR',
+      'NIVELES DE OCUPACIÓN', '', '', '', '', '', '', '',
+      'CRUCE EN VÍA', '', '', '', '', '',
+      'ACTIVOS EXISTENTES', '', '', '', '', '', '',
+      'PASIVOS EXISTENTES', '', '', '',
+      'RESERVA #1', '', '', '',
+      'RESERVA #2', '', '', '',
+      'CAJA #1', '', '',
+      'CAJA #2', '', '',
+      'CAJA #3', '', '',
+      'EMPALME #1', '', '',
+      'EMPALME #2', '', '',
+      'EMPALME #3', '', '',
+      'EMPALME #4', '', '',
+      'BAJANTE #1', '', '', '', '', '', '', '',
+      'OBSERVACIONES', ''
+    ]
 
-      worksheet.getRow(2).values = [
-        '', '', '', '', '', '',
-        'TIPO', 'CONSEC.', 'MARCADA', 'MATERIAL', 'C.ROTURA', 'COD.', 'TEMPLETE', 'EST.TEMP.', 'ALTURA', 'AÑO FAB.',
-        '',
-        'HERRAJES', 'COAXIAL', 'TELEFÓNICO', 'FIBRA', 'UTP', 'GUAYA', 'TOTAL CAB.', 'MARQUILLA',
-        'EXISTE', 'ESTADO', 'DIAGONAL', 'SIN RED', 'ACOMETIDA', 'DESALIN.',
-        'AMPLIF.', 'NODO ÓPT.', 'FUENTE', 'AMP.110V', 'NODO.110V', 'FUENTE.110V', 'SWITCH.110V',
-        'CAJA NAP', 'C.EMPALME', 'RESERVA', 'BAJANTE',
-        ''
-      ]
+    worksheet.getRow(2).values = [
+      '', '', '', '', '', '',
+      'TIPO', 'CONSEC.', 'MARCADA', 'MATERIAL', 'C.ROTURA', 'COD.', 'TEMPLETE', 'EST.TEMP.', 'ALTURA', 'AÑO FAB.',
+      '',
+      'HERRAJES', 'COAXIAL', 'TELEFÓNICO', 'FIBRA', 'UTP', 'GUAYA', 'TOTAL CAB.', 'MARQUILLA',
+      'EXISTE', 'ESTADO', 'DIAGONAL', 'SIN RED', 'ACOMETIDA', 'DESALIN.',
+      'AMPLIF.', 'NODO ÓPT.', 'FUENTE', 'AMP.110V', 'NODO.110V', 'FUENTE.110V', 'SWITCH.110V',
+      'CAJ.NAP', 'CAJ.EMP.', 'RESERVA', 'BAJANTE',
+      'EXISTE', 'CHIPA/RAQ.', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'CHIPA/RAQ.', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'CABLES', 'DIÁMETRO', 'MATERIAL', 'FIBRA', 'TELEFÓNICO', 'UTP', 'COAXIAL',
+      'TEXTO', 'CHECKBOXES'
+    ]
 
-      worksheet.mergeCells('A1:A2')
-      worksheet.mergeCells('B1:B2')
-      worksheet.mergeCells('C1:C2')
-      worksheet.mergeCells('D1:D2')
-      worksheet.mergeCells('E1:E2')
-      worksheet.mergeCells('F1:F2')
-      worksheet.mergeCells('G1:P1')
-      worksheet.mergeCells('Q1:Q2')
-      worksheet.mergeCells('R1:Y1')
-      worksheet.mergeCells('Z1:AE1')
-      worksheet.mergeCells('AF1:AL1')
-      worksheet.mergeCells('AM1:AP1')
-      worksheet.mergeCells('AQ1:AQ2')
+    worksheet.mergeCells('A1:A2')
+    worksheet.mergeCells('B1:B2')
+    worksheet.mergeCells('C1:C2')
+    worksheet.mergeCells('D1:D2')
+    worksheet.mergeCells('E1:E2')
+    worksheet.mergeCells('F1:F2')
+    worksheet.mergeCells('G1:P1')
+    worksheet.mergeCells('Q1:Q2')
+    worksheet.mergeCells('R1:Y1')
+    worksheet.mergeCells('Z1:AE1')
+    worksheet.mergeCells('AF1:AL1')
+    worksheet.mergeCells('AM1:AP1')
+    worksheet.mergeCells('AQ1:AT1')
+    worksheet.mergeCells('AU1:AX1')
+    worksheet.mergeCells('AY1:BA1')
+    worksheet.mergeCells('BB1:BD1')
+    worksheet.mergeCells('BE1:BG1')
+    worksheet.mergeCells('BH1:BJ1')
+    worksheet.mergeCells('BK1:BM1')
+    worksheet.mergeCells('BN1:BP1')
+    worksheet.mergeCells('BQ1:BS1')
+    worksheet.mergeCells('BT1:CA1')
+    worksheet.mergeCells('CB1:CB2')
+    worksheet.mergeCells('CC1:CC2')
 
-      worksheet.getRow(1).height = 30
-      worksheet.getRow(2).height = 40
-      worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
-      worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
+    worksheet.getRow(1).height = 30
+    worksheet.getRow(2).height = 40
+    worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
+    worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
 
-      const colWidths = [
-        10, 12, 14, 15, 20, 30,
-        12, 12, 10, 12, 10, 15, 12, 12, 10, 10,
-        18,
-        10, 10, 10, 10, 10, 10, 12, 10,
-        8, 12, 10, 10, 10, 10,
-        10, 12, 10, 10, 12, 12, 12,
-        10, 12, 10, 10,
-        35
-      ]
-      colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
+    const colWidths = [
+      10, 12, 14, 15, 20, 30,
+      12, 12, 10, 12, 10, 15, 12, 12, 10, 10,
+      18,
+      10, 10, 10, 10, 10, 10, 12, 10,
+      8, 12, 10, 10, 10, 10,
+      10, 12, 10, 10, 12, 12, 12,
+      10, 12, 10, 10,
+      8, 12, 10, 10,
+      8, 12, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 12, 10, 12, 10, 10, 10, 10,
+      35, 50
+    ]
+    colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
 
-      const bool = v => v === true ? 'SI' : v === false ? 'NO' : ''
+    const bool = v => v === true ? 'SI' : v === false ? 'NO' : ''
 
-      let lastConsecutivo = null
-      let colorIndex = 0
-
-      datos.forEach((r) => {
-        const esNuevoPoste = r.consecutivo !== lastConsecutivo
-        if (esNuevoPoste) {
-          lastConsecutivo = r.consecutivo
-          colorIndex++
-        }
-
-        const row = worksheet.addRow([
-          esNuevoPoste ? (r.consecutivo || '') : '',
-          esNuevoPoste ? (r.fecha_registro ? new Date(r.fecha_registro).toLocaleDateString('es-CO') : '') : '',
-          esNuevoPoste ? (r.waypoint || '') : '',
-          esNuevoPoste ? (r.ciudad || '') : '',
-          esNuevoPoste ? (r.barrio || '') : '',
-          esNuevoPoste ? (r.direccion_completa || '') : '',
-          esNuevoPoste ? (r.tipo || '') : '',
-          esNuevoPoste ? (r.consecutivo_poste || '') : '',
-          esNuevoPoste ? (r.marcada || '') : '',
-          esNuevoPoste ? (r.material || '') : '',
-          esNuevoPoste ? (r.carga_rotura || '') : '',
-          esNuevoPoste ? (r.codigo_estructura || '') : '',
-          esNuevoPoste ? (r.templete || '') : '',
-          esNuevoPoste ? (r.estado_templete || '') : '',
-          esNuevoPoste ? (r.altura || '') : '',
-          esNuevoPoste ? (r.ano_fabricacion || '') : '',
-          r.operador_nombre || '',
-          r.herrajes || '',
-          r.coaxial || '',
-          r.telefonico || '',
-          r.fibra_optica || '',
-          r.utp || '',
-          r.guaya || '',
-          r.total_cables || '',
-          r.marquilla || '',
-          r.cruce_via || '',
-          r.cruce_estado || '',
-          r.cruce_diagonal || '',
-          r.cruce_sin_red || '',
-          r.cruce_acometida || '',
-          r.cruce_desalineado || '',
-          bool(r.activo_amplificador),
-          bool(r.activo_nodo_optico),
-          bool(r.activo_fuente_poder),
-          bool(r.activo_amplificador_110v),
-          bool(r.activo_nodo_optico_110v),
-          bool(r.activo_fuente_poder_110v),
-          bool(r.activo_switch_110v),
-          bool(r.pasivo_caja_nap),
-          bool(r.pasivo_caja_empalme),
-          bool(r.pasivo_reserva),
-          bool(r.pasivo_bajante),
-          r.operador_observaciones || ''
-        ])
-        applyDataRow(row, colorIndex)
-      })
-
-      worksheet.views = [{ state: 'frozen', xSplit: 6, ySplit: 2 }]
-
-      const { operador } = req.query
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      res.setHeader('Content-Disposition', `attachment; filename=REPORTE_OPERADOR_${operador || 'TODOS'}_${new Date().toISOString().split('T')[0]}.xlsx`)
-      await workbook.xlsx.write(res)
-      res.end()
-    } catch (error) {
-      console.error('❌ exportarInventarioOperador ERROR:', { message: error.message, detail: error.detail, hint: error.hint })
-      res.status(500).json({ success: false, error: error.message, detail: error.detail || null })
+    const parseCheckboxes = (val) => {
+      try {
+        const arr = typeof val === 'string' ? JSON.parse(val) : (val || [])
+        return Array.isArray(arr) ? arr.join(', ') : ''
+      } catch { return '' }
     }
-  },
+
+    let lastConsecutivo = null
+    let colorIndex = 0
+
+    datos.forEach((r) => {
+      const esNuevoPoste = r.consecutivo !== lastConsecutivo
+      if (esNuevoPoste) {
+        lastConsecutivo = r.consecutivo
+        colorIndex++
+      }
+
+      const row = worksheet.addRow([
+        esNuevoPoste ? (r.consecutivo || '') : '',
+        esNuevoPoste ? (r.fecha_registro ? new Date(r.fecha_registro).toLocaleDateString('es-CO') : '') : '',
+        esNuevoPoste ? (r.waypoint || '') : '',
+        esNuevoPoste ? (r.ciudad || '') : '',
+        esNuevoPoste ? (r.barrio || '') : '',
+        esNuevoPoste ? (r.direccion_completa || '') : '',
+        esNuevoPoste ? (r.tipo || '') : '',
+        esNuevoPoste ? (r.consecutivo_poste || '') : '',
+        esNuevoPoste ? (r.marcada || '') : '',
+        esNuevoPoste ? (r.material || '') : '',
+        esNuevoPoste ? (r.carga_rotura || '') : '',
+        esNuevoPoste ? (r.codigo_estructura || '') : '',
+        esNuevoPoste ? (r.templete || '') : '',
+        esNuevoPoste ? (r.estado_templete || '') : '',
+        esNuevoPoste ? (r.altura || '') : '',
+        esNuevoPoste ? (r.ano_fabricacion || '') : '',
+        r.operador_nombre || '',
+        r.herrajes || '',
+        r.coaxial || '',
+        r.telefonico || '',
+        r.fibra_optica || '',
+        r.utp || '',
+        r.guaya || '',
+        r.total_cables || '',
+        r.marquilla || '',
+        r.cruce_via || '',
+        r.cruce_estado || '',
+        r.cruce_diagonal || '',
+        r.cruce_sin_red || '',
+        r.cruce_acometida || '',
+        r.cruce_desalineado || '',
+        bool(r.activo_amplificador),
+        bool(r.activo_nodo_optico),
+        bool(r.activo_fuente_poder),
+        bool(r.activo_amplificador_110v),
+        bool(r.activo_nodo_optico_110v),
+        bool(r.activo_fuente_poder_110v),
+        bool(r.activo_switch_110v),
+        bool(r.pasivo_caja_nap),
+        bool(r.pasivo_caja_empalme),
+        bool(r.pasivo_reserva),
+        bool(r.pasivo_bajante),
+        r.reserva1 || '',
+        r.reserva1_chipa_raqueta || '',
+        r.reserva1_ubicacion || '',
+        r.reserva1_marquilla || '',
+        r.reserva2 || '',
+        r.reserva2_chipa_raqueta || '',
+        r.reserva2_ubicacion || '',
+        r.reserva2_marquilla || '',
+        r.caja1 || '',
+        r.caja1_ubicacion || '',
+        r.caja1_marquilla || '',
+        r.caja2 || '',
+        r.caja2_ubicacion || '',
+        r.caja2_marquilla || '',
+        r.caja3 || '',
+        r.caja3_ubicacion || '',
+        r.caja3_marquilla || '',
+        r.empalme1 || '',
+        r.empalme1_ubicacion || '',
+        r.empalme1_marquilla || '',
+        r.empalme2 || '',
+        r.empalme2_ubicacion || '',
+        r.empalme2_marquilla || '',
+        r.empalme3 || '',
+        r.empalme3_ubicacion || '',
+        r.empalme3_marquilla || '',
+        r.empalme4 || '',
+        r.empalme4_ubicacion || '',
+        r.empalme4_marquilla || '',
+        r.bajante1 || '',
+        r.bajante1_cables || '',
+        r.bajante1_diametro || '',
+        r.bajante1_material || '',
+        r.bajante1_fibra || '',
+        r.bajante1_telefonico || '',
+        r.bajante1_utp || '',
+        r.bajante1_coaxial || '',
+        r.operador_observaciones || '',
+        parseCheckboxes(r.observaciones_checkboxes)
+      ])
+      applyDataRow(row, colorIndex)
+    })
+
+    worksheet.views = [{ state: 'frozen', xSplit: 6, ySplit: 2 }]
+
+    const { operador } = req.query
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.setHeader('Content-Disposition', `attachment; filename=REPORTE_OPERADOR_${operador || 'TODOS'}_${new Date().toISOString().split('T')[0]}.xlsx`)
+    await workbook.xlsx.write(res)
+    res.end()
+  } catch (error) {
+    console.error('❌ exportarInventarioOperador ERROR:', { message: error.message, detail: error.detail, hint: error.hint })
+    res.status(500).json({ success: false, error: error.message, detail: error.detail || null })
+  }
+},
+
 
   getInventarioInspector: async (req, res) => {
     try {
