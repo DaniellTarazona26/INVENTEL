@@ -378,11 +378,22 @@ const AgregarPoste = ({ setCurrentPage }) => {
   }
 
   const handleInputChange = (campo, valor) => {
+  if (campo === 'altura' && valor === '8') {
     setFormData(prev => ({
       ...prev,
-      [campo]: valor
+      [campo]: valor,
+      media: 'NO',
+      mediaTipoCable: '',
+      mediaEstado: '',
+      mediaContinuidad: '',
+      caja3: '',
+      caja4: ''
     }))
+  } else {
+    setFormData(prev => ({ ...prev, [campo]: valor }))
   }
+}
+
 
   const toggleOperador = (operador) => {
     if (operadoresSeleccionados.includes(operador)) {
@@ -1599,6 +1610,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                 <select
                   value={formData.media}
                   onChange={(e) => handleInputChange('media', e.target.value)}
+                  disabled={formData.altura === '8'}
                 >
                   <option value=""></option>
                   <option value="NO">NO</option>

@@ -90,6 +90,7 @@ const reportesApi = {
         i.direccion_completa,
         i.codigo_estructura,
         i.consecutivo_poste,
+        i.marcada,
         i.tipo,
         i.material,
         i.altura,
@@ -646,87 +647,153 @@ const reportesApi = {
   },
 
   getReporteEstructurasCompleto: async (filtros) => {
-    const { ciudad, empresa, fechaInicial, fechaFinal } = filtros
+  const { ciudad, empresa, fechaInicial, fechaFinal } = filtros
 
-    let query = `
-      SELECT 
-        i.id as consecutivo,
-        i.fecha_registro,
-        i.waypoint,
-        c.nombre as ciudad,
-        b.nombre as barrio,
-        i.direccion_completa,
-        i.tipo,
-        i.consecutivo_poste,
-        i.marcada,
-        i.material,
-        i.carga_rotura,
-        i.codigo_estructura,
-        i.altura,
-        i.ano_fabricacion,
-        i.templete,
-        i.estado_templete,
-        i.estado_estructura,
-        i.desplomado,
-        i.flectado,
-        i.fracturado,
-        i.hierro_base,
-        i.baja,
-        i.baja_tipo_cable,
-        i.baja_estado_red,
-        i.baja_continuidad_electrica,
-        i.media,
-        i.media_tipo_cable,
-        i.media_estado_red,
-        i.media_continuidad_electrica,
-        i.caja1,
-        i.caja2,
-        i.caja3,
-        i.caja4,
-        i.alumbrado,
-        i.alumbrado_tipo_cable,
-        i.alumbrado_estado_red,
-        i.bajantes_electricos,
-        i.poda_arboles,
-        i.posible_fraude
-      FROM inventarios i
-      LEFT JOIN ciudades c ON i.ciudad_id = c.id
-      LEFT JOIN barrios b ON i.barrio_id = b.id
-      WHERE i.estado = 'activo'
-    `
+  let query = `
+    SELECT 
+      i.id as consecutivo,
+      i.fecha_registro,
+      i.waypoint,
+      c.nombre as ciudad,
+      b.nombre as barrio,
+      i.direccion_completa,
+      i.tipo,
+      i.consecutivo_poste,
+      i.marcada,
+      i.material,
+      i.carga_rotura,
+      i.codigo_estructura,
+      i.altura,
+      i.ano_fabricacion,
+      i.templete,
+      i.estado_templete,
+      i.estado_estructura,
+      i.desplomado,
+      i.flectado,
+      i.fracturado,
+      i.hierro_base,
+      i.baja,
+      i.baja_tipo_cable,
+      i.baja_estado_red,
+      i.baja_continuidad_electrica,
+      i.media,
+      i.media_tipo_cable,
+      i.media_estado_red,
+      i.media_continuidad_electrica,
+      i.caja1,
+      i.caja2,
+      i.caja3,
+      i.caja4,
+      i.alumbrado,
+      i.alumbrado_tipo_cable,
+      i.alumbrado_estado_red,
+      i.bajantes_electricos,
+      i.poda_arboles,
+      i.posible_fraude,
+      io.operador_nombre,
+      io.herrajes,
+      io.coaxial,
+      io.telefonico,
+      io.fibra_optica,
+      io.utp,
+      io.guaya,
+      io.total_cables,
+      io.marquilla,
+      io.cruce_via,
+      io.cruce_estado,
+      io.cruce_diagonal,
+      io.cruce_sin_red,
+      io.cruce_acometida,
+      io.cruce_desalineado,
+      io.activo_amplificador,
+      io.activo_nodo_optico,
+      io.activo_fuente_poder,
+      io.activo_amplificador_110v,
+      io.activo_nodo_optico_110v,
+      io.activo_fuente_poder_110v,
+      io.activo_switch_110v,
+      io.pasivo_caja_nap,
+      io.pasivo_caja_empalme,
+      io.pasivo_reserva,
+      io.pasivo_bajante,
+      io.reserva1,
+      io.reserva1_chipa_raqueta,
+      io.reserva1_ubicacion,
+      io.reserva1_marquilla,
+      io.reserva2,
+      io.reserva2_chipa_raqueta,
+      io.reserva2_ubicacion,
+      io.reserva2_marquilla,
+      io.caja1 as op_caja1,
+      io.caja1_ubicacion,
+      io.caja1_marquilla,
+      io.caja2 as op_caja2,
+      io.caja2_ubicacion,
+      io.caja2_marquilla,
+      io.caja3 as op_caja3,
+      io.caja3_ubicacion,
+      io.caja3_marquilla,
+      io.empalme1,
+      io.empalme1_ubicacion,
+      io.empalme1_marquilla,
+      io.empalme2,
+      io.empalme2_ubicacion,
+      io.empalme2_marquilla,
+      io.empalme3,
+      io.empalme3_ubicacion,
+      io.empalme3_marquilla,
+      io.empalme4,
+      io.empalme4_ubicacion,
+      io.empalme4_marquilla,
+      io.bajante1,
+      io.bajante1_cables,
+      io.bajante1_diametro,
+      io.bajante1_material,
+      io.bajante1_fibra,
+      io.bajante1_telefonico,
+      io.bajante1_utp,
+      io.bajante1_coaxial,
+      io.observaciones as operador_observaciones
+    FROM inventarios i
+    LEFT JOIN ciudades c ON i.ciudad_id = c.id
+    LEFT JOIN barrios b ON i.barrio_id = b.id
+    LEFT JOIN inventarios_operadores io ON io.inventario_id = i.id
+    WHERE i.estado = 'activo'
+  `
 
-    const params = []
-    let paramCount = 1
+  const params = []
+  let paramCount = 1
 
-    if (ciudad) {
-      query += ` AND c.nombre = $${paramCount}`
-      params.push(ciudad)
-      paramCount++
-    }
+  if (ciudad) {
+    query += ` AND c.nombre = $${paramCount}`
+    params.push(ciudad)
+    paramCount++
+  }
 
-    if (empresa) {
-      query += ` AND i.empresa_id = $${paramCount}`
-      params.push(empresa)
-      paramCount++
-    }
+  if (empresa) {
+    query += ` AND i.empresa_id = $${paramCount}`
+    params.push(empresa)
+    paramCount++
+  }
 
-    if (fechaInicial) {
-      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
-      params.push(fechaInicial)
-      paramCount++
-    }
+  if (fechaInicial) {
+    query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+    params.push(fechaInicial)
+    paramCount++
+  }
 
-    if (fechaFinal) {
-      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
-      params.push(fechaFinal)
-      paramCount++
-    }
+  if (fechaFinal) {
+    query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+    params.push(fechaFinal)
+    paramCount++
+  }
 
-    query += ` ORDER BY i.fecha_registro DESC`
+  query += ` ORDER BY i.fecha_registro DESC, io.operador_nombre ASC`
 
-    const result = await pool.query(query, params)
-    return result.rows
-  },
+  const result = await pool.query(query, params)
+  return result.rows
+},
+
 
   getReportePerdidas: async (filtros) => {
     const { ciudad, empresa, fechaInicial, fechaFinal } = filtros

@@ -58,169 +58,189 @@ const reportesController = {
   },
 
   exportarInventarioOperador: async (req, res) => {
-    try {
-      console.log('📋 exportarInventarioOperador - filtros:', req.query)
-      const datos = await reportesApi.getInventarioOperadorCompleto(req.query)
+  try {
+    console.log('📋 exportarInventarioOperador - filtros:', req.query)
+    const datos = await reportesApi.getInventarioOperadorCompleto(req.query)
 
-      const workbook = new ExcelJS.Workbook()
-      const worksheet = workbook.addWorksheet('REPORTE OPERADOR')
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('REPORTE OPERADOR')
 
-      worksheet.getRow(1).values = [
-        'CONSEC.',
-        'FECHA',
-        'WAYPOINT',
-        'CIUDAD',
-        'BARRIO',
-        'DIRECCIÓN',
-        'ESTRUCTURA',
-        '', '', '', '', '', '', '', '', '',
-        'OPERADOR',
-        'NIVELES DE OCUPACIÓN',
-        '', '', '', '', '', '', '',
-        'CRUCE EN VÍA',
-        '', '', '', '', '',
-        'ACTIVOS EXISTENTES',
-        '', '', '', '', '', '',
-        'PASIVOS EXISTENTES',
-        '', '', '',
-        'OBSERVACIONES'
-      ]
+    worksheet.getRow(1).values = [
+      'CONSEC.',
+      'FECHA',
+      'WAYPOINT',
+      'CIUDAD',
+      'BARRIO',
+      'DIRECCIÓN',
+      'ESTRUCTURA',
+      '', '', '', '', '', '', '', '', '',
+      'OPERADOR',
+      'NIVELES DE OCUPACIÓN',
+      '', '', '', '', '', '', '',
+      'CRUCE EN VÍA',
+      '', '', '', '', '',
+      'ACTIVOS EXISTENTES',
+      '', '', '', '', '', '',
+      'PASIVOS EXISTENTES',
+      '', '', '', '', '', '', '', '', '', '', '',
+      'OBSERVACIONES'
+    ]
 
-      worksheet.getRow(2).values = [
-        '', '', '', '', '', '',
-        'TIPO',
-        'CONSEC.',
-        'MARCADA',
-        'MATERIAL',
-        'C.ROTURA',
-        'COD.',
-        'TEMPLETE',
-        'EST.TEMP.',
-        'ALTURA',
-        'AÑO FAB.',
-        '',
-        'HERRAJES',
-        'COAXIAL',
-        'TELEFÓNICO',
-        'FIBRA',
-        'UTP',
-        'GUAYA',
-        'TOTAL CAB.',
-        'MARQUILLA',
-        'EXISTE',
-        'ESTADO',
-        'DIAGONAL',
-        'SIN RED',
-        'ACOMETIDA',
-        'DESALIN.',
-        'AMPLIF.',
-        'NODO ÓPT.',
-        'FUENTE',
-        'AMP.110V',
-        'NODO.110V',
-        'FUENTE.110V',
-        'SWITCH.110V',
-        'CAJA NAP',
-        'C.EMPALME',
-        'RESERVA',
-        'BAJANTE',
-        ''
-      ]
+    worksheet.getRow(2).values = [
+      '', '', '', '', '', '',
+      'TIPO',
+      'CONSEC.',
+      'MARCADA',
+      'MATERIAL',
+      'C.ROTURA',
+      'COD.',
+      'TEMPLETE',
+      'EST.TEMP.',
+      'ALTURA',
+      'AÑO FAB.',
+      '',
+      'HERRAJES',
+      'COAXIAL',
+      'TELEFÓNICO',
+      'FIBRA',
+      'UTP',
+      'GUAYA',
+      'TOTAL CAB.',
+      'MARQUILLA',
+      'EXISTE',
+      'ESTADO',
+      'DIAGONAL',
+      'SIN RED',
+      'ACOMETIDA',
+      'DESALIN.',
+      'AMPLIF.',
+      'NODO ÓPT.',
+      'FUENTE',
+      'AMP.110V',
+      'NODO.110V',
+      'FUENTE.110V',
+      'SWITCH.110V',
+      'CAJA NAP',
+      'UBIC. CAJ.NAP',
+      'MARQ. CAJ.NAP',
+      'C.EMPALME',
+      'UBIC. C.EMP.',
+      'MARQ. C.EMP.',
+      'RESERVA',
+      'UBIC. RESERVA',
+      'MARQ. RESERVA',
+      'BAJANTE',
+      'UBIC. BAJANTE',
+      'MARQ. BAJANTE',
+      ''
+    ]
 
-      worksheet.mergeCells('A1:A2')
-      worksheet.mergeCells('B1:B2')
-      worksheet.mergeCells('C1:C2')
-      worksheet.mergeCells('D1:D2')
-      worksheet.mergeCells('E1:E2')
-      worksheet.mergeCells('F1:F2')
-      worksheet.mergeCells('G1:P1')
-      worksheet.mergeCells('Q1:Q2')
-      worksheet.mergeCells('R1:Y1')
-      worksheet.mergeCells('Z1:AE1')
-      worksheet.mergeCells('AF1:AL1')
-      worksheet.mergeCells('AM1:AP1')
-      worksheet.mergeCells('AQ1:AQ2')
+    worksheet.mergeCells('A1:A2')
+    worksheet.mergeCells('B1:B2')
+    worksheet.mergeCells('C1:C2')
+    worksheet.mergeCells('D1:D2')
+    worksheet.mergeCells('E1:E2')
+    worksheet.mergeCells('F1:F2')
+    worksheet.mergeCells('G1:P1')
+    worksheet.mergeCells('Q1:Q2')
+    worksheet.mergeCells('R1:Y1')
+    worksheet.mergeCells('Z1:AE1')
+    worksheet.mergeCells('AF1:AL1')
+    worksheet.mergeCells('AM1:AX1')
+    worksheet.mergeCells('AY1:AY2')
 
-      worksheet.getRow(1).height = 30
-      worksheet.getRow(2).height = 40
-      worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
-      worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
+    worksheet.getRow(1).height = 30
+    worksheet.getRow(2).height = 40
+    worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
+    worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
 
-      const colWidths = [
-        10, 12, 14, 15, 20, 30,
-        12, 12, 10, 12, 10, 15, 12, 12, 10, 10,
-        18,
-        10, 10, 10, 10, 10, 10, 12, 10,
-        8, 12, 10, 10, 10, 10,
-        10, 12, 10, 10, 12, 12, 12,
-        10, 12, 10, 10,
-        35
-      ]
-      colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
+    const colWidths = [
+      10, 12, 14, 15, 20, 30,
+      12, 12, 10, 12, 10, 15, 12, 12, 10, 10,
+      18,
+      10, 10, 10, 10, 10, 10, 12, 10,
+      8, 12, 10, 10, 10, 10,
+      10, 12, 10, 10, 12, 12, 12,
+      10, 14, 14,
+      10, 14, 14,
+      10, 14, 14,
+      10, 14, 14,
+      35
+    ]
+    colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
 
-      const bool = v => v === true ? 'SI' : v === false ? 'NO' : ''
+    const bool = v => v === true ? 'SI' : v === false ? 'NO' : ''
 
-      datos.forEach((r, index) => {
-        const row = worksheet.addRow([
-          r.consecutivo || '',
-          r.fecha_registro ? new Date(r.fecha_registro).toLocaleDateString('es-CO') : '',
-          r.waypoint || '',
-          r.ciudad || '',
-          r.barrio || '',
-          r.direccion_completa || '',
-          r.tipo || '',
-          r.consecutivo_poste || '',
-          r.marcada || '',
-          r.material || '',
-          r.carga_rotura || '',
-          r.codigo_estructura || '',
-          r.templete || '',
-          r.estado_templete || '',
-          r.altura || '',
-          r.ano_fabricacion || '',
-          r.operador_nombre || '',
-          r.herrajes || '',
-          r.coaxial || '',
-          r.telefonico || '',
-          r.fibra_optica || '',
-          r.utp || '',
-          r.guaya || '',
-          r.total_cables || '',
-          r.marquilla || '',
-          r.cruce_via || '',
-          r.cruce_estado || '',
-          r.cruce_diagonal || '',
-          r.cruce_sin_red || '',
-          r.cruce_acometida || '',
-          r.cruce_desalineado || '',
-          bool(r.activo_amplificador),
-          bool(r.activo_nodo_optico),
-          bool(r.activo_fuente_poder),
-          bool(r.activo_amplificador_110v),
-          bool(r.activo_nodo_optico_110v),
-          bool(r.activo_fuente_poder_110v),
-          bool(r.activo_switch_110v),
-          bool(r.pasivo_caja_nap),
-          bool(r.pasivo_caja_empalme),
-          bool(r.pasivo_reserva),
-          bool(r.pasivo_bajante),
-          r.operador_observaciones || ''
-        ])
-        applyDataRow(row, index)
-      })
+    datos.forEach((r, index) => {
+      const row = worksheet.addRow([
+        r.consecutivo || '',
+        r.fecha_registro ? new Date(r.fecha_registro).toLocaleDateString('es-CO') : '',
+        r.waypoint || '',
+        r.ciudad || '',
+        r.barrio || '',
+        r.direccion_completa || '',
+        r.tipo || '',
+        r.consecutivo_poste || '',
+        r.marcada || '',
+        r.material || '',
+        r.carga_rotura || '',
+        r.codigo_estructura || '',
+        r.templete || '',
+        r.estado_templete || '',
+        r.altura || '',
+        r.ano_fabricacion || '',
+        r.operador_nombre || '',
+        r.herrajes || '',
+        r.coaxial || '',
+        r.telefonico || '',
+        r.fibra_optica || '',
+        r.utp || '',
+        r.guaya || '',
+        r.total_cables || '',
+        r.marquilla || '',
+        r.cruce_via || '',
+        r.cruce_estado || '',
+        r.cruce_diagonal || '',
+        r.cruce_sin_red || '',
+        r.cruce_acometida || '',
+        r.cruce_desalineado || '',
+        bool(r.activo_amplificador),
+        bool(r.activo_nodo_optico),
+        bool(r.activo_fuente_poder),
+        bool(r.activo_amplificador_110v),
+        bool(r.activo_nodo_optico_110v),
+        bool(r.activo_fuente_poder_110v),
+        bool(r.activo_switch_110v),
+        bool(r.pasivo_caja_nap),
+        r.caja1 || '',
+        r.caja1_marquilla || '',
+        bool(r.pasivo_caja_empalme),
+        r.empalme1 || '',
+        r.empalme1_marquilla || '',
+        bool(r.pasivo_reserva),
+        r.reserva1 || '',
+        r.reserva1_marquilla || '',
+        bool(r.pasivo_bajante),
+        r.bajante1 || '',
+        r.bajante1_material || '',
+        r.operador_observaciones || ''
+      ])
+      applyDataRow(row, index)
+    })
 
-      worksheet.views = [{ state: 'frozen', xSplit: 6, ySplit: 2 }]
+    worksheet.views = [{ state: 'frozen', xSplit: 6, ySplit: 2 }]
 
-      const { operador } = req.query
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      res.setHeader('Content-Disposition', `attachment; filename=REPORTE_OPERADOR_${operador || 'TODOS'}_${new Date().toISOString().split('T')[0]}.xlsx`)
-      await workbook.xlsx.write(res)
-      res.end()
-    } catch (error) {
-      console.error('❌ exportarInventarioOperador ERROR:', { message: error.message, detail: error.detail, hint: error.hint })
-      res.status(500).json({ success: false, error: error.message, detail: error.detail || null })
-    }
-  },
+    const { operador } = req.query
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.setHeader('Content-Disposition', `attachment; filename=REPORTE_OPERADOR_${operador || 'TODOS'}_${new Date().toISOString().split('T')[0]}.xlsx`)
+    await workbook.xlsx.write(res)
+    res.end()
+  } catch (error) {
+    console.error('❌ exportarInventarioOperador ERROR:', { message: error.message, detail: error.detail, hint: error.hint })
+    res.status(500).json({ success: false, error: error.message, detail: error.detail || null })
+  }
+},
+
 
   // ========== INVENTARIO POR INSPECTOR ==========
   getInventarioInspector: async (req, res) => {
@@ -603,161 +623,253 @@ const reportesController = {
   },
 
   exportarReporteEstructuras: async (req, res) => {
-    try {
-      console.log('📋 exportarReporteEstructuras - filtros:', req.query)
-      const datos = await reportesApi.getReporteEstructurasCompleto(req.query)
+  try {
+    console.log('📋 exportarReporteEstructuras - filtros:', req.query)
+    const datos = await reportesApi.getReporteEstructurasCompleto(req.query)
 
-      const workbook = new ExcelJS.Workbook()
-      const worksheet = workbook.addWorksheet('REPORTE ESTRUCTURAS')
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('REPORTE ESTRUCTURAS')
 
-      worksheet.getRow(1).values = [
-        'CONSEC.',
-        'FECHA',
-        'WAYPOINT',
-        'CIUDAD',
-        'BARRIO',
-        'DIRECCIÓN',
-        'ESTRUCTURA',
-        '', '', '', '', '', '', '', '', '',
-        'ESTADO ESTRUCTURA',
-        '', '', '', '',
-        'BAJA',
-        '', '', '',
-        'MEDIA',
-        '', '', '',
-        'CAJAS',
-        '', '', '',
-        'ALUMBRADO',
-        '', '',
-        'NOVEDADES',
-        '', ''
-      ]
+    worksheet.getRow(1).values = [
+      'CONSEC.', 'FECHA', 'WAYPOINT', 'CIUDAD', 'BARRIO', 'DIRECCIÓN',
+      'ESTRUCTURA', '', '', '', '', '', '', '', '', '',
+      'ESTADO ESTRUCTURA', '', '', '', '',
+      'BAJA', '', '', '',
+      'MEDIA', '', '', '',
+      'CAJAS', '', '', '',
+      'ALUMBRADO', '', '',
+      'NOVEDADES', '', '',
+      'OPERADOR',
+      'NIVELES DE OCUPACIÓN', '', '', '', '', '', '', '',
+      'CRUCE EN VÍA', '', '', '', '', '',
+      'ACTIVOS EXISTENTES', '', '', '', '', '', '',
+      'PASIVOS EXISTENTES', '', '', '',
+      'RESERVA #1', '', '', '',
+      'RESERVA #2', '', '', '',
+      'CAJA #1', '', '',
+      'CAJA #2', '', '',
+      'CAJA #3', '', '',
+      'EMPALME #1', '', '',
+      'EMPALME #2', '', '',
+      'EMPALME #3', '', '',
+      'EMPALME #4', '', '',
+      'BAJANTE #1', '', '', '', '', '', '', '',
+      'OBS. OPERADOR'
+    ]
 
-      worksheet.getRow(2).values = [
-        '', '', '', '', '', '',
-        'TIPO',
-        'CONSEC.',
-        'MARCADA',
-        'MATERIAL',
-        'C.ROTURA',
-        'COD.',
-        'TEMPLETE',
-        'EST.TEMP.',
-        'ALTURA',
-        'AÑO FAB.',
-        'ESTADO',
-        'DESPLOMADO',
-        'FLECTADO',
-        'FRACTURADO',
-        'HIERRO BASE',
-        'EXISTE',
-        'TIPO CABLE',
-        'ESTADO RED',
-        'CONTINUIDAD',
-        'EXISTE',
-        'TIPO CABLE',
-        'ESTADO RED',
-        'CONTINUIDAD',
-        'CAJA 1',
-        'CAJA 2',
-        'CAJA 3',
-        'CAJA 4',
-        'EXISTE',
-        'TIPO CABLE',
-        'ESTADO RED',
-        'BAJANTES',
-        'PODA',
-        'POSIBLE FRAUDE'
-      ]
+    worksheet.getRow(2).values = [
+      '', '', '', '', '', '',
+      'TIPO', 'CONSEC.', 'MARCADA', 'MATERIAL', 'C.ROTURA', 'COD.', 'TEMPLETE', 'EST.TEMP.', 'ALTURA', 'AÑO FAB.',
+      'ESTADO', 'DESPLOMADO', 'FLECTADO', 'FRACTURADO', 'HIERRO BASE',
+      'EXISTE', 'TIPO CABLE', 'ESTADO RED', 'CONTINUIDAD',
+      'EXISTE', 'TIPO CABLE', 'ESTADO RED', 'CONTINUIDAD',
+      'CAJA 1', 'CAJA 2', 'CAJA 3', 'CAJA 4',
+      'EXISTE', 'TIPO CABLE', 'ESTADO RED',
+      'BAJANTES', 'PODA', 'POSIBLE FRAUDE',
+      '',
+      'HERRAJES', 'COAXIAL', 'TELEFÓNICO', 'FIBRA', 'UTP', 'GUAYA', 'TOTAL', 'MARQUILLA',
+      'EXISTE', 'ESTADO', 'DIAGONAL', 'SIN RED', 'ACOMETIDA', 'DESALIN.',
+      'AMPLIF.', 'NODO ÓPT.', 'FUENTE', 'AMPLIF.110V', 'NODO.110V', 'FUENTE.110V', 'SWITCH.110V',
+      'CAJ.NAP', 'CAJ.EMP.', 'RESERVA', 'BAJANTE',
+      'EXISTE', 'CHIPA/RAQ.', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'CHIPA/RAQ.', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'UBICACIÓN', 'MARQUILLA',
+      'EXISTE', 'CABLES', 'DIÁMETRO', 'MATERIAL', 'FIBRA', 'TELEFÓNICO', 'UTP', 'COAXIAL',
+      ''
+    ]
 
-      worksheet.mergeCells('A1:A2')
-      worksheet.mergeCells('B1:B2')
-      worksheet.mergeCells('C1:C2')
-      worksheet.mergeCells('D1:D2')
-      worksheet.mergeCells('E1:E2')
-      worksheet.mergeCells('F1:F2')
-      worksheet.mergeCells('G1:P1')   // ESTRUCTURA (10 cols)
-      worksheet.mergeCells('Q1:U1')   // ESTADO ESTRUCTURA (5 cols)
-      worksheet.mergeCells('V1:Y1')   // BAJA (4 cols)
-      worksheet.mergeCells('Z1:AC1')  // MEDIA (4 cols)
-      worksheet.mergeCells('AD1:AG1') // CAJAS (4 cols)
-      worksheet.mergeCells('AH1:AJ1') // ALUMBRADO (3 cols)
-      worksheet.mergeCells('AK1:AM1') // NOVEDADES (3 cols)
+    worksheet.mergeCells('A1:A2')
+    worksheet.mergeCells('B1:B2')
+    worksheet.mergeCells('C1:C2')
+    worksheet.mergeCells('D1:D2')
+    worksheet.mergeCells('E1:E2')
+    worksheet.mergeCells('F1:F2')
+    worksheet.mergeCells('G1:P1')
+    worksheet.mergeCells('Q1:U1')
+    worksheet.mergeCells('V1:Y1')
+    worksheet.mergeCells('Z1:AC1')
+    worksheet.mergeCells('AD1:AG1')
+    worksheet.mergeCells('AH1:AJ1')
+    worksheet.mergeCells('AK1:AM1')
+    worksheet.mergeCells('AN1:AN2')
+    worksheet.mergeCells('AO1:AV1')
+    worksheet.mergeCells('AW1:BB1')
+    worksheet.mergeCells('BC1:BI1')
+    worksheet.mergeCells('BJ1:BM1')
+    worksheet.mergeCells('BN1:BQ1')
+    worksheet.mergeCells('BR1:BU1')
+    worksheet.mergeCells('BV1:BX1')
+    worksheet.mergeCells('BY1:CA1')
+    worksheet.mergeCells('CB1:CD1')
+    worksheet.mergeCells('CE1:CG1')
+    worksheet.mergeCells('CH1:CJ1')
+    worksheet.mergeCells('CK1:CM1')
+    worksheet.mergeCells('CN1:CV1')
+    worksheet.mergeCells('CW1:CW2')
 
-      worksheet.getRow(1).height = 30
-      worksheet.getRow(2).height = 40
-      worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
-      worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
+    worksheet.getRow(1).height = 30
+    worksheet.getRow(2).height = 40
+    worksheet.getRow(1).eachCell({ includeEmpty: true }, cell => { cell.style = HEADER_STYLE })
+    worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
 
-      const colWidths = [
-        10, 12, 14, 15, 20, 30,          // A-F
-        12, 12, 10, 12, 10, 15, 12, 12, 10, 10, // G-P estructura
-        14, 12, 10, 12, 12,              // Q-U estado estructura
-        8, 15, 12, 12,                   // V-Y baja
-        8, 15, 12, 12,                   // Z-AC media
-        12, 12, 12, 12,                  // AD-AG cajas
-        8, 15, 12,                       // AH-AJ alumbrado
-        14, 10, 15                       // AK-AM novedades
-      ]
-      colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
+    const colWidths = [
+      10, 12, 14, 15, 20, 30,
+      12, 12, 10, 12, 10, 15, 12, 12, 10, 10,
+      14, 12, 10, 12, 12,
+      8, 15, 12, 12,
+      8, 15, 12, 12,
+      12, 12, 12, 12,
+      8, 15, 12,
+      14, 10, 15,
+      18,
+      10, 10, 10, 10, 10, 10, 10, 10,
+      8, 12, 10, 10, 10, 10,
+      10, 12, 10, 10, 12, 12, 12,
+      10, 12, 10, 10,
+      8, 12, 10, 10,
+      8, 12, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 10, 10,
+      8, 12, 10, 12, 10, 10, 10, 10,
+      35
+    ]
+    colWidths.forEach((w, i) => { worksheet.getColumn(i + 1).width = w })
 
-      datos.forEach((r, index) => {
-        const row = worksheet.addRow([
-          r.consecutivo || '',
-          r.fecha_registro ? new Date(r.fecha_registro).toLocaleDateString('es-CO') : '',
-          r.waypoint || '',
-          r.ciudad || '',
-          r.barrio || '',
-          r.direccion_completa || '',
-          r.tipo || '',
-          r.consecutivo_poste || '',
-          r.marcada || '',
-          r.material || '',
-          r.carga_rotura || '',
-          r.codigo_estructura || '',
-          r.templete || '',
-          r.estado_templete || '',
-          r.altura || '',
-          r.ano_fabricacion || '',
-          r.estado_estructura || '',
-          r.desplomado || '',
-          r.flectado || '',
-          r.fracturado || '',
-          r.hierro_base || '',
-          r.baja || '',
-          r.baja_tipo_cable || '',
-          r.baja_estado_red || '',
-          r.baja_continuidad_electrica || '',
-          r.media || '',
-          r.media_tipo_cable || '',
-          r.media_estado_red || '',
-          r.media_continuidad_electrica || '',
-          r.caja1 || '',
-          r.caja2 || '',
-          r.caja3 || '',
-          r.caja4 || '',
-          r.alumbrado || '',
-          r.alumbrado_tipo_cable || '',
-          r.alumbrado_estado_red || '',
-          r.bajantes_electricos || '',
-          r.poda_arboles || '',
-          r.posible_fraude || ''
-        ])
-        applyDataRow(row, index)
-      })
+    const bool = v => v === true ? 'SI' : v === false ? 'NO' : (v || '')
 
-      worksheet.views = [{ state: 'frozen', xSplit: 6, ySplit: 2 }]
+    datos.forEach((r, index) => {
+      const row = worksheet.addRow([
+        r.consecutivo || '',
+        r.fecha_registro ? new Date(r.fecha_registro).toLocaleDateString('es-CO') : '',
+        r.waypoint || '',
+        r.ciudad || '',
+        r.barrio || '',
+        r.direccion_completa || '',
+        r.tipo || '',
+        r.consecutivo_poste || '',
+        r.marcada || '',
+        r.material || '',
+        r.carga_rotura || '',
+        r.codigo_estructura || '',
+        r.templete || '',
+        r.estado_templete || '',
+        r.altura || '',
+        r.ano_fabricacion || '',
+        r.estado_estructura || '',
+        r.desplomado || '',
+        r.flectado || '',
+        r.fracturado || '',
+        r.hierro_base || '',
+        r.baja || '',
+        r.baja_tipo_cable || '',
+        r.baja_estado_red || '',
+        r.baja_continuidad_electrica || '',
+        r.media || '',
+        r.media_tipo_cable || '',
+        r.media_estado_red || '',
+        r.media_continuidad_electrica || '',
+        r.caja1 || '',
+        r.caja2 || '',
+        r.caja3 || '',
+        r.caja4 || '',
+        r.alumbrado || '',
+        r.alumbrado_tipo_cable || '',
+        r.alumbrado_estado_red || '',
+        r.bajantes_electricos || '',
+        r.poda_arboles || '',
+        r.posible_fraude || '',
+        r.operador_nombre || '',
+        r.herrajes || '',
+        r.coaxial || '',
+        r.telefonico || '',
+        r.fibra_optica || '',
+        r.utp || '',
+        r.guaya || '',
+        r.total_cables || '',
+        r.marquilla || '',
+        r.cruce_via || '',
+        r.cruce_estado || '',
+        r.cruce_diagonal || '',
+        r.cruce_sin_red || '',
+        r.cruce_acometida || '',
+        r.cruce_desalineado || '',
+        bool(r.activo_amplificador),
+        bool(r.activo_nodo_optico),
+        bool(r.activo_fuente_poder),
+        bool(r.activo_amplificador_110v),
+        bool(r.activo_nodo_optico_110v),
+        bool(r.activo_fuente_poder_110v),
+        bool(r.activo_switch_110v),
+        bool(r.pasivo_caja_nap),
+        bool(r.pasivo_caja_empalme),
+        bool(r.pasivo_reserva),
+        bool(r.pasivo_bajante),
+        r.reserva1 || '',
+        r.reserva1_chipa_raqueta || '',
+        r.reserva1_ubicacion || '',
+        r.reserva1_marquilla || '',
+        r.reserva2 || '',
+        r.reserva2_chipa_raqueta || '',
+        r.reserva2_ubicacion || '',
+        r.reserva2_marquilla || '',
+        r.op_caja1 || '',
+        r.caja1_ubicacion || '',
+        r.caja1_marquilla || '',
+        r.op_caja2 || '',
+        r.caja2_ubicacion || '',
+        r.caja2_marquilla || '',
+        r.op_caja3 || '',
+        r.caja3_ubicacion || '',
+        r.caja3_marquilla || '',
+        r.empalme1 || '',
+        r.empalme1_ubicacion || '',
+        r.empalme1_marquilla || '',
+        r.empalme2 || '',
+        r.empalme2_ubicacion || '',
+        r.empalme2_marquilla || '',
+        r.empalme3 || '',
+        r.empalme3_ubicacion || '',
+        r.empalme3_marquilla || '',
+        r.empalme4 || '',
+        r.empalme4_ubicacion || '',
+        r.empalme4_marquilla || '',
+        r.bajante1 || '',
+        r.bajante1_cables || '',
+        r.bajante1_diametro || '',
+        r.bajante1_material || '',
+        r.bajante1_fibra || '',
+        r.bajante1_telefonico || '',
+        r.bajante1_utp || '',
+        r.bajante1_coaxial || '',
+        r.operador_observaciones || ''
+      ])
+      applyDataRow(row, index)
+    })
 
-      const { ciudad } = req.query
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      res.setHeader('Content-Disposition', `attachment; filename=REPORTE_ESTRUCTURAS_${ciudad || 'TODAS'}_${new Date().toISOString().split('T')[0]}.xlsx`)
-      await workbook.xlsx.write(res)
-      res.end()
-    } catch (error) {
-      console.error('❌ exportarReporteEstructuras ERROR:', { message: error.message, detail: error.detail, hint: error.hint })
-      res.status(500).json({ success: false, error: error.message, detail: error.detail || null })
-    }
-  },
+    worksheet.views = [{ state: 'frozen', xSplit: 6, ySplit: 2 }]
+
+    const { ciudad } = req.query
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.setHeader('Content-Disposition', `attachment; filename=REPORTE_ESTRUCTURAS_${ciudad || 'TODAS'}_${new Date().toISOString().split('T')[0]}.xlsx`)
+    await workbook.xlsx.write(res)
+    res.end()
+  } catch (error) {
+    console.error('❌ exportarReporteEstructuras ERROR:', { message: error.message, detail: error.detail, hint: error.hint })
+    res.status(500).json({ success: false, error: error.message, detail: error.detail || null })
+  }
+},
+
 
   // ========== REPORTE DE PÉRDIDAS ==========
   getReportePerdidas: async (req, res) => {
