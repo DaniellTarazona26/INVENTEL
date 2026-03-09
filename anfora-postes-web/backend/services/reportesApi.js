@@ -91,6 +91,7 @@ const reportesApi = {
         i.codigo_estructura,
         i.consecutivo_poste,
         i.marcada,
+        i.carga_rotura,
         i.tipo,
         i.material,
         i.altura,
