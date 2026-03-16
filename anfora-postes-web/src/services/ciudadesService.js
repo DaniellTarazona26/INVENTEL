@@ -33,7 +33,12 @@ const ciudadesService = {
     const response = await api.get(`/ciudades/${ciudadId}/barrios`)
     // ✅ Si viene envuelto en { success, barrios }
     return response.data.barrios || response.data || []
-  }
+  },
+
+  obtenerTodasAdmin: async () => {
+  const response = await api.get('/ciudades/todas')
+  return response.data
+}
 }
 
 export default ciudadesService

@@ -1,8 +1,6 @@
-// backend/controllers/empresasController.js
 const empresasService = require('../services/empresasService')
 
 const empresasController = {
-
   obtenerTodas: async (req, res) => {
     try {
       const empresas = await empresasService.obtenerTodas()
@@ -51,7 +49,7 @@ const empresasController = {
   eliminar: async (req, res) => {
     try {
       await empresasService.eliminar(req.params.id)
-      res.json({ success: true, message: 'Empresa desactivada exitosamente' })
+      res.json({ success: true, message: 'Empresa eliminada exitosamente' })
     } catch (error) {
       res.status(500).json({ success: false, error: 'Error al eliminar empresa' })
     }

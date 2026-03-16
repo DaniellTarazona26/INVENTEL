@@ -25,7 +25,12 @@ const barriosService = {
   eliminar: async (id) => {
     const response = await api.delete(`/barrios/${id}`);
     return response.data;
-  }
+  },
+
+  obtenerTodosAdmin: async () => {
+  const response = await api.get('/barrios/todos')
+  return response.data
+}
 };
 
 export default barriosService;

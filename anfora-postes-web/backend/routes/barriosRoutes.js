@@ -6,6 +6,7 @@ const { verificarToken, verificarRol } = require('../middleware/authMiddleware')
 
 router.use(verificarToken);
 
+router.get('/todos', verificarRol('ADMIN'), barriosController.obtenerTodosBarrios);
 router.get('/', barriosController.obtenerBarrios);
 router.get('/:id', barriosController.obtenerBarrioPorId);
 router.post('/', verificarRol('ADMIN', 'INSPECTOR'), barriosController.crearBarrio);

@@ -1,8 +1,6 @@
-// backend/services/empresasService.js
 const pool = require('../config/database')
 
 const empresasService = {
-
   obtenerTodas: async () => {
     const result = await pool.query(
       `SELECT id, nombre, nit, contacto, telefono, email, estado
@@ -57,8 +55,7 @@ const empresasService = {
 
   eliminar: async (id) => {
     const result = await pool.query(
-      `UPDATE empresas SET estado = 'inactivo' WHERE id = $1 RETURNING id`,
-      [id]
+      'DELETE FROM empresas WHERE id = $1 RETURNING id', [id]
     )
     if (result.rows.length === 0) throw new Error('Empresa no encontrada')
     return result.rows[0]
@@ -66,3 +63,4 @@ const empresasService = {
 }
 
 module.exports = empresasService
+

@@ -27,7 +27,12 @@ const proyectosService = {
   eliminar: async (id) => {
     const response = await api.delete(`/proyectos/${id}`)
     return response.data
-  }
+  },
+
+  obtenerTodosAdmin: async () => {
+  const response = await api.get('/proyectos/todos')
+  return response.data
+}
 }
 
 export default proyectosService

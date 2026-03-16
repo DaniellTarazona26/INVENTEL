@@ -70,14 +70,15 @@ const Opciones = () => {
           respuesta = await empresasService.obtenerTodasAdmin()
           break
         case 'ciudades':
-          respuesta = await ciudadesService.obtenerTodas()
+          respuesta = await ciudadesService.obtenerTodasAdmin()
           break
         case 'barrios':
-          respuesta = await barriosService.obtenerTodos()
+          respuesta = await barriosService.obtenerTodosAdmin()
           break
         case 'proyectos':
-          respuesta = await proyectosService.obtenerTodos()
+          respuesta = await proyectosService.obtenerTodosAdmin()
           break
+
         default:
           respuesta = []
       }
@@ -128,6 +129,8 @@ const Opciones = () => {
         case 'operadores': await operadoresService.actualizar(item.id, { estado: nuevoEstado }); break
         case 'empresas': await empresasService.actualizar(item.id, { estado: nuevoEstado }); break
         case 'usuarios': await usuariosService.actualizar(item.id, { estado: nuevoEstado }); break
+        case 'ciudades': await ciudadesService.actualizar(item.id, { estado: nuevoEstado }); break
+        case 'barrios': await barriosService.actualizar(item.id, { estado: nuevoEstado }); break
       }
       cargarDatos()
     } catch (error) {
@@ -163,9 +166,9 @@ const Opciones = () => {
       case 'empresas':
         return <TablaEmpresas datos={datos} onEditar={abrirModalEditar} onEliminar={eliminarItem} esAdmin={esAdmin} onToggleEstado={toggleEstado} />
       case 'ciudades':
-        return <TablaCiudades datos={datos} onEditar={abrirModalEditar} onEliminar={eliminarItem} esAdmin={esAdmin} />
+        return <TablaCiudades datos={datos} onEditar={abrirModalEditar} onEliminar={eliminarItem} esAdmin={esAdmin} onToggleEstado={toggleEstado} />
       case 'barrios':
-        return <TablaBarrios datos={datos} onEditar={abrirModalEditar} onEliminar={eliminarItem} esAdmin={esAdmin} />
+        return <TablaBarrios datos={datos} onEditar={abrirModalEditar} onEliminar={eliminarItem} esAdmin={esAdmin} onToggleEstado={toggleEstado} />
       case 'proyectos':
         return <TablaProyectos datos={datos} onEditar={abrirModalEditar} onEliminar={eliminarItem} esAdmin={esAdmin || esInspector} onCambiarEstado={cambiarEstadoProyecto} />
       default:
@@ -297,14 +300,18 @@ const TablaEmpresas = ({ datos, onEditar, onEliminar, esAdmin, onToggleEstado })
   </table>
 )
 
-const TablaCiudades = ({ datos, onEditar, onEliminar, esAdmin }) => (
+const TablaCiudades = ({ datos, onEditar, onEliminar, esAdmin, onToggleEstado }) => (
   <table className="opciones-table">
-    <thead><tr><th>ID</th><th>Nombre</th><th>Código</th><th>Departamento</th>{esAdmin && <th>Acciones</th>}</tr></thead>
+    <thead><tr>
+      <th>ID</th><th>Nombre</th><th>Código</th><th>Departamento</th>
+      <th>Estado</th>{esAdmin && <th>Acciones</th>}
+    </tr></thead>
     <tbody>
       {datos.map(item => (
         <tr key={item.id}>
           <td>{item.id}</td><td>{item.nombre}</td>
           <td>{item.codigo || '-'}</td><td>{item.departamento || '-'}</td>
+          <td><Toggle activo={item.estado === 'activo'} onChange={() => onToggleEstado(item)} disabled={!esAdmin} /></td>
           {esAdmin && <td className="acciones">
             <button onClick={() => onEditar(item)} className="btn-editar">✏️</button>
             <button onClick={() => onEliminar(item.id)} className="btn-eliminar">🗑️</button>
@@ -315,13 +322,17 @@ const TablaCiudades = ({ datos, onEditar, onEliminar, esAdmin }) => (
   </table>
 )
 
-const TablaBarrios = ({ datos, onEditar, onEliminar, esAdmin }) => (
+const TablaBarrios = ({ datos, onEditar, onEliminar, esAdmin, onToggleEstado }) => (
   <table className="opciones-table">
-    <thead><tr><th>ID</th><th>Nombre</th><th>Ciudad</th>{esAdmin && <th>Acciones</th>}</tr></thead>
+    <thead><tr>
+      <th>ID</th><th>Nombre</th><th>Ciudad</th>
+      <th>Estado</th>{esAdmin && <th>Acciones</th>}
+    </tr></thead>
     <tbody>
       {datos.map(item => (
         <tr key={item.id}>
           <td>{item.id}</td><td>{item.nombre}</td><td>{item.ciudad_nombre || '-'}</td>
+          <td><Toggle activo={item.estado === 'activo'} onChange={() => onToggleEstado(item)} disabled={!esAdmin} /></td>
           {esAdmin && <td className="acciones">
             <button onClick={() => onEditar(item)} className="btn-editar">✏️</button>
             <button onClick={() => onEliminar(item.id)} className="btn-eliminar">🗑️</button>
@@ -331,6 +342,7 @@ const TablaBarrios = ({ datos, onEditar, onEliminar, esAdmin }) => (
     </tbody>
   </table>
 )
+
 
 const TablaProyectos = ({ datos, onEditar, onEliminar, esAdmin, onCambiarEstado }) => (
   <table className="opciones-table">
