@@ -145,8 +145,7 @@ router.get('/:id', verificarToken, async (req, res) => {
 // RUTAS DELETE
 // ==========================================
 
-// ✅ 7. Eliminar inventario (solo ADMIN)
-router.delete('/:id', verificarToken, verificarRol(['ADMIN']), async (req, res) => {
+router.delete('/:id', verificarToken, verificarRol('ADMIN', 'INSPECTOR'), async (req, res) => {
   try {
     await inventariosService.eliminar(req.params.id, req.usuario.id)
     

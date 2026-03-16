@@ -24,6 +24,8 @@ const verificarToken = (req, res, next) => {
 // Middleware para verificar roles específicos
 const verificarRol = (...rolesPermitidos) => {
   return (req, res, next) => {
+    console.log('Rol del usuario:', req.usuario.rol)
+    console.log('Roles permitidos:', rolesPermitidos)
     if (!req.usuario) {
       return res.status(401).json({ error: 'No autenticado' });
     }
