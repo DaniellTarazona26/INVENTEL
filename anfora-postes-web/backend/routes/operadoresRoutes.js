@@ -6,8 +6,8 @@ const { verificarToken, verificarRol } = require('../middleware/authMiddleware')
 
 router.use(verificarToken);
 
-router.get('/', operadoresController.obtenerOperadores);
 router.get('/todos', operadoresController.obtenerTodos);
+router.get('/', operadoresController.obtenerOperadores);
 router.get('/:id', operadoresController.obtenerOperadorPorId);
 router.post('/', operadoresController.crearOperador);
 router.put('/:id', operadoresController.actualizarOperador);

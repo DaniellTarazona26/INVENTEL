@@ -18,6 +18,9 @@ const VerOperadores = () => {
     try {
       setCargando(true)
       const data = await operadoresService.obtenerTodosAdmin()
+      console.log('ROL DEL USUARIO:', /* tu forma de leer el rol del token */)
+      console.log('RESPUESTA BACKEND:', data)       
+      console.log('TOTAL OPERADORES:', data?.operadores?.length)
       setOperadores(data.operadores || [])
     } catch (error) {
       console.error('Error cargando operadores:', error)
