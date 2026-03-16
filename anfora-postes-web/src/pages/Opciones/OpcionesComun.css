@@ -236,7 +236,7 @@
   background-color: #f1f5f9;
 }
 
-.tabla-datos input[type="checkbox"] {
+.tabla-datos input[type="checkbox"]:not(.toggle-input) {
   width: 16px;
   height: 16px;
   cursor: pointer;

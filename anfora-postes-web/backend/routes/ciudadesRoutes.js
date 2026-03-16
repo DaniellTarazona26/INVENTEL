@@ -9,8 +9,8 @@ router.use(verificarToken);
 router.get('/', ciudadesController.obtenerCiudades);
 router.get('/:id', ciudadesController.obtenerCiudadPorId);
 router.get('/:id/barrios', ciudadesController.obtenerBarriosPorCiudad);
-router.post('/', verificarRol('ADMIN', 'supervisor'), ciudadesController.crearCiudad);
-router.put('/:id', verificarRol('ADMIN', 'supervisor'), ciudadesController.actualizarCiudad);
+router.post('/', verificarRol('ADMIN', 'INSPECTOR'), ciudadesController.crearCiudad);
+router.put('/:id', verificarRol('ADMIN', 'INSPECTOR'), ciudadesController.actualizarCiudad);
 router.delete('/:id', verificarRol('ADMIN'), ciudadesController.eliminarCiudad);
 
 module.exports = router;

@@ -94,6 +94,7 @@ const VerOperadores = () => {
                       <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
+                          className="toggle-input"
                           checked={operador.estado === 'activo'}
                           onChange={() => toggleEstado(operador)}
                           style={{ opacity: 0, width: 0, height: 0 }}
