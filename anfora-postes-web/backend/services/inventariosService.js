@@ -612,6 +612,7 @@ const inventariosService = {
 
 
   eliminar: async (id, usuarioId) => {
+  try {
     const query = `
       UPDATE inventarios 
       SET estado = 'inactivo', 
@@ -628,7 +629,18 @@ const inventariosService = {
     }
     
     return result.rows[0]
+
+  } catch (error) {
+    console.error('=== ERROR ELIMINANDO INVENTARIO ===')
+    console.error('ID recibido:', id, 'tipo:', typeof id)
+    console.error('UsuarioId recibido:', usuarioId, 'tipo:', typeof usuarioId)
+    console.error('Mensaje:', error.message)
+    console.error('Detalle:', error.detail)
+    console.error('Codigo:', error.code)
+    throw error
   }
+}
+
 }
 
 module.exports = inventariosService

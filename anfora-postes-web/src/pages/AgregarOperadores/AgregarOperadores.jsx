@@ -361,37 +361,47 @@ const AgregarOperadores = ({ setCurrentPage }) => {
   }
 
   const handleGuardarTodo = async () => {
-    try {
-      setLoading(true)
+  try {
+    setLoading(true)
+
+    if (modoEdicion) {
+      const datosResponse = await inventarioOperadoresService.obtenerPorInventario(inventarioId)
+      const operadoresExistentes = datosResponse.success ? datosResponse.operadores : []
 
       for (const operador of operadoresSeleccionados) {
         const datos = datosOperadores[operador]
-        
-        await inventarioOperadoresService.crear(
-          inventarioId,
-          operador,
-          datos
-        )
+        const existente = operadoresExistentes.find(o => o.operador_nombre === operador)
+
+        if (existente) {
+          await inventarioOperadoresService.actualizar(existente.id, datos)
+        } else {
+          await inventarioOperadoresService.crear(inventarioId, operador, datos)
+        }
       }
-
-      await inventarioService.completarConOperadores(inventarioId)
-
-      setAllowNavigation(true)
-
-      mostrarMensaje('success', 'Inventario completado exitosamente')
-      setTimeout(() => {
-        localStorage.removeItem('inventarioParcialId')
-        localStorage.removeItem('operadoresSeleccionados')
-        localStorage.removeItem('editarInventarioId')
-        setCurrentPage('inventario')
-      }, 2000)
-    } catch (error) {
-      console.error('Error guardando datos:', error)
-      mostrarMensaje('error', 'Error al guardar datos de operadores')
-    } finally {
-      setLoading(false)
+    } else {
+      for (const operador of operadoresSeleccionados) {
+        const datos = datosOperadores[operador]
+        await inventarioOperadoresService.crear(inventarioId, operador, datos)
+      }
     }
+
+    await inventarioService.completarConOperadores(inventarioId)
+    setAllowNavigation(true)
+    mostrarMensaje('success', 'Inventario completado exitosamente')
+    setTimeout(() => {
+      localStorage.removeItem('inventarioParcialId')
+      localStorage.removeItem('operadoresSeleccionados')
+      localStorage.removeItem('editarInventarioId')
+      setCurrentPage('inventario')
+    }, 2000)
+  } catch (error) {
+    console.error('Error guardando datos:', error)
+    mostrarMensaje('error', 'Error al guardar datos de operadores')
+  } finally {
+    setLoading(false)
   }
+}
+
 
   const handleCancelar = () => {
     if (window.confirm('¿Está seguro de cancelar? Se perderán todos los datos de operadores ingresados.')) {
@@ -747,7 +757,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
                 onChange={(e) => handleInputChange(operadorNombre, 'reserva1', e.target.value)}
               >
                 <option value="">-</option>
-                {OPCIONES.cables.map(opt => (
+                {OPCIONES.caja_empalme.map(opt => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
@@ -799,7 +809,7 @@ const AgregarOperadores = ({ setCurrentPage }) => {
                 onChange={(e) => handleInputChange(operadorNombre, 'reserva2', e.target.value)}
               >
                 <option value="">-</option>
-                {OPCIONES.cables.map(opt => (
+                {OPCIONES.caja_empalme.map(opt => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>

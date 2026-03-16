@@ -101,7 +101,7 @@ const reportesController = {
       'EXISTE', 'UBICACIÓN', 'MARQUILLA',
       'EXISTE', 'UBICACIÓN', 'MARQUILLA',
       'EXISTE', 'CABLES', 'DIÁMETRO', 'MATERIAL', 'FIBRA', 'TELEFÓNICO', 'UTP', 'COAXIAL',
-      'TEXTO', 'CHECKBOXES'
+      'TEXTO', 'OBSERVACIONES OPERADOR'
     ]
 
     worksheet.mergeCells('A1:A2')
