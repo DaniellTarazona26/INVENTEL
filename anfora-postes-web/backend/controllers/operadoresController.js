@@ -7,14 +7,10 @@ const obtenerOperadores = async (req, res) => {
     const result = await pool.query(
       `SELECT id, nombre, nit, contacto, telefono, email, estado, fecha_creacion 
        FROM operadores 
+       WHERE estado = 'activo'
        ORDER BY nombre ASC`
     );
-
-    res.json({
-      success: true,
-      operadores: result.rows
-    });
-
+    res.json({ success: true, operadores: result.rows });
   } catch (error) {
     console.error('Error obteniendo operadores:', error);
     res.status(500).json({ error: 'Error al obtener operadores' });
@@ -43,6 +39,20 @@ const obtenerOperadorPorId = async (req, res) => {
   } catch (error) {
     console.error('Error obteniendo operador:', error);
     res.status(500).json({ error: 'Error al obtener operador' });
+  }
+};
+
+const obtenerTodos = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, nombre, nit, contacto, telefono, email, estado, fecha_creacion 
+       FROM operadores 
+       ORDER BY nombre ASC`
+    );
+    res.json({ success: true, operadores: result.rows });
+  } catch (error) {
+    console.error('Error obteniendo todos los operadores:', error);
+    res.status(500).json({ error: 'Error al obtener operadores' });
   }
 };
 
@@ -152,6 +162,7 @@ const eliminarOperador = async (req, res) => {
 module.exports = {
   obtenerOperadores,
   obtenerOperadorPorId,
+  obtenerTodos,
   crearOperador,
   actualizarOperador,
   eliminarOperador

@@ -6,6 +6,11 @@ const operadoresService = {
     return response.data;
   },
 
+  obtenerTodosAdmin: async () => {          
+    const response = await api.get('/operadores/todos');
+    return response.data;
+  },
+
   obtenerPorId: async (id) => {
     const response = await api.get(`/operadores/${id}`);
     return response.data;
