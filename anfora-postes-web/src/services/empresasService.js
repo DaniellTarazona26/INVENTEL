@@ -1,49 +1,37 @@
-// frontend/src/services/empresasService.js
+// src/services/empresasService.js
 import api from './api'
 
-export const obtenerTodas = async () => {
-  try {
+const empresasService = {
+
+  obtenerTodas: async () => {
     const response = await api.get('/empresas')
     return response.data
-  } catch (error) {
-    console.error('Error en obtenerTodas:', error)
-    throw new Error(
-      error.response?.data?.error || 
-      'Error al obtener empresas'
-    )
-  }
-}
+  },
 
-export const obtenerPorId = async (id) => {
-  try {
+  obtenerTodasAdmin: async () => {
+    const response = await api.get('/empresas/todos')
+    return response.data
+  },
+
+  obtenerPorId: async (id) => {
     const response = await api.get(`/empresas/${id}`)
     return response.data
-  } catch (error) {
-    console.error(`Error en obtenerPorId(${id}):`, error)
-    throw new Error(
-      error.response?.data?.error || 
-      'Error al obtener empresa'
-    )
-  }
-}
+  },
 
-export const crear = async (datos) => {
-  try {
-    const response = await api.post('/empresas', datos)
+  crear: async (empresa) => {
+    const response = await api.post('/empresas', empresa)
     return response.data
-  } catch (error) {
-    console.error('Error en crear:', error)
-    throw new Error(
-      error.response?.data?.error || 
-      'Error al crear empresa'
-    )
-  }
-}
+  },
 
-const empresasService = {
-  obtenerTodas,
-  obtenerPorId,
-  crear
+  actualizar: async (id, empresa) => {
+    const response = await api.put(`/empresas/${id}`, empresa)
+    return response.data
+  },
+
+  eliminar: async (id) => {
+    const response = await api.delete(`/empresas/${id}`)
+    return response.data
+  }
 }
 
 export default empresasService
