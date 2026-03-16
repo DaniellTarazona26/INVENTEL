@@ -7,10 +7,10 @@ const { verificarToken, verificarRol } = require('../middleware/authMiddleware')
 router.use(verificarToken);
 
 router.get('/', operadoresController.obtenerOperadores);
-router.get('/todos', verificarRol('ADMIN', 'INSPECTOR'), operadoresController.obtenerTodos);
+router.get('/todos', operadoresController.obtenerTodos);
 router.get('/:id', operadoresController.obtenerOperadorPorId);
-router.post('/', verificarRol('ADMIN', 'INSPECTOR'), operadoresController.crearOperador);
-router.put('/:id', verificarRol('ADMIN', 'INSPECTOR'), operadoresController.actualizarOperador);
-router.delete('/:id', verificarRol('ADMIN'), operadoresController.eliminarOperador);
+router.post('/', operadoresController.crearOperador);
+router.put('/:id', operadoresController.actualizarOperador);
+router.delete('/:id', operadoresController.eliminarOperador);
 
 module.exports = router;

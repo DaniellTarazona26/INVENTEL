@@ -91,35 +91,42 @@ const VerOperadores = () => {
                   <td>{operador.contacto || '-'}</td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          className="toggle-input"
-                          checked={operador.estado === 'activo'}
-                          onChange={() => toggleEstado(operador)}
-                          style={{ opacity: 0, width: 0, height: 0 }}
-                        />
-                        <span style={{
-                          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                      <div
+                        onClick={() => toggleEstado(operador)}
+                        style={{
+                          position: 'relative',
+                          display: 'inline-block',
+                          width: '44px',
+                          height: '24px',
                           backgroundColor: operador.estado === 'activo' ? '#4CAF50' : '#ccc',
-                          borderRadius: '24px', transition: '0.3s'
-                        }}>
-                          <span style={{
-                            position: 'absolute', height: '18px', width: '18px',
-                            left: operador.estado === 'activo' ? '23px' : '3px',
-                            bottom: '3px', backgroundColor: 'white',
-                            borderRadius: '50%', transition: '0.3s'
-                          }} />
-                        </span>
-                      </label>
+                          borderRadius: '24px',
+                          transition: 'background-color 0.3s',
+                          cursor: 'pointer',
+                          flexShrink: 0
+                        }}
+                      >
+                        <div style={{
+                          position: 'absolute',
+                          height: '18px',
+                          width: '18px',
+                          left: operador.estado === 'activo' ? '23px' : '3px',
+                          top: '3px',
+                          backgroundColor: 'white',
+                          borderRadius: '50%',
+                          transition: 'left 0.3s',
+                          pointerEvents: 'none'
+                        }} />
+                      </div>
                       <span style={{
-                        fontSize: '12px', fontWeight: '600',
+                        fontSize: '12px',
+                        fontWeight: '600',
                         color: operador.estado === 'activo' ? '#4CAF50' : '#999'
                       }}>
                         {operador.estado === 'activo' ? 'Activo' : 'Inactivo'}
                       </span>
                     </div>
                   </td>
+
                   <td>
                     <button
                       className="btn-editar"
