@@ -378,20 +378,12 @@ const AgregarPoste = ({ setCurrentPage }) => {
   }
 
   const handleInputChange = (campo, valor) => {
-  if (campo === 'altura' && valor === '8') {
-    setFormData(prev => ({
-      ...prev,
-      [campo]: valor,
-      media: 'NO',
-      mediaTipoCable: '',
-      mediaEstado: '',
-      mediaContinuidad: '',
-      caja3: '',
-      caja4: ''
-    }))
-  } else {
-    setFormData(prev => ({ ...prev, [campo]: valor }))
-  }
+  if (campo === 'altura' && (valor === '8' || !valor)) {
+  setFormData(prev => ({ ...prev, [campo]: valor, media: 'NO', mediaTipoCable: '', mediaEstado: '', mediaContinuidad: '', caja3: '', caja4: '' }))
+} else {
+  setFormData(prev => ({ ...prev, [campo]: valor }))
+}
+
 }
 
 
@@ -1407,7 +1399,7 @@ const AgregarPoste = ({ setCurrentPage }) => {
                   <option value="510">510</option>
                   <option value="750">750</option>
                   <option value="1050">1050</option>
-                  <option value="1275">1275</option>
+                  <option value="1350">1350</option>
                   <option value="1500">1500</option>
                   <option value="1750">1750</option>
                   <option value="2550">2550</option>
@@ -1604,93 +1596,109 @@ const AgregarPoste = ({ setCurrentPage }) => {
 
             <div className="subsection subsection-media">
             <h4 className="subsection-title">MEDIA</h4>
-            <div className="form-grid form-grid-4">
+            <div className="form-grid form-grid-3">
               <div className="form-group">
                 <label>Media</label>
-                <select
-                  value={formData.media}
-                  onChange={(e) => handleInputChange('media', e.target.value)}
-                  disabled={formData.altura === '8'}
-                >
+                <select value={formData.media} onChange={e => handleInputChange('media', e.target.value)} disabled={!formData.altura || formData.altura === '8'}>
                   <option value=""></option>
                   <option value="NO">NO</option>
                   <option value="SI">SI</option>
                 </select>
               </div>
               <div className="form-group">
-                <label>Tipo cable</label>
-                <select
-                  value={formData.mediaTipoCable}
-                  onChange={(e) => handleInputChange('mediaTipoCable', e.target.value)}
-                  disabled={formData.media !== 'SI'}
-                >
-                  <option value=""></option>
-                  <option value="TRENZADO">TRENZADO</option>
-                  <option value="RED ABIERTA">RED ABIERTA</option>
-                </select>
+                <label>Transformador:</label>
+                {formData.mediaTipoCable && formData.mediaTipoCable.startsWith('T:') ? (
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <input
+                      type="text"
+                      placeholder="Digite el código"
+                      value={formData.mediaTipoCable.replace('T:', '')}
+                      onChange={e => handleInputChange('mediaTipoCable', `T:${e.target.value}`)}
+                      disabled={formData.media !== 'SI'}
+                    />
+                    <button type="button" onClick={() => handleInputChange('mediaTipoCable', 'No')} style={{ whiteSpace: 'nowrap' }}>← No</button>
+                  </div>
+                ) : (
+                  <select
+                    value={formData.mediaTipoCable}
+                    onChange={e => {
+                      if (e.target.value === 'Ingresar codigo') {
+                        handleInputChange('mediaTipoCable', 'T:')
+                      } else {
+                        handleInputChange('mediaTipoCable', e.target.value)
+                      }
+                    }}
+                    disabled={formData.media !== 'SI'}
+                  >
+                    <option value=""></option>
+                    <option value="No">No</option>
+                    <option value="Ingresar codigo">Ingresar codigo</option>
+                  </select>
+                )}
               </div>
               <div className="form-group">
-                <label>Estado de la red</label>
-                <select
-                  value={formData.mediaEstado}
-                  onChange={(e) => handleInputChange('mediaEstado', e.target.value)}
-                  disabled={formData.media !== 'SI'}
-                >
-                  <option value=""></option>
-                  <option value="BUENO">BUENO</option>
-                  <option value="DISTENSIONADA">DISTENSIONADA</option>
-                  <option value="MUY TENSIONADA">MUY TENSIONADA</option>
-
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Continuidad eléctrica</label>
-                <select
-                  value={formData.mediaContinuidad}
-                  onChange={(e) => handleInputChange('mediaContinuidad', e.target.value)}
-                  disabled={formData.media !== 'SI'}
-                >
-                  <option value=""></option>
-                  <option value="SI">SI</option>
-                  <option value="NO">NO</option>
-                </select>
+                <label>Macromedidor:</label>
+                {formData.mediaEstado && formData.mediaEstado.startsWith('M:') ? (
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <input
+                      type="text"
+                      placeholder="Digite el número"
+                      value={formData.mediaEstado.replace('M:', '')}
+                      onChange={e => handleInputChange('mediaEstado', `M:${e.target.value}`)}
+                      disabled={formData.media !== 'SI'}
+                    />
+                    <button type="button" onClick={() => handleInputChange('mediaEstado', 'No')} style={{ whiteSpace: 'nowrap' }}>← No</button>
+                  </div>
+                ) : (
+                  <select
+                    value={formData.mediaEstado}
+                    onChange={e => {
+                      if (e.target.value === 'Ingresar numero') {
+                        handleInputChange('mediaEstado', 'M:')
+                      } else {
+                        handleInputChange('mediaEstado', e.target.value)
+                      }
+                    }}
+                    disabled={formData.media !== 'SI'}
+                  >
+                    <option value=""></option>
+                    <option value="No">No</option>
+                    <option value="Ingresar numero">Ingresar numero</option>
+                  </select>
+                )}
               </div>
             </div>
-
             {formData.media === 'SI' && (
-              <div className="subsection-inner">
-                <h5 className="subsection-subtitle">CAJAS DISTRIBUCIÓN ELÉCTRICA</h5>
-                <div className="form-grid form-grid-2">
-                  <div className="form-group">
-                    <label>Caja 3</label>
-                    <select
-                      value={formData.caja3}
-                      onChange={(e) => handleInputChange('caja3', e.target.value)}
-                    >
-                      <option value=""></option>
-                      <option value="NO EXISTE">NO EXISTE</option>
-                      <option value="BUENA">BUENA</option>
-                      <option value="ABIERTA">ABIERTA</option>
-                      <option value="SIN TAPA">SIN TAPA</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label>Caja 4</label>
-                    <select
-                      value={formData.caja4}
-                      onChange={(e) => handleInputChange('caja4', e.target.value)}
-                    >
-                      <option value=""></option>
-                      <option value="NO EXISTE">NO EXISTE</option>
-                      <option value="BUENA">BUENA</option>
-                      <option value="ABIERTA">ABIERTA</option>
-                      <option value="SIN TAPA">SIN TAPA</option>
-                    </select>
-                  </div>
+              <div className="form-grid form-grid-3">
+                <div className="form-group">
+                  <label>Fuga</label>
+                  <select value={formData.mediaContinuidad} onChange={e => handleInputChange('mediaContinuidad', e.target.value)}>
+                    <option value=""></option>
+                    <option value="SI">SI</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Corta Circuito</label>
+                  <select value={formData.caja3} onChange={e => handleInputChange('caja3', e.target.value)}>
+                    <option value=""></option>
+                    <option value="SI">SI</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Seccionador</label>
+                  <select value={formData.caja4} onChange={e => handleInputChange('caja4', e.target.value)}>
+                    <option value=""></option>
+                    <option value="SI">SI</option>
+                    <option value="NO">NO</option>
+                  </select>
                 </div>
               </div>
             )}
           </div>
+
+  
 
 
 

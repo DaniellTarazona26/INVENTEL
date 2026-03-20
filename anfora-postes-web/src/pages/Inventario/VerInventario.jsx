@@ -130,11 +130,11 @@ const VerInventario = ({ setCurrentPage }) => {
             <h4 className="subsection-title">MEDIA</h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem 1.5rem' }}>
               <p style={{ margin: '0.25rem 0', fontSize: '0.9rem' }}><strong>Media:</strong> {badge(inv.media)}</p>
-              {campo('Tipo cable', inv.media_tipo_cable)}
-              {campo('Estado red', inv.media_estado_red)}
-              {campo('Continuidad eléctrica', inv.media_continuidad_electrica)}
-              {campo('Caja 3', inv.caja3)}
-              {campo('Caja 4', inv.caja4)}
+              {campo('Transformador', inv.media_tipo_cable)}
+              {campo('Macromedidor', inv.media_estado_red)}
+              {campo('Fuga', inv.media_continuidad_electrica)}
+              {campo('Corta Circuito', inv.caja3)}
+              {campo('Seccionador', inv.caja4)}
             </div>
           </div>
 

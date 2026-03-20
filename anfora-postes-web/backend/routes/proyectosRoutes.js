@@ -6,7 +6,7 @@ const { verificarToken, verificarRol } = require('../middleware/authMiddleware')
 
 router.use(verificarToken);
 
-router.get('/todos', verificarRol('ADMIN'), proyectosController.obtenerTodosProyectos);
+router.get('/todos', verificarRol('ADMIN', 'INSPECTOR'), proyectosController.obtenerTodosProyectos);
 router.get('/', proyectosController.obtenerProyectos);
 router.get('/:id', proyectosController.obtenerProyectoPorId);
 router.post('/', verificarRol('ADMIN', 'INSPECTOR'), proyectosController.crearProyecto);
