@@ -4,12 +4,16 @@ import ciudadesService from "../../services/ciudadesService";
 import empresasService from "../../services/empresasService";
 import operadoresService from "../../services/operadoresService";
 import reportesService from "../../services/reportesService";
+import useConsultor from "../../hooks/useConsultor"
 
 const ReporteInventarioOperador = () => {
+
+  const { esConsultor, empresaId } = useConsultor()
+
   const [filtros, setFiltros] = useState({
     operador: "",
     ciudad: "",
-    empresa: "",
+    empresa: esConsultor ? empresaId : "",
     fechaInicial: "",
     fechaFinal: ""
   });
@@ -119,6 +123,7 @@ const ReporteInventarioOperador = () => {
           <select
             value={filtros.empresa}
             onChange={e => handleFiltroChange("empresa", e.target.value)}
+            disabled={esConsultor}
           >
             <option value="">Todos los proyectos</option>
             {proyectos.map(p => (

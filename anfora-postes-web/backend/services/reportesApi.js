@@ -1045,18 +1045,25 @@ const reportesApi = {
     return result.rows
   },
 
-  getDashboardStats: async () => {
-    const query = `
-      SELECT
-        COUNT(*) as total_postes,
-        COUNT(CASE WHEN estado_completitud = 'completo' THEN 1 END) as inventario_completo,
-        COUNT(CASE WHEN estado_completitud = 'pendiente_operadores' THEN 1 END) as pendiente_operadores
-      FROM inventarios
-      WHERE estado = 'activo'
-    `
-    const result = await pool.query(query)
-    return result.rows[0]
+  getDashboardStats: async (empresa_id) => {
+  let query = `
+    SELECT
+      COUNT(*) as total_postes,
+      COUNT(CASE WHEN estado_completitud = 'completo' THEN 1 END) as inventario_completo,
+      COUNT(CASE WHEN estado_completitud = 'pendiente_operadores' THEN 1 END) as pendiente_operadores
+    FROM inventarios
+    WHERE estado = 'activo'
+  `
+  const params = []
+
+  if (empresa_id) {
+    query += ` AND empresa_id = $1`
+    params.push(empresa_id)
   }
+
+  const result = await pool.query(query, params)
+  return result.rows[0]
+}
 
 }
 

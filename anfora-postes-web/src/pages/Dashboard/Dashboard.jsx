@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import reportesService from '../../services/reportesService'
+import useConsultor from '../../hooks/useConsultor'
 import './Dashboard.css'
 
 const Dashboard = () => {
+  const { esConsultor, empresaId } = useConsultor()
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
+  const nombreEmpresa = usuario.empresa_nombre || ''
+
   const [stats, setStats] = useState({
     total_postes: 0,
     inventario_completo: 0,
@@ -16,7 +21,9 @@ const Dashboard = () => {
 
   const cargarStats = async () => {
     try {
-      const data = await reportesService.getDashboardStats()
+      const data = await reportesService.getDashboardStats(
+        esConsultor ? empresaId : null
+      )
       setStats({
         total_postes: parseInt(data.total_postes) || 0,
         inventario_completo: parseInt(data.inventario_completo) || 0,
@@ -41,6 +48,9 @@ const Dashboard = () => {
     <div className="dashboard">
       <h2>Bienvenido al Sistema</h2>
       <p>Ha ingresado correctamente al Sistema de Captura de Inventarios para Estructuras.</p>
+      {esConsultor && nombreEmpresa && (
+        <p>Estás viendo datos de: <strong>{nombreEmpresa}</strong></p>
+      )}
       <p>Inicie el uso de la aplicación seleccionando la opción deseada en el menú principal.</p>
 
       {loading ? (

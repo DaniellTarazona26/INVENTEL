@@ -1067,6 +1067,7 @@ const reportesController = {
 
   getDashboardStats: async (req, res) => {
     try {
+      const { empresa_id } = req.query
       const stats = await reportesApi.getDashboardStats()
       res.json({ success: true, data: stats })
     } catch (error) {

@@ -3,12 +3,16 @@ import "./ReportesComun.css";
 import ciudadesService from "../../services/ciudadesService";
 import empresasService from "../../services/empresasService";
 import reportesService from "../../services/reportesService";
+import useConsultor from "../../hooks/useConsultor"
 
 
 const ReportePoda = () => {
+
+  const { esConsultor, empresaId } = useConsultor()
+
   const [filtros, setFiltros] = useState({
     ciudad: "",
-    empresa: "",
+    empresa: esConsultor ? empresaId : "",
     fechaInicial: "",
     fechaFinal: ""
   });
@@ -106,6 +110,7 @@ const ReportePoda = () => {
           <select
             value={filtros.empresa}
             onChange={e => handleFiltroChange("empresa", e.target.value)}
+            disabled={esConsultor}
           >
             <option value="">Todos los proyectos</option>
             {proyectos.map(p => (

@@ -3,12 +3,16 @@ import "./ReportesComun.css";
 import ciudadesService from "../../services/ciudadesService";
 import empresasService from "../../services/empresasService";
 import reportesService from "../../services/reportesService";
+import useConsultor from "../../hooks/useConsultor"
 
 const ReporteRedes = () => {
+
+  const { esConsultor, empresaId } = useConsultor()
+
   const [filtros, setFiltros] = useState({
     ciudad: "",
     barrio: "",
-    empresa: "",
+    empresa: esConsultor ? empresaId : "",
     fechaInicial: "",
     fechaFinal: ""
   });
@@ -115,7 +119,7 @@ const ReporteRedes = () => {
 
         <div className="filtro-group">
           <label>Empresa:</label>
-          <select value={filtros.empresa} onChange={e => handleFiltroChange("empresa", e.target.value)}>
+          <select value={filtros.empresa} onChange={e => handleFiltroChange("empresa", e.target.value)} disabled={esConsultor} >
             <option value="">Todas las empresas</option>
             {proyectos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
           </select>
