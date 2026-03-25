@@ -107,19 +107,16 @@ router.get('/', verificarToken, async (req, res) => {
       barrioId: req.query.barrio_id,
       proyectoId: req.query.proyecto_id
     }
-    
+
+    if (req.usuario.rol === 'CONSULTOR') {
+      filtros.empresaId = req.usuario.empresa_id
+    }
+
     const inventarios = await inventariosService.obtenerTodos(filtros)
-    
-    res.json({
-      success: true,
-      inventarios
-    })
+    res.json({ success: true, inventarios })
   } catch (error) {
     console.error('Error obteniendo inventarios:', error)
-    res.status(500).json({
-      success: false,
-      error: 'Error al obtener inventarios'
-    })
+    res.status(500).json({ success: false, error: 'Error al obtener inventarios' })
   }
 })
 
