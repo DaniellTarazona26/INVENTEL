@@ -8,6 +8,8 @@ const Inventario = ({ setCurrentPage }) => {
   const [filtros, setFiltros] = useState({
     busqueda: ''
   })
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
+  const esConsultor = usuario.rol === 'CONSULTOR'
 
   useEffect(() => {
     cargarInventarios()
@@ -75,15 +77,17 @@ const Inventario = ({ setCurrentPage }) => {
     <div className="inventario-page">
       <div className="inventario-header">
         <h2>📋 Inventarios Registrados</h2>
-        <button 
-          className="btn-primary"
-          onClick={() => {
-            localStorage.removeItem('editarInventarioId')
-            setCurrentPage('agregar')
-          }}
-        >
-          ➕ Nuevo Inventario
-        </button>
+        {!esConsultor && (
+          <button
+            className="btn-primary"
+            onClick={() => {
+              localStorage.removeItem('editarInventarioId')
+              setCurrentPage('agregar')
+            }}
+          >
+            ➕ Nuevo Inventario
+          </button>
+        )}
       </div>
 
       <div className="inventario-filtros">
@@ -179,39 +183,43 @@ const Inventario = ({ setCurrentPage }) => {
                     </td>
                     <td>
                       <div className="acciones-btns">
-                        <button 
+                        <button
                           className="btn-link btn-ver"
                           onClick={() => handleVer(inv.id)}
                           title="Ver detalles"
                         >
                           👁️
                         </button>
-                        
-                        {inv.estado_completitud === 'pendiente_operadores' ? (
-                          <button 
-                            className="btn-link btn-continuar"
-                            onClick={() => handleContinuar(inv.id)}
-                            title="Continuar con operadores"
-                          >
-                            ▶️
-                          </button>
-                        ) : (
-                          <button 
-                            className="btn-link btn-editar"
-                            onClick={() => handleEditar(inv.id)}
-                            title="Editar"
-                          >
-                            ✏️
-                          </button>
+
+                        {!esConsultor && (
+                          <>
+                            {inv.estado_completitud === 'pendiente_operadores' ? (
+                              <button
+                                className="btn-link btn-continuar"
+                                onClick={() => handleContinuar(inv.id)}
+                                title="Continuar con operadores"
+                              >
+                                ▶️
+                              </button>
+                            ) : (
+                              <button
+                                className="btn-link btn-editar"
+                                onClick={() => handleEditar(inv.id)}
+                                title="Editar"
+                              >
+                                ✏️
+                              </button>
+                            )}
+
+                            <button
+                              className="btn-link btn-eliminar"
+                              onClick={() => handleEliminar(inv.id)}
+                              title="Eliminar"
+                            >
+                              🗑️
+                            </button>
+                          </>
                         )}
-                        
-                        <button 
-                          className="btn-link btn-eliminar"
-                          onClick={() => handleEliminar(inv.id)}
-                          title="Eliminar"
-                        >
-                          🗑️
-                        </button>
                       </div>
                     </td>
                   </tr>

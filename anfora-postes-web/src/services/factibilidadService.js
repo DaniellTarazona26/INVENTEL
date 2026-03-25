@@ -20,6 +20,11 @@ export const obtenerTodas = async (filtros = {}) => {
     if (filtros.estado) params.append('estado', filtros.estado);
     if (filtros.limit) params.append('limit', filtros.limit);
     if (filtros.offset) params.append('offset', filtros.offset);
+    if (filtros.empresa_id) {
+        query += ` AND f.empresa_id = $${paramCount}`;
+        params.push(filtros.empresa_id);
+        paramCount++;
+      }
 
     const queryString = params.toString();
     const url = queryString ? `/factibilidades?${queryString}` : '/factibilidades';

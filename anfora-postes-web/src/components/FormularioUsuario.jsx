@@ -1,6 +1,6 @@
-// src/components/FormularioUsuario.jsx
 import React, { useState, useEffect } from 'react'
 import usuariosService from '../services/usuariosService'
+import empresasService from '../services/empresasService'
 import './FormularioModal.css'
 
 const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
@@ -8,31 +8,47 @@ const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
     nombre: '',
     email: '',
     password: '',
-    rol: 'inspector',
+    rol: 'INSPECTOR',
     telefono: '',
-    direccion: ''
+    direccion: '',
+    empresa_id: ''
   })
-  
+  const [empresas, setEmpresas] = useState([])
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    cargarEmpresas()
+  }, [])
 
   useEffect(() => {
     if (modoEdicion && usuario) {
       setFormData({
         nombre: usuario.nombre || '',
         email: usuario.email || '',
-        password: '', // No mostramos la contraseña
-        rol: usuario.rol || 'inspector',
+        password: '',
+        rol: usuario.rol || 'INSPECTOR',
         telefono: usuario.telefono || '',
-        direccion: usuario.direccion || ''
+        direccion: usuario.direccion || '',
+        empresa_id: usuario.empresa_id || ''
       })
     }
   }, [modoEdicion, usuario])
 
+  const cargarEmpresas = async () => {
+    try {
+      const response = await empresasService.obtenerTodas()
+      if (response.success) setEmpresas(response.empresas)
+    } catch (e) {
+      console.error('Error cargando empresas:', e)
+    }
+  }
+
   const handleChange = (campo, valor) => {
     setFormData(prev => ({
       ...prev,
-      [campo]: valor
+      [campo]: valor,
+      ...(campo === 'rol' && valor !== 'CONSULTOR' ? { empresa_id: '' } : {})
     }))
     setError('')
   }
@@ -43,7 +59,6 @@ const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
     setCargando(true)
 
     try {
-      // Validaciones
       if (!formData.nombre || !formData.email || !formData.rol) {
         setError('Nombre, email y rol son obligatorios')
         setCargando(false)
@@ -56,11 +71,15 @@ const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
         return
       }
 
-      // Preparar datos (no enviar password vacío en edición)
-      const datos = { ...formData }
-      if (modoEdicion && !datos.password) {
-        delete datos.password
+      if (formData.rol === 'CONSULTOR' && !formData.empresa_id) {
+        setError('La empresa es obligatoria para el rol CONSULTOR')
+        setCargando(false)
+        return
       }
+
+      const datos = { ...formData }
+      if (modoEdicion && !datos.password) delete datos.password
+      if (datos.rol !== 'CONSULTOR') delete datos.empresa_id
 
       if (modoEdicion) {
         await usuariosService.actualizar(usuario.id, datos)
@@ -72,7 +91,6 @@ const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
 
       onGuardar()
       onCerrar()
-
     } catch (error) {
       console.error('Error guardando usuario:', error)
       setError(error.response?.data?.error || 'Error al guardar usuario')
@@ -98,9 +116,7 @@ const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
           )}
 
           <div className="form-group">
-            <label htmlFor="nombre">
-              Nombre Completo <span className="required">*</span>
-            </label>
+            <label htmlFor="nombre">Nombre Completo <span className="required">*</span></label>
             <input
               type="text"
               id="nombre"
@@ -113,9 +129,7 @@ const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">
-              Email <span className="required">*</span>
-            </label>
+            <label htmlFor="email">Email <span className="required">*</span></label>
             <input
               type="email"
               id="email"
@@ -146,9 +160,7 @@ const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="rol">
-              Rol <span className="required">*</span>
-            </label>
+            <label htmlFor="rol">Rol <span className="required">*</span></label>
             <select
               id="rol"
               value={formData.rol}
@@ -161,6 +173,24 @@ const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
               <option value="CONSULTOR">Consultor</option>
             </select>
           </div>
+
+          {formData.rol === 'CONSULTOR' && (
+            <div className="form-group">
+              <label htmlFor="empresa_id">Empresa <span className="required">*</span></label>
+              <select
+                id="empresa_id"
+                value={formData.empresa_id}
+                onChange={(e) => handleChange('empresa_id', e.target.value)}
+                disabled={cargando}
+                required
+              >
+                <option value="">Seleccionar empresa...</option>
+                {empresas.map(emp => (
+                  <option key={emp.id} value={emp.id}>{emp.nombre}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="form-group">
             <label htmlFor="telefono">Teléfono</label>
@@ -187,19 +217,10 @@ const FormularioUsuario = ({ modoEdicion, usuario, onCerrar, onGuardar }) => {
           </div>
 
           <div className="form-actions">
-            <button 
-              type="button" 
-              className="btn-secundario" 
-              onClick={onCerrar}
-              disabled={cargando}
-            >
+            <button type="button" className="btn-secundario" onClick={onCerrar} disabled={cargando}>
               Cancelar
             </button>
-            <button 
-              type="submit" 
-              className="btn-primario"
-              disabled={cargando}
-            >
+            <button type="submit" className="btn-primario" disabled={cargando}>
               {cargando ? 'Guardando...' : (modoEdicion ? 'Actualizar' : 'Crear Usuario')}
             </button>
           </div>

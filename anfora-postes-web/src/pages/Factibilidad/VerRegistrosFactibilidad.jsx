@@ -15,6 +15,9 @@ const VerRegistrosFactibilidad = ({ setVistaActual }) => {
   const [cargandoDetalles, setCargandoDetalles] = useState(false)
   const registrosPorPagina = 50
 
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
+  const esConsultor = usuario.rol === 'CONSULTOR'
+
   useEffect(() => {
     cargarFactibilidades()
   }, [paginaActual])
@@ -64,9 +67,7 @@ const VerRegistrosFactibilidad = ({ setVistaActual }) => {
   }
 
   const handleEliminar = async (id, codigoPoste) => {
-    if (!window.confirm(`¿Está seguro de eliminar la factibilidad "${codigoPoste}"?`)) {
-      return
-    }
+    if (!window.confirm(`¿Está seguro de eliminar la factibilidad "${codigoPoste}"?`)) return
 
     try {
       setCargando(true)
@@ -107,9 +108,7 @@ const VerRegistrosFactibilidad = ({ setVistaActual }) => {
     }
   }
 
-  const cerrarModalDetalles = () => {
-    setModalDetalles(null)
-  }
+  const cerrarModalDetalles = () => setModalDetalles(null)
 
   const handleEditar = (id) => {
     localStorage.setItem('editarFactibilidadId', id)
@@ -119,15 +118,11 @@ const VerRegistrosFactibilidad = ({ setVistaActual }) => {
   const totalPaginas = Math.ceil(total / registrosPorPagina)
 
   const handlePaginaAnterior = () => {
-    if (paginaActual > 1) {
-      setPaginaActual(paginaActual - 1)
-    }
+    if (paginaActual > 1) setPaginaActual(paginaActual - 1)
   }
 
   const handlePaginaSiguiente = () => {
-    if (paginaActual < totalPaginas) {
-      setPaginaActual(paginaActual + 1)
-    }
+    if (paginaActual < totalPaginas) setPaginaActual(paginaActual + 1)
   }
 
   return (
@@ -168,19 +163,11 @@ const VerRegistrosFactibilidad = ({ setVistaActual }) => {
           />
         </div>
 
-        <button
-          className="btn-buscar"
-          onClick={handleBuscar}
-          disabled={cargando}
-        >
+        <button className="btn-buscar" onClick={handleBuscar} disabled={cargando}>
           {cargando ? 'Buscando...' : 'Buscar'}
         </button>
 
-        <button
-          className="btn-limpiar"
-          onClick={handleLimpiarFiltros}
-          disabled={cargando}
-        >
+        <button className="btn-limpiar" onClick={handleLimpiarFiltros} disabled={cargando}>
           Limpiar
         </button>
       </div>
@@ -238,9 +225,7 @@ const VerRegistrosFactibilidad = ({ setVistaActual }) => {
                     <td>
                       {fact.tipo_cable ? (
                         <span className="badge badge-nuevo">{fact.tipo_cable}</span>
-                      ) : (
-                        'N/A'
-                      )}
+                      ) : 'N/A'}
                     </td>
                     <td>{new Date(fact.created_at).toLocaleDateString('es-CO')}</td>
                     <td>
@@ -252,20 +237,25 @@ const VerRegistrosFactibilidad = ({ setVistaActual }) => {
                         >
                           👁️
                         </button>
-                        <button
-                          className="btn-accion btn-editar"
-                          onClick={() => handleEditar(fact.id)}
-                          title="Editar"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          className="btn-accion btn-eliminar"
-                          onClick={() => handleEliminar(fact.id, fact.codigo_poste)}
-                          title="Eliminar"
-                        >
-                          🗑️
-                        </button>
+
+                        {!esConsultor && (
+                          <>
+                            <button
+                              className="btn-accion btn-editar"
+                              onClick={() => handleEditar(fact.id)}
+                              title="Editar"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              className="btn-accion btn-eliminar"
+                              onClick={() => handleEliminar(fact.id, fact.codigo_poste)}
+                              title="Eliminar"
+                            >
+                              🗑️
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -283,11 +273,9 @@ const VerRegistrosFactibilidad = ({ setVistaActual }) => {
               >
                 ← Anterior
               </button>
-
               <span className="paginacion-info">
                 Página {paginaActual} de {totalPaginas}
               </span>
-
               <button
                 className="btn-paginacion"
                 onClick={handlePaginaSiguiente}
@@ -377,6 +365,17 @@ const VerRegistrosFactibilidad = ({ setVistaActual }) => {
             </div>
 
             <div className="modal-footer">
+              {!esConsultor && (
+                <button
+                  className="btn-primary"
+                  onClick={() => {
+                    cerrarModalDetalles()
+                    handleEditar(modalDetalles.id)
+                  }}
+                >
+                  ✏️ Editar
+                </button>
+              )}
               <button className="btn-cerrar" onClick={cerrarModalDetalles}>
                 Cerrar
               </button>
@@ -389,4 +388,3 @@ const VerRegistrosFactibilidad = ({ setVistaActual }) => {
 }
 
 export default VerRegistrosFactibilidad
-

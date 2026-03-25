@@ -57,7 +57,8 @@ const login = async (req, res) => {
         id: usuario.id,
         email: usuario.email,
         rol: usuario.rol,
-        nombre: usuario.nombre
+        nombre: usuario.nombre,
+        empresa_id: usuario.empresa_id
       },
       process.env.JWT_SECRET,
       { expiresIn: '8h' } // Token válido por 8 horas
@@ -74,7 +75,8 @@ const login = async (req, res) => {
         email: usuario.email,
         rol: usuario.rol,
         telefono: usuario.telefono,
-        direccion: usuario.direccion
+        direccion: usuario.direccion,
+        empresa_id: usuario.empresa_id
       }
     });
 
@@ -88,7 +90,7 @@ const login = async (req, res) => {
 
 // REGISTRO (para admin crear usuarios)
 const registro = async (req, res) => {
-  const { nombre, email, password, rol, telefono, direccion } = req.body;
+  const { nombre, email, password, rol, telefono, direccion, empresa_id } = req.body;
 
   try {
     // Validaciones
@@ -116,10 +118,10 @@ const registro = async (req, res) => {
 
     // Insertar usuario
     const result = await pool.query(
-      `INSERT INTO usuarios (nombre, email, password_hash, rol, telefono, direccion)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, nombre, email, rol, estado, fecha_creacion`,
-      [nombre, email, passwordHash, rol, telefono || null, direccion || null]
+      `INSERT INTO usuarios (nombre, email, password_hash, rol, telefono, direccion, empresa_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, nombre, email, rol, estado, fecha_creacion, empresa_id`,
+      [nombre, email, passwordHash, rol, telefono || null, direccion || null, empresa_id || null]
     );
 
     res.status(201).json({
@@ -141,7 +143,7 @@ const verificarSesion = async (req, res) => {
   try {
     // El middleware ya verificó el token
     const result = await pool.query(
-      'SELECT id, nombre, email, rol, telefono, direccion, estado FROM usuarios WHERE id = $1',
+      'SELECT id, nombre, email, rol, telefono, direccion, estado, empresa_id FROM usuarios WHERE id = $1',
       [req.usuario.id]
     );
 
