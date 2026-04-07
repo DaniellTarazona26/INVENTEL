@@ -1165,327 +1165,235 @@ const AgregarPoste = ({ setCurrentPage }) => {
         </div>
       )}
 
-      <section className={`form-section collapsible ${getEstadoSeccion('ubicacion')}`}>
-        <h3 
-          className="section-title clickable" 
-          onClick={() => toggleSeccion('ubicacion')}
-        >
-          <span className={`arrow ${seccionesAbiertas.ubicacion ? 'open' : ''}`}>▶</span>
-          1. UBICACIÓN
-          <span className="status-indicator"></span>
-        </h3>
-        
-        {seccionesAbiertas.ubicacion && (
-          <div className="section-content">
-            <div className="form-grid form-grid-2">
-              <div className="form-group">
-                <label>Ciudad: *</label>
-                <select 
-                  value={formData.ciudadId}
-                  onChange={(e) => handleInputChange('ciudadId', e.target.value)}
-                >
-                  <option value="">Seleccione ciudad</option>
-                  {ciudades.map(ciudad => (
-                    <option key={ciudad.id} value={ciudad.id}>
-                      {ciudad.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
+      {/* ==================== 1. UBICACIÓN ==================== */}
+<section className={`form-section collapsible ${getEstadoSeccion('ubicacion')}`}>
+  <h3 className="section-title clickable" onClick={() => toggleSeccion('ubicacion')}>
+    <span className={`arrow ${seccionesAbiertas.ubicacion ? 'open' : ''}`}></span>
+    1. UBICACIÓN
+    <span className="status-indicator"></span>
+  </h3>
+  {seccionesAbiertas.ubicacion && (
+    <div className="section-content">
 
-              <div className="form-group">
-                <label>Empresa: *</label>
-                <select 
-                  value={formData.empresaId}
-                  onChange={(e) => handleInputChange('empresaId', e.target.value)}
-                >
-                  <option value="">Seleccione Empresa</option>
-                  {empresas.map(empresa => (
-                    <option key={empresa.id} value={empresa.id}>
-                      {empresa.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+      <div className="form-grid form-grid-2">
+        <div className="form-group">
+          <label>Ciudad</label>
+          <select value={formData.ciudadId} onChange={e => handleInputChange('ciudadId', e.target.value)}>
+            <option value="">Seleccione ciudad</option>
+            {ciudades.map(ciudad => (
+              <option key={ciudad.id} value={ciudad.id}>{ciudad.nombre}</option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Empresa</label>
+          <select value={formData.empresaId} onChange={e => handleInputChange('empresaId', e.target.value)}>
+            <option value="">Seleccione Empresa</option>
+            {empresas.map(empresa => (
+              <option key={empresa.id} value={empresa.id}>{empresa.nombre}</option>
+            ))}
+          </select>
+        </div>
+      </div>
 
-            <div className="form-grid form-grid-2">
-              <div className="form-group">
-                <label>Barrio: *</label>
-                <select 
-                  value={formData.barrio}
-                  onChange={(e) => handleInputChange('barrio', e.target.value)}
-                  disabled={!formData.ciudadId}
-                >
-                  <option value="">
-                    {!formData.ciudadId ? 'Primero seleccione una ciudad' : 'Seleccione barrio'}
-                  </option>
-                  {barrios.map(barrio => (
-                    <option key={barrio.id} value={barrio.id}>
-                      {barrio.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+      <div className="form-grid form-grid-2">
+        <div className="form-group">
+          <label>Barrio</label>
+          <select value={formData.barrio} onChange={e => handleInputChange('barrio', e.target.value)} disabled={!formData.ciudadId}>
+            <option value="">{!formData.ciudadId ? 'Primero seleccione una ciudad' : 'Seleccione barrio'}</option>
+            {barrios.map(barrio => (
+              <option key={barrio.id} value={barrio.id}>{barrio.nombre}</option>
+            ))}
+          </select>
+        </div>
+      </div>
 
-            <div className="form-grid form-grid-direccion-completa">
-              <div className="form-group">
-                <label>C / A / D / K / Lo / Mz / T:</label>
-                <select 
-                  value={formData.direccion1}
-                  onChange={(e) => handleInputChange('direccion1', e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="C">C</option>
-                  <option value="A">A</option>
-                  <option value="D">D</option>
-                  <option value="K">K</option>
-                  <option value="Lo">Lo</option>
-                  <option value="Mz">Mz</option>
-                  <option value="T">T</option>
-                </select>
-              </div>
+      <div className="form-grid form-grid-direccion-completa">
+        <div className="form-group">
+          <label>C A D K Lo Mz T</label>
+          <select value={formData.direccion1} onChange={e => handleInputChange('direccion1', e.target.value)}>
+            <option value=""></option>
+            <option value="C">C</option>
+            <option value="A">A</option>
+            <option value="D">D</option>
+            <option value="K">K</option>
+            <option value="Lo">Lo</option>
+            <option value="Mz">Mz</option>
+            <option value="T">T</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Número Letra</label>
+          <input type="text" value={formData.direccion2} onChange={e => handleInputChange('direccion2', e.target.value)} placeholder="Ej 45" />
+        </div>
+        <div className="form-group">
+          <label># A Bis Lo Cs</label>
+          <select value={formData.direccion3} onChange={e => handleInputChange('direccion3', e.target.value)}>
+            <option value=""></option>
+            <option value=""> </option>
+            <option value="A">A</option>
+            <option value="Bis">Bis</option>
+            <option value="Lo">Lo</option>
+            <option value="Cs">Cs</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Número Letra</label>
+          <input type="text" value={formData.direccion4} onChange={e => handleInputChange('direccion4', e.target.value)} placeholder="Ej 32-15" />
+        </div>
+      </div>
 
-              <div className="form-group">
-                <label>Número / Letra:</label>
-                <input 
-                  type="text" 
-                  value={formData.direccion2}
-                  onChange={(e) => handleInputChange('direccion2', e.target.value)}
-                  placeholder="Ej: 45"
-                />
-              </div>
+      <div className="form-grid form-grid-1">
+        <div className="form-group">
+          <label>Dirección Completa</label>
+          <input type="text" className="direccion-completa-display"
+            value={`${formData.direccion1} ${formData.direccion2} ${formData.direccion3} ${formData.direccion4}`.trim()}
+            readOnly disabled />
+        </div>
+      </div>
 
-              <div className="form-group">
-                <label># / A / Bis / Lo / Cs:</label>
-                <select 
-                  value={formData.direccion3}
-                  onChange={(e) => handleInputChange('direccion3', e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="#">#</option>
-                  <option value="A">A</option>
-                  <option value="Bis">Bis</option>
-                  <option value="Lo">Lo</option>
-                  <option value="Cs">Cs</option>
-                </select>
-              </div>
+      <div className="form-grid form-grid-1">
+        <div className="form-group">
+          <label>WayPoint</label>
+          <input type="text" placeholder="Obligatorio" value={formData.waypoint} onChange={e => handleInputChange('waypoint', e.target.value)} />
+        </div>
+      </div>
 
-              <div className="form-group">
-                <label>Número / Letra:</label>
-                <input 
-                  type="text" 
-                  value={formData.direccion4}
-                  onChange={(e) => handleInputChange('direccion4', e.target.value)}
-                  placeholder="Ej: 32-15"
-                />
-              </div>
-            </div>
+      {/* ── Campos movidos desde Estructura ── */}
+      <div className="form-grid form-grid-3">
+        <div className="form-group">
+          <label>Marcada</label>
+          <select value={formData.marcada} onChange={e => handleInputChange('marcada', e.target.value)}>
+            <option value=""></option>
+            <option value="SI">SI</option>
+            <option value="NO">NO</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Código estructura</label>
+          <input type="text" placeholder="Ej 123456" value={formData.codigoEstructura}
+            onChange={e => handleInputChange('codigoEstructura', e.target.value)}
+            disabled={formData.marcada !== 'SI'} />
+        </div>
+        <div className="form-group">
+          <label>Consecutivo poste</label>
+          <input type="text" placeholder="Ej 123456" value={formData.consecutivoPoste}
+            onChange={e => handleInputChange('consecutivoPoste', e.target.value)}
+            disabled={formData.marcada !== 'SI'} />
+        </div>
+      </div>
 
-            <div className="form-grid form-grid-1">
-              <div className="form-group">
-                <label>Dirección Completa:</label>
-                <input 
-                  type="text" 
-                  className="direccion-completa-display"
-                  value={`${formData.direccion1} ${formData.direccion2} ${formData.direccion3} ${formData.direccion4}`.trim()}
-                  readOnly
-                  disabled
-                />
-              </div>
-            </div>
-            
-            <div className="form-grid form-grid-1">
-              <div className="form-group">
-                <label>WayPoint: *</label>
-                <input 
-                  type="text" 
-                  placeholder="Obligatorio"
-                  value={formData.waypoint}
-                  onChange={(e) => handleInputChange('waypoint', e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
+    </div>
+  )}
+</section>
 
-      <section className={`form-section collapsible ${getEstadoSeccion('estructura')}`}>
-        <h3 
-          className="section-title clickable" 
-          onClick={() => toggleSeccion('estructura')}
-        >
-          <span className={`arrow ${seccionesAbiertas.estructura ? 'open' : ''}`}>▶</span>
-          2. ESTRUCTURA
-          <span className="status-indicator"></span>
-        </h3>
-        
-        {seccionesAbiertas.estructura && (
-          <div className="section-content">
-            <div className="form-grid form-grid-4">
-              <div className="form-group">
-                <label>Tipo: *</label>
-                <select 
-                  value={formData.tipo}
-                  onChange={(e) => handleInputChange('tipo', e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="SENCILLA">SENCILLA</option>
-                  <option value="DOBLE">DOBLE</option>
-                </select>
-              </div>
+{/* ==================== 2. ESTRUCTURA ==================== */}
+<section className={`form-section collapsible ${getEstadoSeccion('estructura')}`}>
+  <h3 className="section-title clickable" onClick={() => toggleSeccion('estructura')}>
+    <span className={`arrow ${seccionesAbiertas.estructura ? 'open' : ''}`}></span>
+    2. ESTRUCTURA
+    <span className="status-indicator"></span>
+  </h3>
+  {seccionesAbiertas.estructura && (
+    <div className="section-content">
 
-              <div className="form-group">
-                <label>Marcada:</label>
-                <select 
-                  value={formData.marcada}
-                  onChange={(e) => handleInputChange('marcada', e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="SI">SI</option>
-                  <option value="NO">NO</option>
-                </select>
-              </div>
+      {/* fila 1: Tipo + Material + C.Rotura + Templete + Estado Templete */}
+      <div className="form-grid form-grid-4">
+        <div className="form-group">
+          <label>Tipo</label>
+          <select value={formData.tipo} onChange={e => handleInputChange('tipo', e.target.value)}>
+            <option value=""></option>
+            <option value="SENCILLA">SENCILLA</option>
+            <option value="DOBLE">DOBLE</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Material</label>
+          <select value={formData.material} onChange={e => handleInputChange('material', e.target.value)}>
+            <option value=""></option>
+            <option value="CONCRETO">CONCRETO</option>
+            <option value="MADERA">MADERA</option>
+            <option value="METALICO">METÁLICO</option>
+            <option value="FIBRA DE VIDRIO">FIBRA DE VIDRIO</option>
+            <option value="TUBULAR">TUBULAR</option>
+            <option value="OTRO">OTRO</option>
+            <option value="PVC">PVC</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>C. de Rotura</label>
+          <select value={formData.cRotura} onChange={e => handleInputChange('cRotura', e.target.value)}>
+            <option value=""></option>
+            <option value="510">510</option>
+            <option value="750">750</option>
+            <option value="1050">1050</option>
+            <option value="1350">1350</option>
+            <option value="1500">1500</option>
+            <option value="1750">1750</option>
+            <option value="2550">2550</option>
+            <option value="OTRO">OTRO</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Templete</label>
+          <select value={formData.templete} onChange={e => handleInputChange('templete', e.target.value)}>
+            <option value=""></option>
+            <option value="NO EXISTE">NO EXISTE</option>
+            <option value="NORMAL">NORMAL</option>
+            <option value="VERTICAL">VERTICAL</option>
+            <option value="PIE DE AMIGO">PIE DE AMIGO</option>
+            <option value="STOCK">STOCK</option>
+          </select>
+        </div>
+      </div>
 
-              <div className="form-group">
-                <label>Código estructura:</label>
-                <input 
-                  type="text" 
-                  placeholder="Ej: 123456"
-                  value={formData.codigoEstructura}
-                  onChange={(e) => handleInputChange('codigoEstructura', e.target.value)}
-                  disabled={formData.marcada !== 'SI'}
-                />
-              </div>
+      {/* fila 2: Estado Templete + Altura + Año fabricación + Bajantes + (vacío) */}
+      <div className="form-grid form-grid-4">
+        <div className="form-group">
+          <label>Estado templete</label>
+          <select value={formData.estadoTemplete} onChange={e => handleInputChange('estadoTemplete', e.target.value)}
+            disabled={formData.templete === 'NO EXISTE' || !formData.templete}>
+            <option value=""></option>
+            <option value="BUENO">BUENO</option>
+            <option value="SUELTO">SUELTO</option>
+            <option value="ROTO">ROTO</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Altura</label>
+          <select value={formData.altura} onChange={e => handleInputChange('altura', e.target.value)}>
+            <option value=""></option>
+            <option value="8">8</option>
+            <option value="10">10</option>
+            <option value="12">12</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="18">18</option>
+            <option value="OTRO">OTRO</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Año fabricación</label>
+          <input type="text" placeholder="Ej 2020" value={formData.anoFabricacion}
+            onChange={e => handleInputChange('anoFabricacion', e.target.value)} maxLength={4} />
+        </div>
+        <div className="form-group">
+          <label>Bajantes Eléctricos</label>
+          <select value={formData.bajantesElectricos} onChange={e => handleInputChange('bajantesElectricos', e.target.value)}>
+            <option value=""></option>
+            <option value="NO">NO</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      </div>
 
-              <div className="form-group">
-                <label>Consecutivo poste:</label>
-                <input 
-                  type="text" 
-                  placeholder="Ej: 123456"
-                  value={formData.consecutivoPoste}
-                  onChange={(e) => handleInputChange('consecutivoPoste', e.target.value)}
-                  disabled={formData.marcada !== 'SI'}
-                />
-              </div>
-            </div>
-
-            <div className="form-grid form-grid-4">
-              <div className="form-group">
-                <label>Material: *</label>
-                <select 
-                  value={formData.material}
-                  onChange={(e) => handleInputChange('material', e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="CONCRETO">CONCRETO</option>
-                  <option value="MADERA">MADERA</option>
-                  <option value="METALICO">METÁLICO</option>
-                  <option value="FIBRA DE VIDRIO">FIBRA DE VIDRIO</option>
-                  <option value="TUBULAR">TUBULAR</option>
-                  <option value="OTRO">OTRO</option>
-                  <option value="PVC">PVC</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>C. de Rotura:</label>
-                <select 
-                  value={formData.cRotura}
-                  onChange={(e) => handleInputChange('cRotura', e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="510">510</option>
-                  <option value="750">750</option>
-                  <option value="1050">1050</option>
-                  <option value="1350">1350</option>
-                  <option value="1500">1500</option>
-                  <option value="1750">1750</option>
-                  <option value="2550">2550</option>
-                  <option value="OTRO">OTRO</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Templete: *</label>
-                <select 
-                  value={formData.templete}
-                  onChange={(e) => handleInputChange('templete', e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="NO EXISTE">NO EXISTE</option>
-                  <option value="NORMAL">NORMAL</option>
-                  <option value="VERTICAL">VERTICAL</option>
-                  <option value="PIE DE AMIGO">PIE DE AMIGO</option>
-                  <option value="STOCK">STOCK</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Estado templete:</label>
-                <select 
-                  value={formData.estadoTemplete}
-                  onChange={(e) => handleInputChange('estadoTemplete', e.target.value)}
-                  disabled={formData.templete === 'NO EXISTE' || !formData.templete}
-                >
-                  <option value=""></option>
-                  <option value="BUENO">BUENO</option>
-                  <option value="SUELTO">SUELTO</option>
-                  <option value="ROTO">ROTO</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="form-grid form-grid-4">
-              <div className="form-group">
-                <label>Altura: *</label>
-                <select 
-                  value={formData.altura}
-                  onChange={(e) => handleInputChange('altura', e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="8">8</option>
-                  <option value="10">10</option>
-                  <option value="12">12</option>
-                  <option value="14">14</option>
-                  <option value="15">15</option>
-                  <option value="18">18</option>
-                  <option value="OTRO">OTRO</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Año fabricación: *</label>
-                <input 
-                  type="text" 
-                  placeholder="Ej: 2020"
-                  value={formData.anoFabricacion}
-                  onChange={(e) => handleInputChange('anoFabricacion', e.target.value)}
-                  maxLength="4"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Bajantes Eléctricos: *</label>
-                <select 
-                  value={formData.bajantesElectricos}
-                  onChange={(e) => handleInputChange('bajantesElectricos', e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="NO">NO</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                </select>
-              </div>
-              <div className="form-group"></div>
-            </div>
-          </div>
-        )}
-      </section>
+    </div>
+  )}
+</section>
 
       <section className={`form-section collapsible ${getEstadoSeccion('tipoRed')}`}>
         <h3 

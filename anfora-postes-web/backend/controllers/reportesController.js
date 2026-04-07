@@ -274,7 +274,6 @@ const reportesController = {
   }
 },
 
-
   getInventarioInspector: async (req, res) => {
     try {
       const datos = await reportesApi.getInventarioInspector(req.query)
@@ -307,7 +306,7 @@ const reportesController = {
         'TIPO', 'CONSEC.', 'MARCADA', 'MATERIAL', 'C.ROTURA', 'COD.', 'TEMPLETE', 'EST.TEMP.', 'ALTURA', 'AÑO FAB.',
         'ESTADO', 'DESPLOMADO', 'FLECTADO', 'FRACTURADO', 'HIERRO BASE',
         'EXISTE', 'TIPO CABLE', 'ESTADO RED', 'CONTINUIDAD',
-        'EXISTE', 'TIPO CABLE', 'ESTADO RED', 'CONTINUIDAD',
+        'EXISTE', 'TRANSFORMADOR', 'MACROMEDIDOR', 'FUGA',
         'EXISTE', 'TIPO CAB.ALU', 'TIERRA',
         'CANTIDAD', 'LISTA'
       ]
@@ -371,8 +370,8 @@ const reportesController = {
           r.baja_estado_red || '',
           r.baja_continuidad_electrica || '',
           r.media || '',
-          r.media_tipo_cable || '',
-          r.media_estado_red || '',
+          r.caja3 || '',
+          r.caja4 || '',
           r.media_continuidad_electrica || '',
           r.alumbrado || '',
           r.alumbrado_tipo_cable || '',
@@ -414,11 +413,11 @@ const reportesController = {
       const worksheet = workbook.addWorksheet('REPORTE DE REDES')
 
       worksheet.getRow(1).values = [
-        'CONSECUTIVO', 'CIUDAD', 'BARRIO', 'DIRECCION',
+        'CONSECUTIVO', 'FECHA', 'CIUDAD', 'BARRIO', 'DIRECCION',
         'ESTRUCTURA', '', '', '', '', '', '', '', '', '',
         'ESTADO',
         'BAJA TENSION', '', '', '',
-        'CAJAS', '',
+        'MEDIA', '', '', '',
         'ALUMBRADO', '', '',
         'LAMPARA 1', '', '', '',
         'LAMPARA 2', '', '', '',
@@ -429,12 +428,12 @@ const reportesController = {
       ]
 
       worksheet.getRow(2).values = [
-        '', '', '', '',
+        '', '', '', '', '',
         'TIPO', 'CONSEC.', 'MARCADA', 'MATERIAL', 'C.ROTURA',
         'COD. ESTRUCT.', 'TEMPLETE', 'EST. TEMPLETE', 'ALTURA', 'AÑO FAB.',
         '',
         'EXISTE', 'TIPO CABLE', 'ESTADO RED', 'CONTINUIDAD',
-        'CAJA 1', 'CAJA 2',
+        'EXISTE', 'TRANSFORMADOR', 'MACROMEDIDOR', 'FUGA',
         'EXISTE', 'TIPO CABLE', 'ESTADO RED',
         'TIPO', 'CÓDIGO', 'DAÑADA', 'ENCENDIDA',
         'TIPO', 'CÓDIGO', 'DAÑADA', 'ENCENDIDA',
@@ -448,17 +447,18 @@ const reportesController = {
       worksheet.mergeCells('B1:B2')
       worksheet.mergeCells('C1:C2')
       worksheet.mergeCells('D1:D2')
-      worksheet.mergeCells('E1:N1')
-      worksheet.mergeCells('O1:O2')
-      worksheet.mergeCells('P1:S1')
-      worksheet.mergeCells('T1:U1')
-      worksheet.mergeCells('V1:X1')
-      worksheet.mergeCells('Y1:AB1')
-      worksheet.mergeCells('AC1:AF1')
-      worksheet.mergeCells('AG1:AK1')
-      worksheet.mergeCells('AL1:AQ1')
-      worksheet.mergeCells('AR1:AR2')
-      worksheet.mergeCells('AS1:AS2')
+      worksheet.mergeCells('E1:E2')
+      worksheet.mergeCells('F1:O1')
+      worksheet.mergeCells('P1:P2')
+      worksheet.mergeCells('Q1:T1')
+      worksheet.mergeCells('U1:X1')
+      worksheet.mergeCells('Y1:AA1')
+      worksheet.mergeCells('AB1:AE1')
+      worksheet.mergeCells('AF1:AI1')
+      worksheet.mergeCells('AJ1:AN1')
+      worksheet.mergeCells('AO1:AT1')
+      worksheet.mergeCells('AU1:AU2')
+      worksheet.mergeCells('AV1:AV2')
 
       worksheet.getRow(1).height = 30
       worksheet.getRow(2).height = 40
@@ -466,11 +466,11 @@ const reportesController = {
       worksheet.getRow(2).eachCell({ includeEmpty: true }, cell => { cell.style = SUBHEADER_STYLE })
 
       const colWidths = [
-        10, 15, 20, 30,
+        10, 12, 15, 20, 30,
         12, 14, 10, 12, 10, 18, 12, 14, 10, 10,
         14,
         8, 15, 12, 12,
-        12, 12,
+        8, 15, 15, 12,
         8, 15, 12,
         12, 15, 10, 12,
         12, 15, 10, 12,
@@ -484,6 +484,7 @@ const reportesController = {
       datos.forEach((r, index) => {
         const row = worksheet.addRow([
           r.consecutivo || '',
+          r.fecha_registro ? new Date(r.fecha_registro).toLocaleDateString('es-CO') : '',
           r.ciudad || '',
           r.barrio || '',
           r.direccion_completa || '',
@@ -502,8 +503,10 @@ const reportesController = {
           r.baja_tipo_cable || '',
           r.baja_estado_red || '',
           r.baja_continuidad_electrica || '',
-          r.caja1 || '',
-          r.caja2 || '',
+          r.media || '',
+          r.caja3 || '',
+          r.caja4 || '',
+          r.media_continuidad_electrica || '',
           r.alumbrado || '',
           r.alumbrado_tipo_cable || '',
           r.alumbrado_estado_red || '',
@@ -532,7 +535,7 @@ const reportesController = {
         applyDataRow(row, index)
       })
 
-      worksheet.views = [{ state: 'frozen', xSplit: 4, ySplit: 2 }]
+      worksheet.views = [{ state: 'frozen', xSplit: 5, ySplit: 2 }]
 
       const { ciudad } = req.query
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -649,7 +652,7 @@ const reportesController = {
         'TIPO', 'CONSEC.', 'MARCADA', 'MATERIAL', 'C.ROTURA', 'COD.', 'TEMPLETE', 'EST.TEMP.', 'ALTURA', 'AÑO FAB.',
         'ESTADO', 'DESPLOMADO', 'FLECTADO', 'FRACTURADO', 'HIERRO BASE',
         'EXISTE', 'TIPO CABLE', 'ESTADO RED', 'CONTINUIDAD',
-        'EXISTE', 'TIPO CABLE', 'ESTADO RED', 'CONTINUIDAD',
+        'EXISTE', 'TRANSFORMADOR', 'MACROMEDIDOR', 'FUGA',
         'CAJA 1', 'CAJA 2', 'CAJA 3', 'CAJA 4',
         'EXISTE', 'TIPO CABLE', 'ESTADO RED',
         'BAJANTES', 'PODA', 'POSIBLE FRAUDE',
@@ -772,8 +775,8 @@ const reportesController = {
           esNuevoPoste ? (r.baja_estado_red || '') : '',
           esNuevoPoste ? (r.baja_continuidad_electrica || '') : '',
           esNuevoPoste ? (r.media || '') : '',
-          esNuevoPoste ? (r.media_tipo_cable || '') : '',
-          esNuevoPoste ? (r.media_estado_red || '') : '',
+          esNuevoPoste ? (r.caja3 || '') : '',
+          esNuevoPoste ? (r.caja4 || '') : '',
           esNuevoPoste ? (r.media_continuidad_electrica || '') : '',
           esNuevoPoste ? (r.caja1 || '') : '',
           esNuevoPoste ? (r.caja2 || '') : '',
@@ -1078,5 +1081,7 @@ const reportesController = {
 }
 
 module.exports = reportesController
+
+
 
 
