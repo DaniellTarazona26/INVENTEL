@@ -6,29 +6,61 @@ const reportesApi = {
     const { operador, ciudad, empresa, fechaInicial, fechaFinal } = filtros
 
     let query = `
-      SELECT 
-        i.id,
-        i.fecha_registro,
-        i.waypoint,
-        c.nombre as ciudad,
-        b.nombre as barrio,
-        i.direccion_completa,
-        i.codigo_estructura,
-        i.consecutivo_poste,
-        i.tipo,
-        i.material,
-        i.altura,
-        i.estado_estructura,
-        i.baja,
-        i.alumbrado,
-        i.tierra_electrica,
-        COALESCE(
-          (SELECT STRING_AGG(io.operador_nombre, ', ') 
-           FROM inventarios_operadores io 
-           WHERE io.inventario_id = i.id),
-          'SIN OPERADORES'
-        ) as operadores_lista
-      FROM inventarios i
+        SELECT 
+          i.id as consecutivo,
+          i.fecha_registro,
+          c.nombre as ciudad,
+          b.nombre as barrio,
+          i.direccion_completa,
+          i.tipo,
+          i.consecutivo_poste,
+          i.marcada,
+          i.material,
+          i.carga_rotura,
+          i.codigo_estructura,
+          i.templete,
+          i.estado_templete,
+          i.altura,
+          i.ano_fabricacion,
+          i.estado_estructura,
+          i.baja,
+          i.baja_tipo_cable,
+          i.baja_estado_red,
+          i.baja_continuidad_electrica,
+          i.media,
+          i.caja3,
+          i.caja4,
+          i.media_continuidad_electrica,
+          i.alumbrado,
+          i.alumbrado_tipo_cable,
+          i.alumbrado_estado_red,
+          i.lampara1_tipo,
+          i.lampara1_codigo,
+          i.lampara1_danada,
+          i.lampara1_encendida,
+          i.lampara2_tipo,
+          i.lampara2_codigo,
+          i.lampara2_danada,
+          i.lampara2_encendida,
+          i.tierra_electrica,
+          i.tierra_estado,
+          i.tierra_suelta,
+          i.tierra_desconectada,
+          i.tierra_rota,
+          i.bajantes_electricos,
+          i.lampara,
+          i.camara_tv,
+          i.corneta,
+          i.aviso,
+          i.caja_metalica,
+          i.otro,
+          COALESCE(
+            (SELECT STRING_AGG(io.operador_nombre, ', ')
+            FROM inventarios_operadores io
+            WHERE io.inventario_id = i.id),
+            'SIN OPERADORES'
+          ) as operadores_lista
+        FROM inventarios i
       LEFT JOIN ciudades c ON i.ciudad_id = c.id
       LEFT JOIN barrios b ON i.barrio_id = b.id
       WHERE i.estado = 'activo'
