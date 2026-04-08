@@ -296,7 +296,7 @@ const reportesController = {
         'ESTRUCTURA', '', '', '', '', '', '', '', '', '',
         'ESTADO ESTRUCTURA', '', '', '', '',
         'BAJA', '', '', '',
-        'MEDIA', '', '', '',
+        'MEDIA', '', '', '', '', '',
         'ALUMBRADO', '', '',
         'OPERADORES', ''
       ]
@@ -306,7 +306,7 @@ const reportesController = {
         'TIPO', 'CONSEC.', 'MARCADA', 'MATERIAL', 'C.ROTURA', 'COD.', 'TEMPLETE', 'EST.TEMP.', 'ALTURA', 'AÑO FAB.',
         'ESTADO', 'DESPLOMADO', 'FLECTADO', 'FRACTURADO', 'HIERRO BASE',
         'EXISTE', 'TIPO CABLE', 'ESTADO RED', 'CONTINUIDAD',
-        'EXISTE', 'TRANSFORMADOR', 'MACROMEDIDOR', 'FUGA',
+        'EXISTE', 'TRANSFORMADOR', 'MACROMEDIDOR', 'FUGA', 'CORTA CIRCUITO', 'SECCIONADOR',
         'EXISTE', 'TIPO CAB.ALU', 'TIERRA',
         'CANTIDAD', 'LISTA'
       ]
@@ -321,9 +321,9 @@ const reportesController = {
       worksheet.mergeCells('H1:Q1')
       worksheet.mergeCells('R1:V1')
       worksheet.mergeCells('W1:Z1')
-      worksheet.mergeCells('AA1:AD1')
-      worksheet.mergeCells('AE1:AG1')
-      worksheet.mergeCells('AH1:AI1')
+      worksheet.mergeCells('AA1:AF1')
+      worksheet.mergeCells('AG1:AI1')
+      worksheet.mergeCells('AJ1:AK1')
 
       worksheet.getRow(1).height = 30
       worksheet.getRow(2).height = 40
@@ -335,7 +335,7 @@ const reportesController = {
         12, 12, 10, 12, 10, 15, 12, 12, 10, 10,
         14, 12, 10, 12, 12,
         8, 15, 12, 12,
-        8, 15, 12, 12,
+        8, 15, 15, 12, 15, 15,
         8, 15, 8,
         10, 35
       ]
@@ -373,6 +373,8 @@ const reportesController = {
           r.caja3 || '',
           r.caja4 || '',
           r.media_continuidad_electrica || '',
+          r.corta_circuito || '',
+          r.seccionador || '',
           r.alumbrado || '',
           r.alumbrado_tipo_cable || '',
           r.tierra_electrica || '',
@@ -417,7 +419,7 @@ const reportesController = {
         'ESTRUCTURA', '', '', '', '', '', '', '', '', '',
         'ESTADO',
         'BAJA TENSION', '', '', '',
-        'MEDIA', '', '', '',
+        'MEDIA', '', '', '', '', '',
         'ALUMBRADO', '', '',
         'LAMPARA 1', '', '', '',
         'LAMPARA 2', '', '', '',
@@ -433,7 +435,7 @@ const reportesController = {
         'COD. ESTRUCT.', 'TEMPLETE', 'EST. TEMPLETE', 'ALTURA', 'AÑO FAB.',
         '',
         'EXISTE', 'TIPO CABLE', 'ESTADO RED', 'CONTINUIDAD',
-        'EXISTE', 'TRANSFORMADOR', 'MACROMEDIDOR', 'FUGA',
+        'EXISTE', 'TRANSFORMADOR', 'MACROMEDIDOR', 'FUGA', 'CORTA CIRCUITO', 'SECCIONADOR',
         'EXISTE', 'TIPO CABLE', 'ESTADO RED',
         'TIPO', 'CÓDIGO', 'DAÑADA', 'ENCENDIDA',
         'TIPO', 'CÓDIGO', 'DAÑADA', 'ENCENDIDA',
@@ -451,14 +453,14 @@ const reportesController = {
       worksheet.mergeCells('F1:O1')
       worksheet.mergeCells('P1:P2')
       worksheet.mergeCells('Q1:T1')
-      worksheet.mergeCells('U1:X1')
-      worksheet.mergeCells('Y1:AA1')
-      worksheet.mergeCells('AB1:AE1')
-      worksheet.mergeCells('AF1:AI1')
-      worksheet.mergeCells('AJ1:AN1')
-      worksheet.mergeCells('AO1:AT1')
-      worksheet.mergeCells('AU1:AU2')
-      worksheet.mergeCells('AV1:AV2')
+      worksheet.mergeCells('U1:Z1')
+      worksheet.mergeCells('AA1:AC1')
+      worksheet.mergeCells('AD1:AG1')
+      worksheet.mergeCells('AH1:AK1')
+      worksheet.mergeCells('AL1:AP1')
+      worksheet.mergeCells('AQ1:AV1')
+      worksheet.mergeCells('AW1:AW2')
+      worksheet.mergeCells('AX1:AX2')
 
       worksheet.getRow(1).height = 30
       worksheet.getRow(2).height = 40
@@ -470,7 +472,7 @@ const reportesController = {
         12, 14, 10, 12, 10, 18, 12, 14, 10, 10,
         14,
         8, 15, 12, 12,
-        8, 15, 15, 12,
+        8, 15, 15, 12, 15, 15,
         8, 15, 12,
         12, 15, 10, 12,
         12, 15, 10, 12,
@@ -507,6 +509,8 @@ const reportesController = {
           r.caja3 || '',
           r.caja4 || '',
           r.media_continuidad_electrica || '',
+          r.corta_circuito || '',
+          r.seccionador || '',
           r.alumbrado || '',
           r.alumbrado_tipo_cable || '',
           r.alumbrado_estado_red || '',

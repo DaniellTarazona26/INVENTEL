@@ -474,69 +474,67 @@ const reportesApi = {
   const { ciudad, barrio, empresa, fechaInicial, fechaFinal } = filtros
 
   let query = `
-    SELECT 
-      i.id as consecutivo,
-      i.fecha_registro,
-      i.tipo,
-      i.consecutivo_poste,
-      i.marcada,
-      i.material,
-      i.carga_rotura,
-      i.codigo_estructura,
-      i.templete,
-      i.estado_templete,
-      i.altura,
-      i.ano_fabricacion,
-      i.estado_estructura,
-      i.baja,
-      i.baja_tipo_cable,
-      i.baja_estado_red,
-      i.baja_continuidad_electrica,
-      i.caja1,
-      i.caja2,
-      i.media,
-      i.media_tipo_cable,
-      i.media_estado_red,
-      i.media_continuidad_electrica,
-      i.caja3,
-      i.caja4,
-      i.alumbrado,
-      i.alumbrado_tipo_cable,
-      i.alumbrado_estado_red,
-      i.lampara1_tipo,
-      i.lampara1_codigo,
-      i.lampara1_danada,
-      i.lampara1_encendida,
-      i.lampara2_tipo,
-      i.lampara2_codigo,
-      i.lampara2_danada,
-      i.lampara2_encendida,
-      i.tierra_electrica,
-      i.tierra_estado,
-      i.tierra_suelta,
-      i.tierra_desconectada,
-      i.tierra_rota,
-      i.bajantes_electricos,
-      i.lampara,
-      i.camara_tv,
-      i.corneta,
-      i.aviso,
-      i.caja_metalica,
-      i.otro,
-      c.nombre as ciudad,
-      b.nombre as barrio,
-      i.direccion_completa,
-      COALESCE(
-        (SELECT STRING_AGG(io.operador_nombre, ', ')
-         FROM inventarios_operadores io
-         WHERE io.inventario_id = i.id),
-        'SIN OPERADORES'
-      ) as operadores_lista
-    FROM inventarios i
-    LEFT JOIN ciudades c ON i.ciudad_id = c.id
-    LEFT JOIN barrios b ON i.barrio_id = b.id
-    WHERE i.estado = 'activo'
-  `
+  SELECT 
+    i.id as consecutivo,
+    i.fecha_registro,
+    c.nombre as ciudad,
+    b.nombre as barrio,
+    i.direccion_completa,
+    i.tipo,
+    i.consecutivo_poste,
+    i.marcada,
+    i.material,
+    i.carga_rotura,
+    i.codigo_estructura,
+    i.templete,
+    i.estado_templete,
+    i.altura,
+    i.ano_fabricacion,
+    i.estado_estructura,
+    i.baja,
+    i.baja_tipo_cable,
+    i.baja_estado_red,
+    i.baja_continuidad_electrica,
+    i.media,
+    i.media_tipo_cable,
+    i.media_estado_red,
+    i.media_continuidad_electrica,
+    i.caja3,
+    i.caja4,
+    i.alumbrado,
+    i.alumbrado_tipo_cable,
+    i.alumbrado_estado_red,
+    i.lampara1_tipo,
+    i.lampara1_codigo,
+    i.lampara1_danada,
+    i.lampara1_encendida,
+    i.lampara2_tipo,
+    i.lampara2_codigo,
+    i.lampara2_danada,
+    i.lampara2_encendida,
+    i.tierra_electrica,
+    i.tierra_estado,
+    i.tierra_suelta,
+    i.tierra_desconectada,
+    i.tierra_rota,
+    i.bajantes_electricos,
+    i.lampara,
+    i.camara_tv,
+    i.corneta,
+    i.aviso,
+    i.caja_metalica,
+    i.otro,
+    COALESCE(
+      (SELECT STRING_AGG(io.operador_nombre, ', ')
+       FROM inventarios_operadores io
+       WHERE io.inventario_id = i.id),
+      'SIN OPERADORES'
+    ) as operadores_lista
+  FROM inventarios i
+  LEFT JOIN ciudades c ON i.ciudad_id = c.id
+  LEFT JOIN barrios b ON i.barrio_id = b.id
+  WHERE i.estado = 'activo'
+`
 
   const params = []
   let paramCount = 1
