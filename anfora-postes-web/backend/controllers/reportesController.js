@@ -370,11 +370,11 @@ const reportesController = {
           r.baja_estado_red || '',
           r.baja_continuidad_electrica || '',
           r.media || '',
+          r.media_tipo_cable || '',
+          r.media_estado_red || '',
+          r.media_continuidad_electrica || '',
           r.caja3 || '',
           r.caja4 || '',
-          r.media_continuidad_electrica || '',
-          r.corta_circuito || '',
-          r.seccionador || '',
           r.alumbrado || '',
           r.alumbrado_tipo_cable || '',
           r.tierra_electrica || '',
@@ -506,11 +506,11 @@ const reportesController = {
           r.baja_estado_red || '',
           r.baja_continuidad_electrica || '',
           r.media || '',
+          r.media_tipo_cable || '',
+          r.media_estado_red || '',
+          r.media_continuidad_electrica || '',
           r.caja3 || '',
           r.caja4 || '',
-          r.media_continuidad_electrica || '',
-          r.corta_circuito || '',
-          r.seccionador || '',
           r.alumbrado || '',
           r.alumbrado_tipo_cable || '',
           r.alumbrado_estado_red || '',
@@ -1085,7 +1085,3 @@ const reportesController = {
 }
 
 module.exports = reportesController
-
-
-
-
