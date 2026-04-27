@@ -1,16 +1,17 @@
-// frontend/src/services/inventarioService.js
-
 import axios from 'axios'
 
+
 const API_URL = 'https://inventel-production.up.railway.app/api'
+
 
 const getAuthHeader = () => {
   const token = localStorage.getItem('token')
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
+
 const inventarioService = {
-  // Crear nuevo inventario COMPLETO
+
   crear: async (datos) => {
     try {
       const response = await axios.post(
@@ -24,7 +25,7 @@ const inventarioService = {
     }
   },
 
-  // Crear inventario PARCIAL (solo eléctrica)
+
   crearParcial: async (datos) => {
     try {
       const response = await axios.post(
@@ -38,7 +39,7 @@ const inventarioService = {
     }
   },
 
-  // Completar inventario (marcar como completo)
+
   completarConOperadores: async (inventarioId) => {
     try {
       const response = await axios.patch(
@@ -52,13 +53,16 @@ const inventarioService = {
     }
   },
 
-  // Obtener todos los inventarios
+
   obtenerTodos: async (filtros = {}) => {
     try {
+      const hoy = new Date().toISOString().split('T')[0]
       const params = new URLSearchParams()
       if (filtros.ciudadId) params.append('ciudad_id', filtros.ciudadId)
       if (filtros.barrioId) params.append('barrio_id', filtros.barrioId)
-      
+      params.append('fechaInicio', filtros.fechaInicio || hoy)
+      params.append('fechaFin',    filtros.fechaFin    || hoy)
+
       const response = await axios.get(
         `${API_URL}/inventarios?${params.toString()}`,
         { headers: getAuthHeader() }
@@ -69,7 +73,7 @@ const inventarioService = {
     }
   },
 
-  // Obtener inventario por ID
+
   obtenerPorId: async (id) => {
     try {
       const response = await axios.get(
@@ -82,7 +86,7 @@ const inventarioService = {
     }
   },
 
-  // Actualizar inventario
+
   actualizar: async (id, datos) => {
     try {
       const response = await axios.put(
@@ -96,7 +100,7 @@ const inventarioService = {
     }
   },
 
-  // Eliminar inventario
+
   eliminar: async (id) => {
     try {
       const response = await axios.delete(
@@ -109,6 +113,7 @@ const inventarioService = {
     }
   }
 }
+
 
 export default inventarioService
 

@@ -1,14 +1,9 @@
-// backend/routes/inventarios.js
 const express = require('express')
 const router = express.Router()
 const inventariosService = require('../services/inventariosService')
 const { verificarToken, verificarRol } = require('../middleware/authMiddleware')
 
-// ==========================================
-// RUTAS POST (específicas primero)
-// ==========================================
 
-// ✅ 1. Crear inventario PARCIAL (debe ir ANTES de '/')
 router.post('/parcial', verificarToken, async (req, res) => {
   try {
     const inventario = await inventariosService.crearParcial(req.body, req.usuario.id)
@@ -27,7 +22,7 @@ router.post('/parcial', verificarToken, async (req, res) => {
   }
 })
 
-// ✅ 2. Crear nuevo inventario COMPLETO (debe ir DESPUÉS de '/parcial')
+
 router.post('/', verificarToken, async (req, res) => {
   try {
     const inventario = await inventariosService.crear(req.body, req.usuario.id)
@@ -46,11 +41,7 @@ router.post('/', verificarToken, async (req, res) => {
   }
 })
 
-// ==========================================
-// RUTAS PATCH/PUT
-// ==========================================
 
-// ✅ 3. Completar inventario (debe ir ANTES de '/:id')
 router.patch('/:id/completar', verificarToken, async (req, res) => {
   try {
     const inventario = await inventariosService.completarConOperadores(
@@ -72,7 +63,7 @@ router.patch('/:id/completar', verificarToken, async (req, res) => {
   }
 })
 
-// ✅ 4. Actualizar inventario
+
 router.put('/:id', verificarToken, async (req, res) => {
   try {
     const inventario = await inventariosService.actualizar(
@@ -95,17 +86,15 @@ router.put('/:id', verificarToken, async (req, res) => {
   }
 })
 
-// ==========================================
-// RUTAS GET
-// ==========================================
 
-// ✅ 5. Obtener todos los inventarios
 router.get('/', verificarToken, async (req, res) => {
   try {
     const filtros = {
       ciudadId: req.query.ciudad_id,
       barrioId: req.query.barrio_id,
-      proyectoId: req.query.proyecto_id
+      proyectoId: req.query.proyecto_id,
+      fechaInicio: req.query.fechaInicio,
+      fechaFin: req.query.fechaFin
     }
 
     if (req.usuario.rol === 'CONSULTOR') {
@@ -120,7 +109,7 @@ router.get('/', verificarToken, async (req, res) => {
   }
 })
 
-// ✅ 6. Obtener un inventario por ID (debe ir DESPUÉS de rutas específicas)
+
 router.get('/:id', verificarToken, async (req, res) => {
   try {
     const inventario = await inventariosService.obtenerPorId(req.params.id)
@@ -138,9 +127,6 @@ router.get('/:id', verificarToken, async (req, res) => {
   }
 })
 
-// ==========================================
-// RUTAS DELETE
-// ==========================================
 
 router.delete('/:id', verificarToken, verificarRol('ADMIN', 'INSPECTOR'), async (req, res) => {
   try {
@@ -158,5 +144,6 @@ router.delete('/:id', verificarToken, verificarRol('ADMIN', 'INSPECTOR'), async 
     })
   }
 })
+
 
 module.exports = router

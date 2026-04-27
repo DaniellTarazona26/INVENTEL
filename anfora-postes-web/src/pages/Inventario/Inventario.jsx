@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react'
 import './Inventario.css'
 import inventarioService from '../../services/inventarioService'
 
+const hoyISO = () => new Date().toISOString().split('T')[0]
+
 const Inventario = ({ setCurrentPage }) => {
   const [inventarios, setInventarios] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filtros, setFiltros] = useState({
-    busqueda: ''
-  })
+  const [filtros, setFiltros] = useState({ busqueda: '' })
+  const [fechaInicio, setFechaInicio] = useState(hoyISO())
+  const [fechaFin, setFechaFin] = useState(hoyISO())
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
   const esConsultor = usuario.rol === 'CONSULTOR'
 
@@ -15,11 +17,13 @@ const Inventario = ({ setCurrentPage }) => {
     cargarInventarios()
   }, [])
 
-  const cargarInventarios = async () => {
+  const cargarInventarios = async (fInicio = fechaInicio, fFin = fechaFin) => {
     try {
       setLoading(true)
-      const response = await inventarioService.obtenerTodos()
-      
+      const response = await inventarioService.obtenerTodos({
+        fechaInicio: fInicio,
+        fechaFin: fFin,
+      })
       if (response.success) {
         setInventarios(response.inventarios)
       }
@@ -29,6 +33,18 @@ const Inventario = ({ setCurrentPage }) => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleBuscarFecha = () => {
+    cargarInventarios(fechaInicio, fechaFin)
+  }
+
+  const handleVerTodos = () => {
+    const inicio = '2000-01-01'
+    const fin = hoyISO()
+    setFechaInicio(inicio)
+    setFechaFin(fin)
+    cargarInventarios(inicio, fin)
   }
 
   const handleEditar = (id) => {
@@ -46,10 +62,9 @@ const Inventario = ({ setCurrentPage }) => {
   }
 
   const handleVer = (id) => {
-  localStorage.setItem('verInventarioId', id)
-  setCurrentPage('ver-inventario')
-}
-
+    localStorage.setItem('verInventarioId', id)
+    setCurrentPage('ver-inventario')
+  }
 
   const handleEliminar = async (id) => {
     if (window.confirm('¿Está seguro de eliminar este inventario?')) {
@@ -93,17 +108,39 @@ const Inventario = ({ setCurrentPage }) => {
       <div className="inventario-filtros">
         <div>
           <label>Buscar (WayPoint / Código / Poste)</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Buscar..."
             value={filtros.busqueda}
             onChange={(e) => setFiltros({...filtros, busqueda: e.target.value})}
           />
         </div>
-        <button 
-          className="btn-secondary"
-          onClick={cargarInventarios}
-        >
+        <div>
+          <label>Desde</label>
+          <input
+            type="date"
+            value={fechaInicio}
+            max={fechaFin}
+            onChange={(e) => setFechaInicio(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Hasta</label>
+          <input
+            type="date"
+            value={fechaFin}
+            min={fechaInicio}
+            max={hoyISO()}
+            onChange={(e) => setFechaFin(e.target.value)}
+          />
+        </div>
+        <button className="btn-primary" onClick={handleBuscarFecha}>
+          🔍 Buscar
+        </button>
+        <button className="btn-secondary" onClick={handleVerTodos}>
+          📂 Ver todos
+        </button>
+        <button className="btn-secondary" onClick={() => cargarInventarios()}>
           🔄 Recargar
         </button>
       </div>
@@ -116,6 +153,9 @@ const Inventario = ({ setCurrentPage }) => {
       ) : (
         <>
           <div className="inventario-stats">
+            <span className="rango-fecha">
+              📅 Del <strong>{fechaInicio}</strong> al <strong>{fechaFin}</strong>
+            </span>
             <span>Total de registros: <strong>{inventariosFiltrados.length}</strong></span>
             <span className="pendientes-count">
               Pendientes de completar: <strong>
@@ -125,110 +165,107 @@ const Inventario = ({ setCurrentPage }) => {
           </div>
 
           <div className="inventario-tabla">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Estado</th>
-                <th>Código</th>
-                <th>WayPoint</th>
-                <th>Dirección</th>
-                <th>Tipo</th>
-                <th>Material</th>
-                <th>Altura</th>
-                <th>Operadores</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {inventariosFiltrados.length === 0 ? (
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="11" style={{textAlign: 'center', padding: '2rem'}}>
-                    {inventarios.length === 0 
-                      ? '📭 No hay inventarios registrados' 
-                      : '🔍 No se encontraron resultados'}
-                  </td>
+                  <th>ID</th>
+                  <th>Estado</th>
+                  <th>Código</th>
+                  <th>WayPoint</th>
+                  <th>Dirección</th>
+                  <th>Tipo</th>
+                  <th>Material</th>
+                  <th>Altura</th>
+                  <th>Operadores</th>
+                  <th>Fecha</th>
+                  <th>Acciones</th>
                 </tr>
-              ) : (
-                inventariosFiltrados.map((inv) => (
-                  <tr 
-                    key={inv.id}
-                    className={inv.estado_completitud === 'pendiente_operadores' ? 'fila-pendiente' : ''}
-                  >
-                    <td>{inv.id}</td>
-                    <td>
-                      {inv.estado_completitud === 'pendiente_operadores' ? (
-                        <span className="badge badge-warning">⚠️ Pendiente</span>
-                      ) : (
-                        <span className="badge badge-success">✅ Completo</span>
-                      )}
-                    </td>
-                    <td><strong>{inv.codigo_estructura || '-'}</strong></td>
-                    <td><strong>{inv.waypoint || '-'}</strong></td>
-                    <td>{inv.direccion_completa || '-'}</td>
-                    <td>{inv.tipo || '-'}</td>
-                    <td>{inv.material || '-'}</td>
-                    <td>{inv.altura || '-'}</td>
-                    <td>
-                      {inv.operadores && inv.operadores.length > 0 
-                        ? inv.operadores.slice(0, 2).join(', ') + 
-                          (inv.operadores.length > 2 ? '...' : '')
-                        : '-'}
-                    </td>
-                    <td>
-                      {inv.fecha_registro 
-                        ? new Date(inv.fecha_registro).toLocaleDateString('es-CO')
-                        : '-'}
-                    </td>
-                    <td>
-                      <div className="acciones-btns">
-                        <button
-                          className="btn-link btn-ver"
-                          onClick={() => handleVer(inv.id)}
-                          title="Ver detalles"
-                        >
-                          👁️
-                        </button>
-
-                        {!esConsultor && (
-                          <>
-                            {inv.estado_completitud === 'pendiente_operadores' ? (
-                              <button
-                                className="btn-link btn-continuar"
-                                onClick={() => handleContinuar(inv.id)}
-                                title="Continuar con operadores"
-                              >
-                                ▶️
-                              </button>
-                            ) : (
-                              <button
-                                className="btn-link btn-editar"
-                                onClick={() => handleEditar(inv.id)}
-                                title="Editar"
-                              >
-                                ✏️
-                              </button>
-                            )}
-
-                            <button
-                              className="btn-link btn-eliminar"
-                              onClick={() => handleEliminar(inv.id)}
-                              title="Eliminar"
-                            >
-                              🗑️
-                            </button>
-                          </>
-                        )}
-                      </div>
+              </thead>
+              <tbody>
+                {inventariosFiltrados.length === 0 ? (
+                  <tr>
+                    <td colSpan="11" style={{textAlign: 'center', padding: '2rem'}}>
+                      {inventarios.length === 0
+                        ? '📭 No hay inventarios para este rango de fechas'
+                        : '🔍 No se encontraron resultados'}
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
+                ) : (
+                  inventariosFiltrados.map((inv) => (
+                    <tr
+                      key={inv.id}
+                      className={inv.estado_completitud === 'pendiente_operadores' ? 'fila-pendiente' : ''}
+                    >
+                      <td>{inv.id}</td>
+                      <td>
+                        {inv.estado_completitud === 'pendiente_operadores' ? (
+                          <span className="badge badge-warning">⚠️ Pendiente</span>
+                        ) : (
+                          <span className="badge badge-success">✅ Completo</span>
+                        )}
+                      </td>
+                      <td><strong>{inv.codigo_estructura || '-'}</strong></td>
+                      <td><strong>{inv.waypoint || '-'}</strong></td>
+                      <td>{inv.direccion_completa || '-'}</td>
+                      <td>{inv.tipo || '-'}</td>
+                      <td>{inv.material || '-'}</td>
+                      <td>{inv.altura || '-'}</td>
+                      <td>
+                        {inv.operadores && inv.operadores.length > 0
+                          ? inv.operadores.slice(0, 2).join(', ') +
+                            (inv.operadores.length > 2 ? '...' : '')
+                          : '-'}
+                      </td>
+                      <td>
+                        {inv.fecha_registro
+                          ? new Date(inv.fecha_registro).toLocaleDateString('es-CO')
+                          : '-'}
+                      </td>
+                      <td>
+                        <div className="acciones-btns">
+                          <button
+                            className="btn-link btn-ver"
+                            onClick={() => handleVer(inv.id)}
+                            title="Ver detalles"
+                          >
+                            👁️
+                          </button>
+                          {!esConsultor && (
+                            <>
+                              {inv.estado_completitud === 'pendiente_operadores' ? (
+                                <button
+                                  className="btn-link btn-continuar"
+                                  onClick={() => handleContinuar(inv.id)}
+                                  title="Continuar con operadores"
+                                >
+                                  ▶️
+                                </button>
+                              ) : (
+                                <button
+                                  className="btn-link btn-editar"
+                                  onClick={() => handleEditar(inv.id)}
+                                  title="Editar"
+                                >
+                                  ✏️
+                                </button>
+                              )}
+                              <button
+                                className="btn-link btn-eliminar"
+                                onClick={() => handleEliminar(inv.id)}
+                                title="Eliminar"
+                              >
+                                🗑️
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
     </div>

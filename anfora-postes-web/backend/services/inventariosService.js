@@ -1,5 +1,6 @@
 const pool = require('../config/database')
 
+
 const inventariosService = {
   
   crear: async (datos, usuarioId) => {
@@ -19,6 +20,7 @@ const inventariosService = {
         }
       }
 
+
       let barrioId = datos.barrio
       
       if (datos.barrio && isNaN(datos.barrio)) {
@@ -34,9 +36,11 @@ const inventariosService = {
         }
       }
 
+
       if (!datos.empresaId) {
         throw new Error('La empresa es obligatoria')
       }
+
 
       const usuarioQuery = await client.query(
         'SELECT nombre FROM usuarios WHERE id = $1',
@@ -164,6 +168,7 @@ const inventariosService = {
   },
 
 
+
   crearParcial: async (datos, usuarioId) => {
     const client = await pool.connect()
     
@@ -185,9 +190,11 @@ const inventariosService = {
         }
       }
 
+
       if (!datos.empresaId) {
         throw new Error('La empresa es obligatoria')
       }
+
 
       const usuarioQuery = await client.query(
         'SELECT nombre FROM usuarios WHERE id = $1',
@@ -315,6 +322,7 @@ const inventariosService = {
   },
 
 
+
   completarConOperadores: async (inventarioId, usuarioId) => {
     const query = `
       UPDATE inventarios 
@@ -333,6 +341,7 @@ const inventariosService = {
     
     return result.rows[0]
   },
+
 
 
   obtenerTodos: async (filtros = {}) => {
@@ -375,12 +384,25 @@ const inventariosService = {
       values.push(filtros.barrioId)
       paramCount++
     }
+
+    if (filtros.fechaInicio) {
+      query += ` AND DATE(i.fecha_registro) >= $${paramCount}`
+      values.push(filtros.fechaInicio)
+      paramCount++
+    }
+
+    if (filtros.fechaFin) {
+      query += ` AND DATE(i.fecha_registro) <= $${paramCount}`
+      values.push(filtros.fechaFin)
+      paramCount++
+    }
     
     query += ` ORDER BY i.fecha_registro DESC`
     
     const result = await pool.query(query, values)
     return result.rows
   },
+
 
 
   obtenerPorId: async (id) => {
@@ -413,11 +435,13 @@ const inventariosService = {
   },
 
 
+
   actualizar: async (id, datos, usuarioId) => {
     const client = await pool.connect()
     
     try {
       await client.query('BEGIN')
+
 
       if (datos.codigoEstructura) {
         const checkCodigo = await client.query(
@@ -442,6 +466,7 @@ const inventariosService = {
           barrioId = barrioQuery.rows[0].id
         }
       }
+
 
       if (!datos.empresaId) {
         throw new Error('La empresa es obligatoria')
@@ -611,6 +636,7 @@ const inventariosService = {
   },
 
 
+
   eliminar: async (id, usuarioId) => {
   try {
     const query = `
@@ -630,6 +656,7 @@ const inventariosService = {
     
     return result.rows[0]
 
+
   } catch (error) {
     console.error('=== ERROR ELIMINANDO INVENTARIO ===')
     console.error('ID recibido:', id, 'tipo:', typeof id)
@@ -641,8 +668,8 @@ const inventariosService = {
   }
 }
 
+
 }
 
+
 module.exports = inventariosService
-
-
